@@ -317,6 +317,11 @@ export default [
         '使用“同步”菜单将文件保存在GitHub仓库中。',
       ),
       new Feature(
+        'saveOnGist',
+        'GitHubGist保存',
+        '使用“同步”菜单将文件保存在GitHubGist中。',
+      ),
+      new Feature(
         'openFromGitee',
         'Gitee阅读器',
         '使用“同步”菜单从Gitee仓库打开文件。',
@@ -327,9 +332,9 @@ export default [
         '使用“同步”菜单将文件保存在Gitee仓库中。',
       ),
       new Feature(
-        'saveOnGist',
-        'Gist保存',
-        '使用“同步”菜单将文件保存在GIST中。',
+        'saveOnGiteeGist',
+        'GiteeGist保存',
+        '使用“同步”菜单将文件保存在GiteeGist中。',
       ),
       new Feature(
         'openFromGitlab',
@@ -405,13 +410,18 @@ export default [
       ),
       new Feature(
         'publishToGist',
-        'Gist发布',
-        '使用“发布”菜单将文件发布到GIST。',
+        'GitHubGist发布',
+        '使用“发布”菜单将文件发布到GitHubGist。',
       ),
       new Feature(
         'publishToGitee',
         'Gitee发布',
         '使用“发布”菜单将文件发布到Gitee仓库。',
+      ),
+      new Feature(
+        'publishToGiteeGist',
+        'GiteeGist发布',
+        '使用“发布”菜单将文件发布到GiteeGist。',
       ),
       new Feature(
         'publishToGitlab',

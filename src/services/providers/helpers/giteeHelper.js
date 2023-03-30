@@ -346,8 +346,8 @@ export default {
   },
 
   /**
-   * https://developer.gitee.com/v3/gists/#create-a-gist
-   * https://developer.gitee.com/v3/gists/#edit-a-gist
+   * https://gitee.com/api/v5/swagger#/postV5Gists
+   * https://gitee.com/api/v5/swagger#/patchV5GistsId
    */
   async uploadGist({
     token,
@@ -357,8 +357,7 @@ export default {
     isPublic,
     gistId,
   }) {
-    const refreshedToken = await this.refreshToken(token);
-    const { body } = await request(refreshedToken, gistId ? {
+    const { body } = await request(token, gistId ? {
       method: 'PATCH',
       url: `https://gitee.com/api/v5/gists/${gistId}`,
       body: {
@@ -386,16 +385,15 @@ export default {
   },
 
   /**
-   * https://developer.gitee.com/v3/gists/#get-a-single-gist
+   * https://gitee.com/api/v5/swagger#/getV5Gists
    */
   async downloadGist({
     token,
     gistId,
     filename,
   }) {
-    const refreshedToken = await this.refreshToken(token);
-    const result = (await request(refreshedToken, {
-      url: `https://gitee.com/api/v5/gists/${gistId}`,
+    const result = (await request(token, {
+      url: `https://api.github.com/gists/${gistId}`,
     })).body.files[filename];
     if (!result) {
       throw new Error('Gist file not found.');
@@ -404,35 +402,15 @@ export default {
   },
 
   /**
-   * https://developer.gitee.com/v3/gists/#list-gist-commits
+   * https://gitee.com/api/v5/swagger#/getV5GistsIdCommits
    */
   async getGistCommits({
     token,
     gistId,
   }) {
-    const refreshedToken = await this.refreshToken(token);
-    const { body } = await request(refreshedToken, {
+    const { body } = await request(token, {
       url: `https://gitee.com/api/v5/gists/${gistId}/commits`,
     });
     return body;
-  },
-
-  /**
-   * https://developer.gitee.com/v3/gists/#get-a-specific-revision-of-a-gist
-   */
-  async downloadGistRevision({
-    token,
-    gistId,
-    filename,
-    sha,
-  }) {
-    const refreshedToken = await this.refreshToken(token);
-    const result = (await request(refreshedToken, {
-      url: `https://gitee.com/api/v5/gists/${gistId}/${sha}`,
-    })).body.files[filename];
-    if (!result) {
-      throw new Error('Gist file not found.');
-    }
-    return result.content;
   },
 };

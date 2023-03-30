@@ -60,6 +60,15 @@ export default {
     '取消',
     '确认清理',
   ),
+  shareHtml: simpleModal(
+    config => `<p>给文档 "${config.name}" 创建了分享链接如下:<br/><a href="${config.url}" target="_blank">${config.url}</a><br/>关闭该窗口后可以到发布中查看分享链接。</p>`,
+    '关闭窗口',
+  ),
+  shareHtmlPre: simpleModal(
+    config => `<p>将给文档 "${config.name}" 创建分享链接，创建后将会把文档公开发布到GiteeGist中。您确定吗？</p>`,
+    '取消',
+    '确认分享',
+  ),
   signInForComment: simpleModal(
     `<p>您必须使用 Google 登录才能开始评论。</p>
     <div class="modal__info"><b>注意:</b> 这将同步您的主文档空间。</div>`,

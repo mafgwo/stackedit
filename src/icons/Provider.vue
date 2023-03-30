@@ -29,6 +29,7 @@ export default {
           return 'couchdb';
         case 'giteeAppData':
         case 'giteeWorkspace':
+        case 'giteegist':
           return 'gitee';
         default:
           return this.providerId;

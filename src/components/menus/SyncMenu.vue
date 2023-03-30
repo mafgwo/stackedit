@@ -46,7 +46,7 @@
         </menu-entry>
         <menu-entry @click.native="saveGist(token)">
           <icon-provider slot="icon" provider-id="gist"></icon-provider>
-          <div>在Gist上保存</div>
+          <div>在GitHubGist上保存</div>
           <span>{{token.name}}</span>
         </menu-entry>
       </div>
@@ -59,6 +59,11 @@
         <menu-entry @click.native="saveGitee(token)">
           <icon-provider slot="icon" provider-id="gitee"></icon-provider>
           <div>在Gitee上保存</div>
+          <span>{{token.name}}</span>
+        </menu-entry>
+        <menu-entry @click.native="saveGiteeGist(token)">
+          <icon-provider slot="icon" provider-id="giteegist"></icon-provider>
+          <div>在GiteeGist上保存</div>
           <span>{{token.name}}</span>
         </menu-entry>
       </div>
@@ -328,6 +333,12 @@ export default {
       try {
         await openSyncModal(token, 'gistSync');
         badgeSvc.addBadge('saveOnGist');
+      } catch (e) { /* cancel */ }
+    },
+    async saveGiteeGist(token) {
+      try {
+        await openSyncModal(token, 'giteeGistSync');
+        badgeSvc.addBadge('saveOnGiteeGist');
       } catch (e) { /* cancel */ }
     },
     async openGitlab(token) {

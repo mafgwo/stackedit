@@ -43,7 +43,7 @@
       <div v-for="token in githubTokens" :key="token.sub">
         <menu-entry @click.native="publishGist(token)">
           <icon-provider slot="icon" provider-id="gist"></icon-provider>
-          <div>发布到 Gist</div>
+          <div>发布到 GitHubGist</div>
           <span>{{token.name}}</span>
         </menu-entry>
         <menu-entry @click.native="publishGithub(token)">
@@ -53,6 +53,11 @@
         </menu-entry>
       </div>
       <div v-for="token in giteeTokens" :key="token.sub">
+        <menu-entry @click.native="publishGiteeGist(token)">
+          <icon-provider slot="icon" provider-id="giteegist"></icon-provider>
+          <div>发布到 GiteeGist</div>
+          <span>{{token.name}}</span>
+        </menu-entry>
         <menu-entry @click.native="publishGitee(token)">
           <icon-provider slot="icon" provider-id="gitee"></icon-provider>
           <div>发布到 Gitee</div>
@@ -289,8 +294,9 @@ export default {
     publishBloggerPage: publishModalOpener('bloggerPagePublish', 'publishToBloggerPage'),
     publishDropbox: publishModalOpener('dropboxPublish', 'publishToDropbox'),
     publishGithub: publishModalOpener('githubPublish', 'publishToGithub'),
-    publishGitee: publishModalOpener('giteePublish', 'publishToGitee'),
     publishGist: publishModalOpener('gistPublish', 'publishToGist'),
+    publishGitee: publishModalOpener('giteePublish', 'publishToGitee'),
+    publishGiteeGist: publishModalOpener('giteeGistPublish', 'publishGiteeGist'),
     publishGitlab: publishModalOpener('gitlabPublish', 'publishToGitlab'),
     publishGitea: publishModalOpener('giteaPublish', 'publishToGitea'),
     publishGoogleDrive: publishModalOpener('googleDrivePublish', 'publishToGoogleDrive'),

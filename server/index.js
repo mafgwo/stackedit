@@ -61,13 +61,15 @@ module.exports = (app) => {
     res.redirect(`./app#providerId=googleDrive&state=${encodeURIComponent(req.query.state)}`));
   // Serve the static folder with 30 day max-age
   app.use('/themes', serveStatic(resolvePath('static/themes'), {
-    maxAge: '1d',
+    maxAge: '5d',
   }));
 
   // Serve style.css with 1 day max-age
   app.get('/style.css', (req, res) => res.sendFile(resolvePath('dist/style.css'), {
     maxAge: '1d',
   }));
+  // Serve share.html
+  app.get('/share.html', (req, res) => res.sendFile(resolvePath('static/landing/share.html')));
 
   // Serve static resources
   if (process.env.NODE_ENV === 'production') {

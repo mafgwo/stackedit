@@ -1,10 +1,10 @@
 <template>
-  <modal-inner aria-label="发布到GitHubGist">
+  <modal-inner aria-label="发布到GiteeGist">
     <div class="modal__content">
       <div class="modal__image">
-        <icon-provider provider-id="gist"></icon-provider>
+        <icon-provider provider-id="giteegist"></icon-provider>
       </div>
-      <p>发布<b> {{CurrentFileName}} </b>到<b>GitHubGist</b>。</p>
+      <p>发布<b> {{CurrentFileName}} </b>到<b>GiteeGist</b>。</p>
       <form-entry label="文件名" error="filename">
         <input slot="field" class="textfield" type="text" v-model.trim="filename" @keydown.enter="resolve()">
       </form-entry>
@@ -18,7 +18,7 @@
       <form-entry label="存在Gist ID" info="可选的">
         <input slot="field" class="textfield" type="text" v-model.trim="gistId" @keydown.enter="resolve()">
         <div class="form-entry__info">
-          如果文件存在于GitHubGist中，则将被覆盖。
+          如果文件存在于GiteeGist中，则将被覆盖。
         </div>
       </form-entry>
       <form-entry label="Template">
@@ -43,7 +43,7 @@
 </template>
 
 <script>
-import gistProvider from '../../../services/providers/gistProvider';
+import giteeGistProvider from '../../../services/providers/giteeGistProvider';
 import modalTemplate from '../common/modalTemplate';
 
 export default modalTemplate({
@@ -64,7 +64,7 @@ export default modalTemplate({
         this.setError('filename');
       } else {
         // Return new location
-        const location = gistProvider.makeLocation(
+        const location = giteeGistProvider.makeLocation(
           this.config.token,
           this.filename,
           this.isPublic,

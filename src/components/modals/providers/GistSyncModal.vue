@@ -1,11 +1,11 @@
 <template>
-  <modal-inner aria-label="与 Gist 同步">
+  <modal-inner aria-label="与 GitHubGist 同步">
     <div class="modal__content">
       <div class="modal__image">
         <icon-provider provider-id="gist"></icon-provider>
       </div>
-      <p>将<b> {{currentFileName}} </b>保存到<b>Gist</b>并保持同步。</p>
-      <form-entry label="Filename" error="filename">
+      <p>将<b> {{currentFileName}} </b>保存到<b>GitHubGist</b>并保持同步。</p>
+      <form-entry label="文件名" error="filename">
         <input slot="field" class="textfield" type="text" v-model.trim="filename" @keydown.enter="resolve()">
       </form-entry>
       <div class="form-entry">
@@ -15,10 +15,10 @@
           </label>
         </div>
       </div>
-      <form-entry label="Existing Gist ID" info="可选的">
+      <form-entry label="存在Gist ID" info="可选的">
         <input slot="field" class="textfield" type="text" v-model.trim="gistId" @keydown.enter="resolve()">
         <div class="form-entry__info">
-          如果文件存在于Gist中，则将被覆盖。
+          如果文件存在于GitHubGist中，则将被覆盖。
         </div>
       </form-entry>
     </div>
