@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>StackEdit中文版</title>
+	<title>文章分享 - StackEdit中文版</title>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="canonical" href="https://stackedit.cn/">
@@ -123,10 +123,10 @@
             } else if (xhr.status === 403) {
                 const rateLimit = xhr.responseText && xhr.responseText.indexOf('Rate Limit') >= 0;
                 const appUri = `${window.location.protocol}//${window.location.host}/app`;
-                document.getElementsByClassName('share-content')[0].innerHTML = `${rateLimit ? "请求太过频繁" : "无权限访问"}，请登录 <a href="${appUri}" target="_brank">主文档空间</a> 后再刷新此页面!`;
+                document.getElementById('div_info').innerHTML = `${rateLimit ? "请求太过频繁" : "无权限访问"}，请登录 <a href="${appUri}" target="_brank">主文档空间</a> 后再刷新此页面!`;
             } else {
                 console.error('An error occurred: ' + xhr.status);
-                document.getElementsByClassName('share-content')[0].innerHTML = '分享内容获取失败或已失效!';
+                document.getElementById('div_info').innerHTML = '分享内容获取失败或已失效!';
             }
         };
         xhr.send();
@@ -136,17 +136,17 @@
 <body>
 	<div class="share-header">
 		<nav>
-			<a class="logo" href="/" target="_blank">
+			<a class="logo" href="https://stackedit.cn" target="_blank">
 				<img src="static/landing/logo.svg" height="30px"/>
 			</a>
 			<ul>
-				<li><a href="/" target="_blank">首页</a></li>
-				<li><a href="app" target="_blank">写笔记</a></li>
+				<li><a href="https://stackedit.cn" target="_blank">首页</a></li>
+				<li><a href="https://stackedit.cn/app" target="_blank">写笔记</a></li>
 			</ul>
 		</nav>
 	</div>
 	<div class="share-content stackedit">
-		<div style="text-align: center; height: 600px;">文章加载中......</div>
+		<div id="div_info" style="text-align: center; height: 600px;">文章加载中......</div>
 	</div>
 
     <script src="https://code.jquery.com/jquery-2.2.4.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script>
