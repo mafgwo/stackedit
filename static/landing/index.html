@@ -2,7 +2,7 @@
 <html manifest="cache.manifest">
 
 <head>
-    <title>StackEdit中文版 – 浏览器内 Markdown 编辑器</title>
+    <title>StackEdit中文版 – 浏览器内 Markdown 编辑器 & 笔记利器</title>
     <link rel="canonical" href="https://stackedit.cn/">
     <link rel="icon" href="static/landing/favicon.ico" type="image/x-icon">
     <link rel="shortcut icon" href="static/landing/favicon.ico" type="image/x-icon">
@@ -134,9 +134,16 @@
             background-color: #2c2c2c;
             position: fixed;
             padding: 5px;
-            text-align: center;
             width: 100%;
             z-index: 1;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .navigation-bar__write {
+            text-align: center;
+            flex-grow: 1;
         }
 
         .navigation-bar__button {
@@ -148,6 +155,49 @@
         .navigation-bar__button:hover {
             color: #fff;
             background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        /* 语言切换样式 */
+        .navigation-bar__lang-switcher {
+            display: flex;
+            align-items: center;
+            margin-left: auto;
+            font-size: 14px;
+        }
+        /* 隐藏下拉内容区域 */
+        .navigation-bar__dropdown-content {
+            display: none;
+            position: absolute;
+            z-index: 1;
+        }
+
+        /* 当鼠标悬停在按钮上时，显示下拉内容区域 */
+        .navigation-bar__dropdown:hover .navigation-bar__dropdown-content {
+            display: block;
+        }
+
+        /* 样式化下拉按钮 */
+        .navigation-bar__dropbtn {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 16px;
+            font-size: 16px;
+            border: none;
+            cursor: pointer;
+        }
+
+        /* 样式化下拉选项 */
+        .navigation-bar__dropdown-content a {
+            color: black;
+            background-color: #f1f1f1;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+        }
+
+        /* 当鼠标悬停在下拉选项上时，更改其背景颜色 */
+        .navigation-bar__dropdown-content a:hover {
+            background-color: #b2b2b2;
         }
 
         .splash-screen {
@@ -269,15 +319,26 @@
 <body>
     <div class="landing">
         <div class="navigation-bar">
-            <a class="navigation-bar__button button" href="app" title="The app">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="icon"><path d="M 16.8363,2.73375C 16.45,2.73375 16.0688,2.88125 15.7712,3.17375L 13.6525,5.2925L 18.955,10.5962L 21.0737,8.47625C 21.665,7.89 21.665,6.94375 21.0737,6.3575L 17.895,3.17375C 17.6025,2.88125 17.2163,2.73375 16.8363,2.73375 Z M 12.9437,6.00125L 4.84375,14.1062L 7.4025,14.39L 7.57875,16.675L 9.85875,16.85L 10.1462,19.4088L 18.2475,11.3038M 4.2475,15.0437L 2.515,21.7337L 9.19875,19.9412L 8.955,17.7838L 6.645,17.6075L 6.465,15.2925"></path></svg>
-                开始写作
-            </a>
+            <div class="navigation-bar__write">
+                <a class="navigation-bar__button button" href="app" title="The app">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="icon"><path d="M 16.8363,2.73375C 16.45,2.73375 16.0688,2.88125 15.7712,3.17375L 13.6525,5.2925L 18.955,10.5962L 21.0737,8.47625C 21.665,7.89 21.665,6.94375 21.0737,6.3575L 17.895,3.17375C 17.6025,2.88125 17.2163,2.73375 16.8363,2.73375 Z M 12.9437,6.00125L 4.84375,14.1062L 7.4025,14.39L 7.57875,16.675L 9.85875,16.85L 10.1462,19.4088L 18.2475,11.3038M 4.2475,15.0437L 2.515,21.7337L 9.19875,19.9412L 8.955,17.7838L 6.645,17.6075L 6.465,15.2925"></path></svg>
+                    开始写作
+                </a>
+            </div>
+            <div class="navigation-bar__lang-switcher">
+                <div class="navigation-bar__dropdown">
+                <button class="navigation-bar__dropbtn">Language</button>
+                <div class="navigation-bar__dropdown-content">
+                    <a href="/">简体中文</a>
+                    <a href="https://stackedit.net" target="_blank">English</a>
+                </div>
+                </div>
+            </div>
         </div>
         <div class="splash-screen">
             <div class="splash-screen__logo">
                 <div class="splash-screen__subtitle">
-                    笔记利器(浏览器内 Markdown 编辑器)
+                    浏览器内 Markdown 笔记利器
 
                     <div class="social">
                         <a href="https://jq.qq.com/?_wv=1027&k=wUSCNqmN" target="_blank" title="QQ交流群">
