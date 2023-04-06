@@ -61,7 +61,7 @@
 		}
 
 		.share-content {
-			margin-top: 60px;
+			padding-top: 50px;
 		}
 	</style>
     <script type="text/javascript">
@@ -120,6 +120,7 @@
                 // 内容
                 const shareContent = document.getElementsByClassName('share-content')[0];
                 shareContent.innerHTML = newdoc.body.innerHTML;
+                document.body.className = newdoc.body.className;
             } else if (xhr.status === 403) {
                 const rateLimit = xhr.responseText && xhr.responseText.indexOf('Rate Limit') >= 0;
                 const appUri = `${window.location.protocol}//${window.location.host}/app`;
