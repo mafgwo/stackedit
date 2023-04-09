@@ -87,16 +87,14 @@
     window.onload = function() {
         const xhr = new XMLHttpRequest();
         const gistId = getQueryString('id');
-        const workspaces = window.localStorage.getItem('data/workspaces');
         let accessToken = null;
-        if (workspaces) {
-            const workspacesObj = JSON.parse(workspaces);
-            const sub = workspacesObj.data && workspacesObj.data.main && workspacesObj.data.main.sub;
-            if (sub) {
-                const tokens = window.localStorage.getItem('data/tokens');
-                if (tokens) {
-                    const tokensObj = JSON.parse(tokens);
-                    accessToken = tokensObj.data && tokensObj.data.gitee && tokensObj.data.gitee[sub] && tokensObj.data.gitee[sub].accessToken;
+        const tokens = window.localStorage.getItem('data/tokens');
+        if (tokens) {
+            const tokensObj = JSON.parse(tokens);
+            if (tokensObj.data && tokensObj.data.gitee) {
+                const tokenArr = Object.keys(tokensObj.data.gitee).map(it => tokensObj.data.gitee[it]).filter(it => it && it.isLogin);
+                if (tokenArr.length > 0) {
+                    accessToken = tokenArr[0].accessToken;
                 }
             }
         }

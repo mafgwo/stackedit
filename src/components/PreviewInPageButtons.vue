@@ -125,7 +125,9 @@ export default {
         const url = `${window.location.protocol}//${window.location.host}/share.html?id=${gistId}`;
         await store.dispatch('modal/open', { type: 'shareHtml', name: currentFile.name, url });
       } catch (err) {
-        /* cancel */
+        if (err) {
+          store.dispatch('notification/error', err);
+        }
       } finally {
         this.sharing = false;
       }
