@@ -21,7 +21,7 @@
       </form-entry>
       <div class="modal__result">
         <span v-if="generating && !result">(等待生成中...)</span>
-        <pre class="result_pre" v-html="result"></pre>
+        <pre class="result_pre" v-text="result"></pre>
       </div>
     </div>
     <div class="modal__button-bar">
