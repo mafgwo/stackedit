@@ -31,7 +31,8 @@ StackEdit中文版
 2 支持直接上传图片，也支持多种外部图床（GitHub、Gitea、SM.MS、自定义图床）粘贴或拖拽上传。<br>
 3 编辑区域支持选择主题或自定义，总有你喜欢的主题。<br>
 4 支持历史版本管理，不用担心编辑覆盖后无法回滚。<br>
-5 支持KaTeX数学表达式、Mermaid UML图、乐谱等扩展。
+5 支持ChatGPT辅助写作。<br>
+6 支持KaTeX数学表达式、Mermaid UML图、乐谱等扩展。
 <hr />
 
 ## 截图
