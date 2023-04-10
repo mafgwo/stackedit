@@ -48,6 +48,9 @@ StackEdit中文版
 **支持文档搜索**
 ![](./images/search.gif)
 
+**ChatGPT集成协助写作**
+![](./images/chatgpt.gif)
+
 ## 相比国外开源版本的区别：
 - 修复了Github授权登录问题
 - 支持了Gitee仓库（2022-05-25）
