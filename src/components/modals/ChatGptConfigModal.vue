@@ -4,17 +4,17 @@
       <div class="modal__image">
         <icon-chat-gpt></icon-chat-gpt>
       </div>
-      <p> <b>ChatGPT</b> 配置.</p>
+      <p> <b>ChatGPT</b> 配置<br>官方的接口地址在国内可能无法正常访问，可以自行找代理地址</p>
       <form-entry label="代理地址" error="proxyHost">
         <input slot="field" class="textfield" type="text" v-model.trim="proxyHost" @keydown.enter="resolve()">
         <div class="form-entry__info">
-          <b>非必填，默认是官方接口地址(https://api.openai.com)，例如:</b> https://openai.geekr.cool
+          <b>非必填，默认是官方接口地址(https://api.openai.com)，代理地址如:</b> https://openai.geekr.cool
         </div>
       </form-entry>
       <form-entry label="apiKey" error="apiKey">
         <input slot="field" class="textfield" type="text" v-model.trim="apiKey" @keydown.enter="resolve()">
         <div class="form-entry__info">
-          <b>apiKey</b> 请到<a href="https://platform.openai.com/account/api-keys" target="_blank">https://platform.openai.com/account/api-keys</a> 获取<br>
+          <b>apiKey</b> 请到 <a href="https://platform.openai.com/account/api-keys" target="_blank">https://platform.openai.com/account/api-keys</a> 获取<br>
         </div>
       </form-entry>
     </div>
