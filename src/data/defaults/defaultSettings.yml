@@ -43,6 +43,8 @@ editor:
     link: true
     # 图片
     image: true
+    # ChatGPT
+    chatgpt: true
 
 # Keyboard shortcuts
 # See https://craig.is/killing/mice
@@ -57,6 +59,7 @@ shortcuts:
   mod+shift+h: heading
   mod+shift+r: hr
   mod+shift+g: image
+  mod+shift+p: chatgpt
   mod+shift+i: italic
   mod+shift+l: link
   mod+shift+o: olist

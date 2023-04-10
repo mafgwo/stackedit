@@ -41,6 +41,8 @@ import BadgeManagementModal from './modals/BadgeManagementModal';
 import SponsorModal from './modals/SponsorModal';
 import CommitMessageModal from './modals/CommitMessageModal';
 import WorkspaceImgPathModal from './modals/WorkspaceImgPathModal';
+import ChatGptModal from './modals/ChatGptModal';
+import ChatGptConfigModal from './modals/ChatGptConfigModal';
 
 // Providers
 import GooglePhotoModal from './modals/providers/GooglePhotoModal';
@@ -111,6 +113,8 @@ export default {
     SponsorModal,
     CommitMessageModal,
     WorkspaceImgPathModal,
+    ChatGptModal,
+    ChatGptConfigModal,
     // Providers
     GooglePhotoModal,
     GoogleDriveAccountModal,

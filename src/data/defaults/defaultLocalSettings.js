@@ -40,4 +40,6 @@ export default () => ({
   zendescPublishSectionId: '',
   zendescPublishLocale: '',
   zendeskPublishTemplate: 'plainHtml',
+  chatgptApiKey: '',
+  chatgptProxyHost: '',
 });

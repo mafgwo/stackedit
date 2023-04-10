@@ -4,7 +4,7 @@
       <div class="modal__image">
         <icon-provider provider-id="gitee"></icon-provider>
       </div>
-      <p>Save <b>{{currentFileName}}</b> to your <b>Gitee</b> repository and keep it synced.</p>
+      <p>保存 <b>{{currentFileName}}</b> 并与您的 <b>Gitee</b> 仓库保持同步.</p>
       <form-entry label="仓库URL" error="repoUrl">
         <input slot="field" class="textfield" type="text" v-model.trim="repoUrl" @keydown.enter="resolve()">
         <div class="form-entry__info">
