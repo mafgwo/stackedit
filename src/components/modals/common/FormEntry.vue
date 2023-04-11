@@ -17,7 +17,7 @@ export default {
     uid: utils.uid(),
   }),
   mounted() {
-    this.$el.querySelector('input,select').id = this.uid;
+    this.$el.querySelector('input,select,textarea').id = this.uid;
   },
 };
 </script>

@@ -6,7 +6,7 @@
       </div>
       <p><b>ChatGPT内容生成</b><br>生成时长受ChatGPT服务响应与网络响应时长影响，时间可能较长</p>
       <form-entry label="生成内容要求详细描述" error="content">
-        <textarea slot="field" class="text-input" type="text" placeholder="输入内容" v-model.trim="content" :disabled="generating || !chatGptConfig.apiKey"></textarea>
+        <textarea slot="field" class="text-input" type="text" placeholder="输入内容(支持换行)" v-model.trim="content" :disabled="generating || !chatGptConfig.apiKey"></textarea>
         <div class="form-entry__info">
           <span v-if="!chatGptConfig.apiKey" class="config-warning">
             未配置apiKey，请点击 <a href="javascript:void(0)" @click="openConfig">配置</a> apiKey。
@@ -20,8 +20,8 @@
         </div>
       </form-entry>
       <div class="modal__result">
-        <span v-if="generating && !result">(等待生成中...)</span>
-        <pre class="result_pre" v-text="result"></pre>
+        <pre class="result_pre" v-if="generating && !result">(等待生成中...)</pre>
+        <pre class="result_pre" v-else v-text="result"></pre>
       </div>
     </div>
     <div class="modal__button-bar">
@@ -139,7 +139,7 @@ export default modalTemplate({
   }
 
   .text-input {
-    min-height: 50px;
+    min-height: 60px;
   }
 }
 </style>

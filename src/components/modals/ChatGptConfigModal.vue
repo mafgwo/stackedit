@@ -30,13 +30,9 @@ import modalTemplate from './common/modalTemplate';
 
 export default modalTemplate({
   data: () => ({
-    apiKey: this.config.apiKey,
-    proxyHost: this.config.proxyHost,
+    apiKey: null,
+    proxyHost: null,
   }),
-  computedLocalSettings: {
-    apiKey: 'chatgptApiKey',
-    proxyHost: 'chatgptProxyHost',
-  },
   methods: {
     resolve() {
       if (!this.apiKey) {
@@ -47,6 +43,10 @@ export default modalTemplate({
       }
       this.config.resolve({ apiKey: this.apiKey, proxyHost: this.proxyHost });
     },
+  },
+  mounted() {
+    this.apiKey = this.config.apiKey;
+    this.proxyHost = this.config.proxyHost;
   },
 });
 </script>
