@@ -73,7 +73,12 @@ export default modalTemplate({
       this.generating = true;
       this.result = '';
       try {
-        this.xhr = chatGptSvc.chat(this.chatGptConfig.proxyHost, this.chatGptConfig.apiKey, `${this.content}\n(使用Markdown方式输出结果)`, this.process);
+        this.xhr = chatGptSvc.chat({
+          proxyHost: this.chatGptConfig.proxyHost,
+          apiKey: this.chatGptConfig.apiKey,
+          content: `${this.content}\n(使用Markdown方式输出结果)`,
+          temperature: this.chatGptConfig.temperature || 1,
+        }, this.process);
       } catch (err) {
         this.generating = false;
         store.dispatch('notification/error', err);
@@ -81,7 +86,12 @@ export default modalTemplate({
     },
     async openConfig() {
       try {
-        const config = await store.dispatch('modal/open', { type: 'chatGptConfig', apiKey: this.chatGptConfig.apiKey, proxyHost: this.chatGptConfig.proxyHost });
+        const config = await store.dispatch('modal/open', {
+          type: 'chatGptConfig',
+          apiKey: this.chatGptConfig.apiKey,
+          proxyHost: this.chatGptConfig.proxyHost,
+          temperature: this.chatGptConfig.temperature,
+        });
         store.dispatch('chatgpt/setCurrConfig', config);
       } catch (e) { /* Cancel */ }
     },

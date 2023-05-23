@@ -1,7 +1,12 @@
 import store from '../store';
 
 export default {
-  chat(proxyHost, apiKey, content, callback) {
+  chat({
+    proxyHost,
+    apiKey,
+    content,
+    temperature,
+  }, callback) {
     const xhr = new XMLHttpRequest();
     const url = `${proxyHost || 'https://api.openai.com'}/v1/chat/completions`;
     xhr.open('POST', url);
@@ -10,7 +15,7 @@ export default {
     xhr.send(JSON.stringify({
       model: 'gpt-3.5-turbo',
       messages: [{ role: 'user', content }],
-      temperature: 1,
+      temperature: temperature || 1,
       stream: true,
     }));
     let lastRespLen = 0;
