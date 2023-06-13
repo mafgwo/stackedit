@@ -2,21 +2,24 @@ import store from '../store';
 
 export default {
   chat({
-    proxyHost,
-    apiKey,
     content,
-    temperature,
   }, callback) {
     const xhr = new XMLHttpRequest();
-    const url = `${proxyHost || 'https://api.openai.com'}/v1/chat/completions`;
+    const url = 'https://streaming.tenant-forefront-default.knative.chi.coreweave.com/free-chat';
     xhr.open('POST', url);
-    xhr.setRequestHeader('Authorization', `Bearer ${apiKey}`);
+    xhr.setRequestHeader('Authorization', 'Bearer null');
     xhr.setRequestHeader('Content-Type', 'application/json');
     xhr.send(JSON.stringify({
       model: 'gpt-3.5-turbo',
-      messages: [{ role: 'user', content }],
-      temperature: temperature || 1,
-      stream: true,
+      action: 'noauth',
+      text: content,
+      messagePersona: '607e41fe-95be-497e-8e97-010a59b2e2c0',
+      messages: [],
+      internetMode: 'auto',
+      hidden: false,
+      id: '',
+      parentId: '',
+      workspaceId: '',
     }));
     let lastRespLen = 0;
     xhr.onprogress = () => {
@@ -25,12 +28,17 @@ export default {
       responseText.split('\n\n')
         .filter(l => l.length > 0)
         .forEach((text) => {
-          const item = text.substr(6);
-          if (item === '[DONE]') {
+          if (text === 'event: end') {
             callback({ done: true });
-          } else {
+          } else if (text.startsWith('event: message')) {
+            const item = text.split('\n')[1].substr(6);
             const data = JSON.parse(item);
-            callback({ content: data.choices[0].delta.content });
+            if (data.error) {
+              store.dispatch('notification/error', `ChatGPT接口报错,错误信息:${data.error.message}`);
+              callback({ error: 'ChatGPT接口请求异常！' });
+            } else {
+              callback({ content: data.delta });
+            }
           }
         });
     };

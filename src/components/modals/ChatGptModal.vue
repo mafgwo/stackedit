@@ -6,17 +6,9 @@
       </div>
       <p><b>ChatGPT内容生成</b><br>生成时长受ChatGPT服务响应与网络响应时长影响，时间可能较长</p>
       <form-entry label="生成内容要求详细描述" error="content">
-        <textarea slot="field" class="text-input" type="text" placeholder="输入内容(支持换行)" v-model.trim="content" :disabled="generating || !chatGptConfig.apiKey"></textarea>
+        <textarea slot="field" class="text-input" type="text" placeholder="输入内容(支持换行)" v-model.trim="content" :disabled="generating"></textarea>
         <div class="form-entry__info">
-          <span v-if="!chatGptConfig.apiKey" class="config-warning">
-            未配置apiKey，请点击 <a href="javascript:void(0)" @click="openConfig">配置</a> apiKey。
-          </span>
-          <span v-else>
-            <span v-if="chatGptConfig.proxyHost">
-              <b>当前使用的接口代理：</b>{{ chatGptConfig.proxyHost }}
-            </span>
-            <a href="javascript:void(0)" @click="openConfig">修改apiKey配置</a>
-          </span>
+          使用 <a href="https://chat.forefront.ai" target="_blank">https://chat.forefront.ai</a> 的免费接口生成内容，AI模型是：GPT-3.5 Turbo。
         </div>
       </form-entry>
       <div class="modal__result">
@@ -33,7 +25,6 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex';
 import modalTemplate from './common/modalTemplate';
 import chatGptSvc from '../../services/chatGptSvc';
 import store from '../../store';
@@ -45,14 +36,9 @@ export default modalTemplate({
     result: '',
     xhr: null,
   }),
-  computed: {
-    ...mapGetters('chatgpt', [
-      'chatGptConfig',
-    ]),
-  },
   methods: {
     resolve(evt) {
-      evt.preventDefault(); // Fixes https://github.com/mafgwo/stackedit/issues/1503
+      evt.preventDefault();
       const { callback } = this.config;
       this.config.resolve();
       callback(this.result);
@@ -74,26 +60,12 @@ export default modalTemplate({
       this.result = '';
       try {
         this.xhr = chatGptSvc.chat({
-          proxyHost: this.chatGptConfig.proxyHost,
-          apiKey: this.chatGptConfig.apiKey,
           content: `${this.content}\n(使用Markdown方式输出结果)`,
-          temperature: this.chatGptConfig.temperature || 1,
         }, this.process);
       } catch (err) {
         this.generating = false;
         store.dispatch('notification/error', err);
       }
-    },
-    async openConfig() {
-      try {
-        const config = await store.dispatch('modal/open', {
-          type: 'chatGptConfig',
-          apiKey: this.chatGptConfig.apiKey,
-          proxyHost: this.chatGptConfig.proxyHost,
-          temperature: this.chatGptConfig.temperature,
-        });
-        store.dispatch('chatgpt/setCurrConfig', config);
-      } catch (e) { /* Cancel */ }
     },
     reject() {
       if (this.generating) {
