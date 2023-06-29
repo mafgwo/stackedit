@@ -217,8 +217,8 @@ const editorSvc = Object.assign(new Vue(), editorSvcDiscussions, editorSvcUtils,
           ];
 
           Array.prototype.slice.call(sectionPreviewElt.getElementsByTagName('a')).forEach((aElt) => {
-            const url = aElt.attributes.href.nodeValue;
-            if (url.indexOf('http://') >= 0 || url.indexOf('https://') >= 0 || url.indexOf('#') >= 0) {
+            const url = aElt.attributes && aElt.attributes.href && aElt.attributes.href.nodeValue;
+            if (!url || url.indexOf('http://') >= 0 || url.indexOf('https://') >= 0 || url.indexOf('#') >= 0) {
               return;
             }
             aElt.href = 'javascript:void(0);'; // eslint-disable-line no-script-url

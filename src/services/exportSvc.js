@@ -93,8 +93,8 @@ export default {
 
     // 替换相对路径图片为blob图片
     const imgs = Array.prototype.slice.call(containerElt.getElementsByTagName('img')).map((imgElt) => {
-      let uri = imgElt.attributes.src.nodeValue;
-      if (uri.indexOf('http://') !== 0 && uri.indexOf('https://') !== 0) {
+      let uri = imgElt.attributes && imgElt.attributes.href && imgElt.attributes.href.nodeValue;
+      if (uri && uri.indexOf('http://') !== 0 && uri.indexOf('https://') !== 0) {
         uri = decodeURIComponent(uri);
         imgElt.removeAttribute('src');
         return { imgElt, uri };
