@@ -228,13 +228,21 @@ export default {
     path,
     isImg,
   }) {
-    const { sha, content } = await repoRequest(token, owner, repo, {
+    const { sha, content, encoding } = await repoRequest(token, owner, repo, {
       url: `contents/${encodeURIComponent(path)}`,
       params: { ref: branch },
     });
+    let tempContent = content;
+    // 如果是图片且 encoding 为 none 则 需要获取 blob
+    if (isImg && encoding === 'none') {
+      const blobInfo = await repoRequest(token, owner, repo, {
+        url: `git/blobs/${sha}`,
+      });
+      tempContent = blobInfo.content;
+    }
     return {
       sha,
-      data: !isImg ? utils.decodeBase64(content) : content,
+      data: !isImg ? utils.decodeBase64(tempContent) : tempContent,
     };
   },
   /**
