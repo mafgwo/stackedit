@@ -8,7 +8,7 @@
       <form-entry label="生成内容要求详细描述" error="content">
         <textarea slot="field" class="text-input" type="text" placeholder="输入内容(支持换行)" v-model.trim="content" :disabled="generating"></textarea>
         <div class="form-entry__info">
-          使用 <a href="https://chat.forefront.ai" target="_blank">https://chat.forefront.ai</a> 的免费接口生成内容，AI模型是：GPT-3.5 Turbo。
+          使用 <a href="https://chat1.52ai.pw/" target="_blank">chat1.52ai.pw</a> 的免费接口生成内容，AI模型是：GPT-3.5 Turbo。
         </div>
       </form-entry>
       <div class="modal__result">
