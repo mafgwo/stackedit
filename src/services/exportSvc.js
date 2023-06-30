@@ -93,7 +93,7 @@ export default {
 
     // 替换相对路径图片为blob图片
     const imgs = Array.prototype.slice.call(containerElt.getElementsByTagName('img')).map((imgElt) => {
-      let uri = imgElt.attributes && imgElt.attributes.href && imgElt.attributes.href.nodeValue;
+      let uri = imgElt.attributes && imgElt.attributes.src && imgElt.attributes.src.nodeValue;
       if (uri && uri.indexOf('http://') !== 0 && uri.indexOf('https://') !== 0) {
         uri = decodeURIComponent(uri);
         imgElt.removeAttribute('src');
@@ -116,7 +116,12 @@ export default {
     // Make TOC
     const allHeaders = containerElt.querySelectorAll('h1,h2,h3,h4,h5,h6');
     Array.prototype.slice.call(allHeaders).forEach((headingElt) => {
-      headingElt.innerHTML = `<span class="prefix"></span><span class="content">${headingElt.innerHTML}</span><span class="suffix"></span>`;
+      const prefixElt = document.createElement('span');
+      prefixElt.className = 'prefix';
+      headingElt.insertBefore(prefixElt, headingElt.firstChild);
+      const suffixElt = document.createElement('span');
+      suffixElt.className = 'suffix';
+      headingElt.appendChild(suffixElt);
     });
     const headings = allHeaders.cl_map(headingElt => ({
       title: headingElt.textContent,
