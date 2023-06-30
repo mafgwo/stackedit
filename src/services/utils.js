@@ -400,7 +400,8 @@ export default {
     return path || '';
   },
   // 根据当前绝对路径 与 文件路径计算出文件绝对路径
-  getAbsoluteFilePath(currDirNode, filePath) {
+  getAbsoluteFilePath(currDirNode, originFilePath) {
+    const filePath = originFilePath && originFilePath.replaceAll('\\', '/');
     const currAbsolutePath = this.getAbsoluteDir(currDirNode);
     // "/"开头说明已经是绝对路径
     if (filePath.indexOf('/') === 0) {
