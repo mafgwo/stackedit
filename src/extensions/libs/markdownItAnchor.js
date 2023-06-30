@@ -56,6 +56,7 @@ export default (md) => {
 
         // According to http://pandoc.org/README.html#extension-auto_identifiers
         let slug = headingContent
+          .replace(/<img[^>]*>/g, '') // Replace image to empty
           .replace(/\s/g, '-') // Replace all spaces and newlines with hyphens
           .replace(/[\0-,/:-@[-^`{-~]/g, '') // Remove all punctuation, except underscores, hyphens, and periods
           .toLowerCase(); // Convert all alphabetic characters to lowercase
