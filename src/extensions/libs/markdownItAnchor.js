@@ -65,7 +65,9 @@ export default (md) => {
         let i;
         for (i = 0; i < slug.length; i += 1) {
           const charCode = slug.charCodeAt(i);
-          if ((charCode >= 0x61 && charCode <= 0x7A) || charCode > 0x7E) {
+          if ((charCode >= 0x30 && charCode <= 0x39) || // 0-9
+            (charCode >= 0x61 && charCode <= 0x7A) || // a-z
+            charCode > 0x7E) {
             break;
           }
         }
