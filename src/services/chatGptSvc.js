@@ -6,7 +6,7 @@ export default {
     const url = 'https://fd.52ai.pw/v1/chat/completions';
     xhr.open('POST', url);
     xhr.setRequestHeader('Content-Type', 'application/json');
-    xhr.setRequestHeader('Authorization', 'Bearer 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');
+    xhr.setRequestHeader('Authorization', `Bearer ${window.my_api_key}`);
     xhr.send(JSON.stringify({
       model: 'gpt-3.5-turbo',
       max_tokens: 3000,
