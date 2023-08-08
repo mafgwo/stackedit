@@ -3,7 +3,7 @@ import store from '../store';
 export default {
   chat({ content }, callback) {
     const xhr = new XMLHttpRequest();
-    const url = 'https://fd.52ai.pw/v1/chat/completions';
+    const url = 'https://dis.zoai.cc/v1/chat/completions';
     xhr.open('POST', url);
     xhr.setRequestHeader('Content-Type', 'application/json');
     xhr.setRequestHeader('Authorization', `Bearer ${window.my_api_key}`);
