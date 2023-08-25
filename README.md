@@ -77,6 +77,7 @@ StackEdit中文版
 - 导出HTML、PDF支持带预览主题导出（2023-02-26）
 - 支持分享文档（2023-03-30）
 - 支持ChatGPT生成内容（2023-04-10）
+- GitLab授权接口调整（2023-08-26）
 
 ## 国外开源版本弊端：
 - 作者已经不维护了
@@ -113,6 +114,7 @@ services:
       - GITEA_CLIENT_SECRET=【不需要支持则删掉】
       - GITEA_URL=【不需要支持则删掉】
       - GITLAB_CLIENT_ID=【不需要支持则删掉】
+      - GITLAB_CLIENT_SECRET=【不需要支持则删掉】
       - GITLAB_URL=【不需要支持则删掉】
     ports:
       - 8080:8080/tcp
@@ -149,6 +151,7 @@ docker run -itd --name stackedit \
   -e GITEA_CLIENT_SECRET=【不需要支持则删掉】 \
   -e GITEA_URL=【不需要支持则删掉】 \
   -e GITLAB_CLIENT_ID=【不需要支持则删掉】 \
+  -e GITLAB_CLIENT_SECRET=【不需要支持则删掉】 \
   -e GITLAB_URL=【不需要支持则删掉】 \
   mafgwo/stackedit:【docker中央仓库找到最新版本】
 
@@ -163,7 +166,7 @@ docker run -itd --name stackedit \
 
 - Gitea可选择性配置环境变量（未配置则在关联时前端指定，有配置则仅允许配置的应用信息）：GITEA_CLIENT_ID、GITEA_CLIENT_SECRET、GITEA_URL，**[如何创建Gitea应用](./docs/部署之Gitea应用创建.md)**
 
-- Gitlab可选择性配置环境变量（未配置则在关联时前端指定，有配置则仅允许配置的应用信息）：GITLAB_CLIENT_ID、GITLAB_URL **如何创建Gitlab应用(待补充文档)**
+- Gitlab可选择性配置环境变量（未配置则在关联时前端指定，有配置则仅允许配置的应用信息）：GITLAB_CLIENT_ID、GITLAB_CLIENT_SECRET、GITLAB_URL **如何创建Gitlab应用(待补充文档)**
 
 （特别说明：自建的Gitea、Gitlab要能接入stackedit必须支持跨域）
 

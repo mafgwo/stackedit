@@ -12,6 +12,7 @@ module.exports = merge(prodEnv, {
   // GITEA_CLIENT_ID: '"fe30f8f9-b1e8-4531-8f72-c1a5d3912805"',
   // GITEA_CLIENT_SECRET: '"lus7oMnb3H6M1hsChndphArE20Txr7erwJLf7SDBQWTw"',
   // GITEA_URL: '"https://gitea.test.com"',
-  // GITLAB_CLIENT_ID: '"33e01128c27fe75df3e5b35218d710c7df280e6ee9c90b6ca27ac9d9fdfb92f7"',
-  // GITLAB_URL: '"http://gitlab.qicoder.com"',
+  GITLAB_CLIENT_ID: '"074cd5103c62dea0f479dac861039656ac80935e304c8113a02cc64c629496ae"', 
+  GITLAB_CLIENT_SECRET: '"6f406f24216b686d55d28313dec1913c2a8e599afdb08380d5e8ce838e16e41e"',
+  GITLAB_URL: '"http://gitlab.qicoder.com"',
 })

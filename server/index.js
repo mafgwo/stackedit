@@ -5,6 +5,7 @@ const path = require('path');
 const github = require('./github');
 const gitee = require('./gitee');
 const gitea = require('./gitea');
+const gitlab = require('./gitlab');
 const pdf = require('./pdf');
 const pandoc = require('./pandoc');
 const conf = require('./conf');
@@ -28,6 +29,7 @@ module.exports = (app) => {
   app.get('/oauth2/githubToken', github.githubToken);
   app.get('/oauth2/giteeToken', gitee.giteeToken);
   app.get('/oauth2/giteaToken', gitea.giteaToken);
+  app.get('/oauth2/gitlabToken', gitlab.gitlabToken);
   app.get('/conf', (req, res) => res.send(conf.publicValues));
   app.post('/pdfExport', pdf.generate);
   app.post('/pandocExport', pandoc.generate);
