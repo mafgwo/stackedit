@@ -36,7 +36,7 @@ export default new Provider({
   async uploadContent(token, content, syncLocation) {
     const updatedSyncLocation = {
       ...syncLocation,
-      projectId: await giteaHelper.getProjectId(syncLocation),
+      projectId: await giteaHelper.getProjectId(token, syncLocation),
     };
     if (!savedSha[updatedSyncLocation.id]) {
       try {
@@ -59,7 +59,7 @@ export default new Provider({
   async publish(token, html, metadata, publishLocation, commitMessage) {
     const updatedPublishLocation = {
       ...publishLocation,
-      projectId: await giteaHelper.getProjectId(publishLocation),
+      projectId: await giteaHelper.getProjectId(token, publishLocation),
     };
     try {
       // Get the last sha
@@ -81,7 +81,7 @@ export default new Provider({
   async openFile(token, syncLocation) {
     const updatedSyncLocation = {
       ...syncLocation,
-      projectId: await giteaHelper.getProjectId(syncLocation),
+      projectId: await giteaHelper.getProjectId(token, syncLocation),
     };
 
     // Check if the file exists and open it

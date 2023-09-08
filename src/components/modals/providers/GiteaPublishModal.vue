@@ -4,11 +4,11 @@
       <div class="modal__image">
         <icon-provider provider-id="gitea"></icon-provider>
       </div>
-      <p>向您的<b> Gitea </b>项目发布<b> {{CurrentFileName}} </b>。</p>
+      <p>向您的<b> Gitea </b>项目发布<b> {{ currentFileName }} </b>。</p>
       <form-entry label="Project URL" error="projectUrl">
         <input slot="field" class="textfield" type="text" v-model.trim="projectUrl" @keydown.enter="resolve()">
         <div class="form-entry__info">
-          <b>例如:</b> {{config.token.serverUrl}}/path/to/project
+          <b>例如:</b> {{ config.token.serverUrl }}/path/to/project
         </div>
       </form-entry>
       <form-entry label="File path" error="path">
