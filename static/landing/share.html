@@ -99,11 +99,14 @@
                 }
             }
         }
-        let url = `https://gitee.com/api/v5/gists/${gistId}`;
+        const url = `https://gitee.com/api/v5/gists/${gistId}`;
+        let urlWithToken = url;
+        let withToken = false;
         if (accessToken) {
-            url = `${url}?access_token=${accessToken}`;
+            urlWithToken = `${url}?access_token=${accessToken}`;
+            withToken = true;
         }
-        xhr.open('GET', url);
+        xhr.open('GET', urlWithToken);
         xhr.onload = function() {
             if (xhr.status === 200) {
                 const newdoc = document.implementation.createHTMLDocument("");
@@ -124,9 +127,17 @@
                 const rateLimit = xhr.responseText && xhr.responseText.indexOf('Rate Limit') >= 0;
                 const appUri = `${window.location.protocol}//${window.location.host}/app`;
                 document.getElementById('div_info').innerHTML = `${rateLimit ? "请求太过频繁" : "无权限访问"}，请登录 <a href="${appUri}" target="_brank">主文档空间</a> 后再刷新此页面!`;
+            } else if (xhr.status === 401) {
+                if (withToken) {
+                    withToken = false;
+                    xhr.open('GET', url);
+                } else {
+                    console.error('An error occurred: ' + xhr.status);
+                    document.getElementById('div_info').innerHTML = `分享内容获取失败或已失效！请登录 <a href="${appUri}" target="_brank">主文档空间</a> 后再刷新此页面!`;
+                }
             } else {
                 console.error('An error occurred: ' + xhr.status);
-                document.getElementById('div_info').innerHTML = '分享内容获取失败或已失效!';
+                document.getElementById('div_info').innerHTML = `分享内容获取失败或已失效！请登录 <a href="${appUri}" target="_brank">主文档空间</a> 后再刷新此页面!`;
             }
         };
         xhr.send();
