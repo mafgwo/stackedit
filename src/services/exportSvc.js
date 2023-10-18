@@ -116,9 +116,18 @@ export default {
     // Make TOC
     const allHeaders = containerElt.querySelectorAll('h1,h2,h3,h4,h5,h6');
     Array.prototype.slice.call(allHeaders).forEach((headingElt) => {
+      // 创建一个新的 <span> 元素
+      const contentElt = document.createElement('span');
+      contentElt.className = 'content';
+      // 将原始内容移动到新的 <span> 元素中
+      while (headingElt.firstChild) {
+        contentElt.appendChild(headingElt.firstChild);
+      }
       const prefixElt = document.createElement('span');
       prefixElt.className = 'prefix';
       headingElt.insertBefore(prefixElt, headingElt.firstChild);
+      // 将新的 <span> 元素替换原始元素
+      headingElt.appendChild(contentElt);
       const suffixElt = document.createElement('span');
       suffixElt.className = 'suffix';
       headingElt.appendChild(suffixElt);
