@@ -131,6 +131,7 @@
                 if (withToken) {
                     withToken = false;
                     xhr.open('GET', url);
+                    xhr.send();
                 } else {
                     console.error('An error occurred: ' + xhr.status);
                     document.getElementById('div_info').innerHTML = `分享内容获取失败或已失效！请登录 <a href="${appUri}" target="_brank">主文档空间</a> 后再刷新此页面!`;

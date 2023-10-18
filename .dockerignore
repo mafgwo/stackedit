@@ -4,3 +4,6 @@ dist
 .history
 images
 docs
+Dockerfile
+README.md
+build.sh

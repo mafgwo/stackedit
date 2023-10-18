@@ -279,6 +279,12 @@ export default {
     isImg,
     commitMessage,
   }) {
+    // 非法的文件名 不让提交
+    if (!path || path.endsWith('undefined')) {
+      return new Promise((resolve) => {
+        resolve({ res: { content: { sha: null } } });
+      });
+    }
     let uploadContent = content;
     if (isImg && typeof content !== 'string') {
       uploadContent = await utils.encodeFiletoBase64(content);
