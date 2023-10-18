@@ -233,9 +233,18 @@ const editorSvc = Object.assign(new Vue(), editorSvcDiscussions, editorSvcUtils,
             const clonedElt = headingElt.cloneNode(true);
             clonedElt.removeAttribute('id');
             sectionTocElt.appendChild(clonedElt);
+            // 创建一个新的 <span> 元素
+            const contentElt = document.createElement('span');
+            contentElt.className = 'content';
+            // 将原始内容移动到新的 <span> 元素中
+            while (headingElt.firstChild) {
+              contentElt.appendChild(headingElt.firstChild);
+            }
             const prefixElt = document.createElement('span');
             prefixElt.className = 'prefix';
             headingElt.insertBefore(prefixElt, headingElt.firstChild);
+            // 将新的 <span> 元素替换原始元素
+            headingElt.appendChild(contentElt);
             const suffixElt = document.createElement('span');
             suffixElt.className = 'suffix';
             headingElt.appendChild(suffixElt);
