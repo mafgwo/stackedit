@@ -14,6 +14,9 @@
         <span v-if="currentWorkspace.providerId === 'giteeAppData'">
           <b>{{currentWorkspace.name}}</b> 与您的 Gitee 默认文档空间仓库同步。
         </span>
+        <span v-else-if="currentWorkspace.providerId === 'githubAppData'">
+          <b>{{currentWorkspace.name}}</b> 与您的 GitHub 默认文档空间仓库同步。
+        </span>
         <span v-else-if="currentWorkspace.providerId === 'googleDriveWorkspace'">
           <b>{{currentWorkspace.name}}</b> 与 <a :href="workspaceLocationUrl" target="_blank">Google Drive 文件夹</a>同步。
         </span>
@@ -43,6 +46,11 @@
     <menu-entry v-if="!loginToken" @click.native="signin">
       <icon-login slot="icon"></icon-login>
       <div>使用 Gitee 登录</div>
+      <span>同步您的主文档空间并解锁功能。</span>
+    </menu-entry>
+    <menu-entry v-if="!loginToken" @click.native="signinWithGithub">
+      <icon-login slot="icon"></icon-login>
+      <div>使用 GitHub 登录</div>
       <span>同步您的主文档空间并解锁功能。</span>
     </menu-entry>
     <menu-entry @click.native="setPanel('workspaces')">
@@ -142,6 +150,7 @@ import MenuEntry from './common/MenuEntry';
 import providerRegistry from '../../services/providers/common/providerRegistry';
 import UserImage from '../UserImage';
 import giteeHelper from '../../services/providers/helpers/giteeHelper';
+import githubHelper from '../../services/providers/helpers/githubHelper';
 import syncSvc from '../../services/syncSvc';
 import userSvc from '../../services/userSvc';
 import store from '../../store';
@@ -194,6 +203,16 @@ export default {
     async signin() {
       try {
         await giteeHelper.signin();
+        await syncSvc.afterSignIn();
+        syncSvc.requestSync();
+      } catch (e) {
+        // Cancel
+      }
+    },
+    async signinWithGithub() {
+      try {
+        await githubHelper.signin();
+        await syncSvc.afterSignIn();
         syncSvc.requestSync();
       } catch (e) {
         // Cancel

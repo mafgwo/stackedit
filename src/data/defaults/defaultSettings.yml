@@ -68,6 +68,8 @@ shortcuts:
   mod+shift+t: table
   mod+shift+u: ulist
   mod+shift+f: inlineformula
+  # 切换编辑与预览模式
+  mod+shift+e: toggleeditor
   '= = > space':
     method: expand
     params:

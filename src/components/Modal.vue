@@ -10,6 +10,7 @@
       <div class="modal__button-bar">
         <button class="button" v-if="simpleModal.rejectText" @click="config.reject()">{{simpleModal.rejectText}}</button>
         <button class="button button--resolve" v-if="simpleModal.resolveText" @click="config.resolve()">{{simpleModal.resolveText}}</button>
+        <button v-for="(item, idx) in (simpleModal.resolveArray || [])" class="button button--resolve"  @click="config.resolve(item.value)">{{item.text}}</button>
       </div>
     </modal-inner>
   </div>
@@ -187,6 +188,7 @@ export default {
           // User has to sign in
           await store.dispatch('modal/open', 'signInForSponsorship');
           await giteeHelper.signin();
+          await syncSvc.afterSignIn();
           syncSvc.requestSync();
         }
         if (!store.getters.isSponsor) {

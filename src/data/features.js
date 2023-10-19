@@ -158,7 +158,19 @@ export default [
       new Feature(
         'sponsor',
         '赞助',
-        '使用 Google 登录并赞助 StackEdit 以解锁 PDF 和 Pandoc 导出。（暂不支持赞助）',
+        '使用 Gitee 登录并赞助 StackEdit 以解锁 PDF 和 Pandoc 导出。（暂不支持赞助）',
+      ),
+    ],
+  ),
+  new Feature(
+    'githubSignIn',
+    '登录',
+    '使用 Gitee 登录，同步您的主文档空间并解锁功能。',
+    [
+      new Feature(
+        'githubSyncMainWorkspace',
+        '主文档空间已同步',
+        '使用 GitHub 登录以将您的主文档空间与您的默认空间stackedit-app-data仓库数据同步。',
       ),
     ],
   ),

@@ -36,7 +36,7 @@ style.innerHTML = "/** activeblue 灵动蓝\n \
  top: 0;\n \
  width: 60px;\n \
  height: 60px;\n \
- background: url(https://my-wechat.mdnice.com/ape_blue.svg);\n \
+ background: url(https://imgs.qicoder.com/stackedit/ape_blue.svg);\n \
  background-size: 100% 100%;\n \
  opacity: .12;\n \
 }\n \

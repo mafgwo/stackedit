@@ -6,6 +6,7 @@ import diffUtils from './diffUtils';
 import networkSvc from './networkSvc';
 import providerRegistry from './providers/common/providerRegistry';
 import giteeAppDataProvider from './providers/giteeAppDataProvider';
+import githubAppDataProvider from './providers/githubAppDataProvider';
 import './providers/couchdbWorkspaceProvider';
 import './providers/githubWorkspaceProvider';
 import './providers/giteeWorkspaceProvider';
@@ -830,7 +831,7 @@ const syncWorkspace = async (skipContents = false) => {
     }
 
     if (workspace.id === 'main') {
-      badgeSvc.addBadge('syncMainWorkspace');
+      badgeSvc.addBadge(workspace.providerId === 'giteeAppData' ? 'syncMainWorkspace' : 'githubSyncMainWorkspace');
     }
   } catch (err) {
     if (err && err.message === 'TOO_LATE') {
@@ -969,6 +970,15 @@ const requestSync = (addTriggerSyncBadge = false) => {
   });
 };
 
+const afterSignIn = async () => {
+  if (store.getters['workspace/currentWorkspace'].id === 'main' && workspaceProvider) {
+    const mainToken = store.getters['workspace/mainWorkspaceToken'];
+    // Try to find a suitable workspace sync provider
+    workspaceProvider = mainToken.providerId === 'githubAppData' ? githubAppDataProvider : giteeAppDataProvider;
+    await workspaceProvider.initWorkspace();
+  }
+};
+
 export default {
   async init() {
     // Load workspaces and tokens from localStorage
@@ -980,10 +990,11 @@ export default {
       await actionProvider.initAction();
     }
 
+    const mainToken = store.getters['workspace/mainWorkspaceToken'];
     // Try to find a suitable workspace sync provider
     workspaceProvider = providerRegistry.providersById[utils.queryParams.providerId];
     if (!workspaceProvider || !workspaceProvider.initWorkspace) {
-      workspaceProvider = giteeAppDataProvider;
+      workspaceProvider = mainToken && mainToken.providerId === 'githubAppData' ? githubAppDataProvider : giteeAppDataProvider;
     }
     const workspace = await workspaceProvider.initWorkspace();
     // Fix the URL hash
@@ -1041,6 +1052,7 @@ export default {
       }, 5000);
     }
   },
+  afterSignIn,
   syncImg,
   isSyncPossible,
   requestSync,

@@ -8,7 +8,7 @@
           </option>
         </select>
       </p>
-      <p v-if="!historyContext">同步 <b>{{currentFileName}}</b> 以启用修订历史 或者 <a href="javascript:void(0)" @click="signin">登录 Gitee</a> 以同步您的主文档空间。</p>
+      <p v-if="!historyContext">同步 <b>{{currentFileName}}</b> 以启用修订历史 或者 <a href="javascript:void(0)" @click="signin">登录 Gitee</a> 或 <a href="javascript:void(0)" @click="signinWithGithub">登录 GitHub</a> 以同步您的主文档空间。</p>
       <p v-else-if="loading">历史版本加载中…</p>
       <p v-else-if="!revisionsWithSpacer.length"><b>{{currentFileName}}</b> 没有历史版本.</p>
       <div class="menu-entry menu-entry--info flex flex--row flex--align-center" v-else>
@@ -55,6 +55,7 @@ import EditorClassApplier from '../common/EditorClassApplier';
 import PreviewClassApplier from '../common/PreviewClassApplier';
 import utils from '../../services/utils';
 import giteeHelper from '../../services/providers/helpers/giteeHelper';
+import githubHelper from '../../services/providers/helpers/githubHelper';
 import syncSvc from '../../services/syncSvc';
 import store from '../../store';
 import badgeSvc from '../../services/badgeSvc';
@@ -168,6 +169,16 @@ export default {
     async signin() {
       try {
         await giteeHelper.signin();
+        await syncSvc.afterSignIn();
+        syncSvc.requestSync();
+      } catch (e) {
+        // Cancel
+      }
+    },
+    async signinWithGithub() {
+      try {
+        await githubHelper.signin();
+        await syncSvc.afterSignIn();
         syncSvc.requestSync();
       } catch (e) {
         // Cancel

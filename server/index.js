@@ -72,6 +72,7 @@ module.exports = (app) => {
   }));
   // Serve share.html
   app.get('/share.html', (req, res) => res.sendFile(resolvePath('static/landing/share.html')));
+  app.get('/gistshare.html', (req, res) => res.sendFile(resolvePath('static/landing/gistshare.html')));
 
   // Serve static resources
   if (process.env.NODE_ENV === 'production') {

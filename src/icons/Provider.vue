@@ -15,6 +15,7 @@ export default {
           return 'google-drive';
         case 'googlePhotos':
           return 'google-photos';
+        case 'githubAppData':
         case 'githubWorkspace':
           return 'github';
         case 'gist':
@@ -31,6 +32,8 @@ export default {
         case 'giteeWorkspace':
         case 'giteegist':
           return 'gitee';
+        case 'stackedit':
+          return 'stackedit';
         default:
           return this.providerId;
       }

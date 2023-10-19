@@ -3,8 +3,8 @@ import store from '../../store';
 import editorSvc from '../../services/editorSvc';
 import syncSvc from '../../services/syncSvc';
 
-// Skip shortcuts if modal is open or editor is hidden
-Mousetrap.prototype.stopCallback = () => store.getters['modal/config'] || !store.getters['content/isCurrentEditable'];
+// Skip shortcuts if modal is open
+Mousetrap.prototype.stopCallback = () => store.getters['modal/config'];
 
 const pagedownHandler = name => () => {
   editorSvc.pagedownEditor.uiManager.doClick(name);
@@ -19,6 +19,14 @@ const findReplaceOpener = type => () => {
   });
   return true;
 };
+
+const toggleEditor = () => () => {
+  store.dispatch('data/toggleEditor', !store.getters['data/layoutSettings'].showEditor);
+  return true;
+};
+
+// 非编辑模式下支持的快捷键
+const noEditableShortcutMethods = ['toggleeditor'];
 
 const methods = {
   bold: pagedownHandler('bold'),
@@ -36,6 +44,7 @@ const methods = {
   inline: pagedownHandler('heading'),
   hr: pagedownHandler('hr'),
   inlineformula: pagedownHandler('inlineformula'),
+  toggleeditor: toggleEditor(),
   sync() {
     if (syncSvc.isSyncPossible()) {
       syncSvc.requestSync();
@@ -80,7 +89,10 @@ store.watch(
         }
         if (Object.prototype.hasOwnProperty.call(methods, method)) {
           try {
-            Mousetrap.bind(`${key}`, () => !methods[method].apply(null, params));
+            // editor is editable or 一些非编辑模式下支持的快捷键
+            if (store.getters['content/isCurrentEditable'] || noEditableShortcutMethods.indexOf(method) !== -1) {
+              Mousetrap.bind(`${key}`, () => !methods[method].apply(null, params));
+            }
           } catch (e) {
             // Ignore
           }

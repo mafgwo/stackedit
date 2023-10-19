@@ -6,6 +6,8 @@ import badgeSvc from '../../badgeSvc';
 
 const getScopes = token => [token.repoFullAccess ? 'repo' : 'public_repo', 'gist'];
 
+const appDataRepo = 'stackedit-app-data';
+
 const request = (token, options) => networkSvc.request({
   ...options,
   headers: {
@@ -62,7 +64,7 @@ export default {
   /**
    * https://developer.github.com/apps/building-oauth-apps/authorization-options-for-oauth-apps/
    */
-  async startOauth2(scopes, sub = null, silent = false) {
+  async startOauth2(scopes, sub = null, silent = false, isMain) {
     await networkSvc.getServerConf();
     const clientId = store.getters['data/serverConf'].githubClientId;
 
@@ -110,15 +112,25 @@ export default {
     const token = {
       scopes,
       accessToken,
+      // 主文档空间的登录 标识登录
+      isLogin: !!isMain || (oldToken && !!oldToken.isLogin),
       name: user.login,
       sub: `${user.id}`,
       imgStorages: oldToken && oldToken.imgStorages,
       repoFullAccess: scopes.includes('repo'),
     };
 
+    if (isMain) {
+      token.providerId = 'githubAppData';
+      // check stackedit-app-data repo exist?
+      await this.checkAndCreateRepo(token);
+    }
     // Add token to github tokens
     store.dispatch('data/addGithubToken', token);
     return token;
+  },
+  signin() {
+    return this.startOauth2(['repo', 'gist'], null, false, true);
   },
   async addAccount(repoFullAccess = false) {
     const token = await this.startOauth2(getScopes({ repoFullAccess }));
@@ -146,6 +158,30 @@ export default {
       throw new Error('Git tree too big. Please remove some files in the repository.');
     }
     return tree;
+  },
+
+  async checkAndCreateRepo(token) {
+    const url = `https://api.github.com/repos/${encodeURIComponent(token.name)}/${encodeURIComponent(appDataRepo)}`;
+    try {
+      await request(token, { url });
+    } catch (err) {
+      // create
+      if (err.status === 404) {
+        await request(token, {
+          method: 'POST',
+          url: 'https://api.github.com/repos/mafgwo/stackeditplus-appdata-template/generate',
+          body: {
+            owner: token.name,
+            name: appDataRepo,
+            description: 'StackEdit中文版默认空间.',
+            include_all_branches: false,
+            private: true,
+          },
+        });
+      } else {
+        throw err;
+      }
+    }
   },
 
   /**

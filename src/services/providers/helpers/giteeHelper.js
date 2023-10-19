@@ -147,6 +147,7 @@ export default {
       sub: `${user.login}`,
     };
     if (isMain) {
+      token.providerId = 'giteeAppData';
       // 检查 stackedit-app-data 仓库是否已经存在 如果不存在则创建该仓库
       await this.checkAndCreateRepo(token);
     }

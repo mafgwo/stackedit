@@ -9,7 +9,8 @@
         <div class="flex flex--column">
           <div class="workspace-entry__header flex flex--row flex--align-center">
             <div class="workspace-entry__icon">
-              <icon-provider :provider-id="workspace.providerId"></icon-provider>
+              <icon-provider v-if="id === 'main' && !workspace.sub" :provider-id="'stackedit'"></icon-provider>
+              <icon-provider v-else :provider-id="workspace.providerId"></icon-provider>
             </div>
             <input class="text-input" type="text" v-if="editedId === id" v-focus @blur="submitEdit()" @keydown.enter="submitEdit()" @keydown.esc.stop="submitEdit(true)" v-model="editingName">
             <div class="workspace-entry__name" v-else>{{workspace.name}}</div>
@@ -17,7 +18,7 @@
               <button class="workspace-entry__button button" @click="edit(id)" v-title="'编辑名称'">
                 <icon-pen></icon-pen>
               </button>
-              <template v-if="workspace.providerId === 'giteeAppData' || workspace.providerId === 'githubWorkspace'
+              <template v-if="workspace.providerId === 'giteeAppData' || workspace.providerId === 'githubAppData' || workspace.providerId === 'githubWorkspace'
                 || workspace.providerId === 'giteeWorkspace' || workspace.providerId === 'gitlabWorkspace' || workspace.providerId === 'giteaWorkspace'">
                 <button class="workspace-entry__button button" @click="stopAutoSync(id)" v-if="workspace.autoSync == undefined || workspace.autoSync" v-title="'关闭自动同步'">
                   <icon-sync-auto></icon-sync-auto>

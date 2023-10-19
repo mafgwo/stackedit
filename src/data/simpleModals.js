@@ -1,6 +1,7 @@
-const simpleModal = (contentHtml, rejectText, resolveText) => ({
+const simpleModal = (contentHtml, rejectText, resolveText, resolveArray) => ({
   contentHtml: typeof contentHtml === 'function' ? contentHtml : () => contentHtml,
   rejectText,
+  resolveArray,
   resolveText,
 });
 
@@ -65,21 +66,35 @@ export default {
     '关闭窗口',
   ),
   shareHtmlPre: simpleModal(
-    config => `<p>将给文档 "${config.name}" 创建分享链接，创建后将会把文档公开发布到GiteeGist中。您确定吗？</p>`,
+    config => `<p>将给文档 "${config.name}" 创建分享链接，创建后将会把文档公开发布到默认空间账号的Gist中。您确定吗？</p>`,
     '取消',
     '确认分享',
   ),
   signInForComment: simpleModal(
-    `<p>您必须使用 Google 登录才能开始评论。</p>
+    `<p>您必须使用 Gitee或GitHub 登录默认文档空间后才能开始评论。</p>
     <div class="modal__info"><b>注意:</b> 这将同步您的主文档空间。</div>`,
     '取消',
-    '确认登录',
+    '',
+    [{
+      text: 'Gitee登录',
+      value: 'gitee',
+    }, {
+      text: 'GitHub登录',
+      value: 'github',
+    }],
   ),
   signInForSponsorship: simpleModal(
-    `<p>您必须使用 Google 登录才能赞助。</p>
+    `<p>您必须使用 Gitee或GitHub 登录才能赞助。</p>
     <div class="modal__info"><b>注意:</b> 这将同步您的主文档空间。</div>`,
     '取消',
-    '确认登录',
+    '',
+    [{
+      text: 'Gitee登录',
+      value: 'gitee',
+    }, {
+      text: 'GitHub登录',
+      value: 'github',
+    }],
   ),
   sponsorOnly: simpleModal(
     '<p>此功能仅限于赞助商，因为它依赖于服务器资源。</p>',

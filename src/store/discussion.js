@@ -1,5 +1,6 @@
 import utils from '../services/utils';
 import giteeHelper from '../services/providers/helpers/giteeHelper';
+import githubHelper from '../services/providers/helpers/githubHelper';
 import syncSvc from '../services/syncSvc';
 
 const idShifter = offset => (state, getters) => {
@@ -136,8 +137,13 @@ export default {
       const loginToken = rootGetters['workspace/loginToken'];
       if (!loginToken) {
         try {
-          await dispatch('modal/open', 'signInForComment', { root: true });
-          await giteeHelper.signin();
+          const signInWhere = await dispatch('modal/open', 'signInForComment', { root: true });
+          if (signInWhere === 'github') {
+            await githubHelper.signin();
+          } else {
+            await giteeHelper.signin();
+          }
+          await syncSvc.afterSignIn();
           syncSvc.requestSync();
           await dispatch('createNewDiscussion', selection);
         } catch (e) { /* cancel */ }

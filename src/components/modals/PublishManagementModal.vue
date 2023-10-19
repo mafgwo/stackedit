@@ -89,14 +89,14 @@ export default {
       badgeSvc.addBadge('removePublishLocation');
     },
     shareUrl(location) {
-      if (location.providerId !== 'giteegist') {
+      if (location.providerId !== 'giteegist' && location.providerId !== 'gist') {
         return null;
       }
-      if (!location.url) {
+      if (!location.url || !location.gistId) {
         return null;
       }
-      const splitIndex = location.url.lastIndexOf('/');
-      return `${window.location.protocol}//${window.location.host}/share.html?id=${location.url.substr(splitIndex + 1)}`;
+      const sharePage = location.providerId === 'gist' ? 'gistshare.html' : 'share.html';
+      return `${window.location.protocol}//${window.location.host}/${sharePage}?id=${location.gistId}`;
     },
   },
 };

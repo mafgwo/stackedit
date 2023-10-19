@@ -26,6 +26,7 @@ import store from '../store';
 import DropdownMenu from './common/DropdownMenu';
 import publishSvc from '../services/publishSvc';
 import giteeGistProvider from '../services/providers/giteeGistProvider';
+import gistProvider from '../services/providers/gistProvider';
 
 export default {
   components: {
@@ -107,12 +108,15 @@ export default {
           store.dispatch('notification/info', '登录主文档空间之后才可使用分享功能！');
           return;
         }
-        let giteeGistId = null;
-        const filterLocations = this.publishLocations.filter(it => it.providerId === 'giteegist' && it.url && it.gistId);
+        let tempGistId = null;
+        const isGithub = mainToken.providerId === 'githubAppData';
+        const gistProviderId = isGithub ? 'gist' : 'giteegist';
+        const filterLocations = this.publishLocations.filter(it => it.providerId === gistProviderId
+                 && it.url && it.gistId);
         if (filterLocations.length > 0) {
-          giteeGistId = filterLocations[0].gistId;
+          tempGistId = filterLocations[0].gistId;
         }
-        const location = giteeGistProvider.makeLocation(
+        const location = (isGithub ? gistProvider : giteeGistProvider).makeLocation(
           mainToken,
           `分享-${currentFile.name}`,
           true,
@@ -120,9 +124,10 @@ export default {
         );
         location.templateId = 'styledHtmlWithTheme';
         location.fileId = currentFile.id;
-        location.gistId = giteeGistId;
+        location.gistId = tempGistId;
         const { gistId } = await publishSvc.publishLocationAndStore(location);
-        const url = `${window.location.protocol}//${window.location.host}/share.html?id=${gistId}`;
+        const sharePage = mainToken.providerId === 'githubAppData' ? 'gistshare.html' : 'share.html';
+        const url = `${window.location.protocol}//${window.location.host}/${sharePage}?id=${gistId}`;
         await store.dispatch('modal/open', { type: 'shareHtml', name: currentFile.name, url });
       } catch (err) {
         if (err) {

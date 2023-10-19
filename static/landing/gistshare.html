@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>文章分享 - StackEdit中文版</title>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="canonical" href="https://stackedit.cn/">
+    <link rel="icon" href="static/landing/favicon.ico" type="image/x-icon">
+    <link rel="shortcut icon" href="static/landing/favicon.ico" type="image/x-icon">
+    <meta charset="UTF-8">
+    <meta name="keywords" content="Markdown编辑器,StackEdit中文版,StackEdit汉化版,StackEdit,在线Markdown,笔记利器,Markdown笔记">
+    <meta name="description"
+          content="支持直接将码云（Gitee）、GitHub、Gitea等仓库作为笔记存储仓库且支持拖拽/粘贴上传图片，并且可以直接在页面编辑同步和管理的Markdown编辑器。">
+    <meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="baidu-site-verification" content="code-tGpn2BT069" />
+    <meta name="msvalidate.01" content="90A9558158543277BD284CFA054E7F5B" />
+    <link rel="stylesheet" href="style.css">
+	<style>
+		.share-header {
+			position: fixed;
+			top: 0;
+			left: 0;
+			width: 100%;
+			background-color: #383c4a;
+			color: #fff;
+			padding: 10px;
+			box-sizing: border-box;
+            z-index: 99999;
+		}
+
+		.share-header .logo {
+			margin: 0 0 -8px 0;
+		}
+
+		.share-header nav {
+			display: flex;
+			flex-direction: row;
+			justify-content: space-between;
+			align-items: center;
+		}
+
+		.share-header nav ul {
+			list-style-type: none;
+			margin: 0;
+			padding: 0;
+			display: flex;
+			flex-direction: row;
+		}
+
+		.share-header nav li {
+			margin: 0 10px;
+		}
+
+		.share-header nav a {
+			color: #fff;
+			text-decoration: none;
+		}
+
+		.share-header nav a:hover {
+			text-decoration: underline;
+		}
+
+		.share-content {
+            transform: translateY(50px);
+            height: 100vh;
+		}
+	</style>
+    <script type="text/javascript">
+    function getQueryString(name) {
+        var reg = new RegExp('(^|&)' + name + '=([^&]*)(&|$)', 'i');
+        var r = window.location.search.substr(1).match(reg);
+        if (r != null) {
+            return unescape(r[2]);
+        }
+        return null;
+     }
+
+    function appendTagHtml(newdoc, tagName, targetParentEle) {
+        const tags = newdoc.getElementsByTagName(tagName);
+        if (!tags) {
+            return;
+        }
+        for (let i = 0; i < tags.length; i++) {
+            targetParentEle.append(tags[i]);
+        }
+    }
+
+    window.onload = function() {
+        const xhr = new XMLHttpRequest();
+        const gistId = getQueryString('id');
+        let accessToken = null;
+        const tokens = window.localStorage.getItem('data/tokens');
+        if (tokens) {
+            const tokensObj = JSON.parse(tokens);
+            if (tokensObj.data && tokensObj.data.github) {
+                const tokenArr = Object.keys(tokensObj.data.github).map(it => tokensObj.data.github[it]).filter(it => it && it.isLogin);
+                if (tokenArr.length > 0) {
+                    accessToken = tokenArr[0].accessToken;
+                }
+            }
+        }
+        const url = `https://api.github.com/gists/${gistId}`;
+        xhr.open('GET', url);
+        if (accessToken) {
+            xhr.setRequestHeader('Authorization', `Bearer ${accessToken}`);
+        }
+        xhr.onload = function() {
+            if (xhr.status === 200) {
+                const newdoc = document.implementation.createHTMLDocument("");
+                const body = JSON.parse(xhr.responseText);
+                for (let key in body.files) {
+                    newdoc.documentElement.innerHTML = body.files[key].content;
+                }
+                const currHead = document.head;
+                // head
+                appendTagHtml(newdoc, 'style', currHead);
+                // title
+                document.title = newdoc.title + ' - StackEdit中文版';
+                // 内容
+                const shareContent = document.getElementsByClassName('share-content')[0];
+                shareContent.innerHTML = newdoc.body.innerHTML;
+                document.body.className = newdoc.body.className;
+            } else if (xhr.status === 403) {
+                const rateLimit = xhr.responseText && xhr.responseText.indexOf('Rate Limit') >= 0;
+                const appUri = `${window.location.protocol}//${window.location.host}/app`;
+                document.getElementById('div_info').innerHTML = `${rateLimit ? "请求太过频繁" : "无权限访问"}，请使用GitHub登录 <a href="${appUri}" target="_brank">主文档空间</a> 后再刷新此页面!`;
+            } else {
+                console.error('An error occurred: ' + xhr.status);
+                document.getElementById('div_info').innerHTML = `分享内容获取失败或已失效！请使用GitHub登录 <a href="${appUri}" target="_brank">主文档空间</a> 后再刷新此页面!`;
+            }
+        };
+        xhr.send();
+     }
+     </script>
+</head>
+<body>
+	<div class="share-header">
+		<nav>
+			<a class="logo" href="https://stackedit.cn" target="_blank">
+				<img src="static/landing/logo.svg" height="30px"/>
+			</a>
+			<ul>
+				<li><a href="https://stackedit.cn" target="_blank">首页</a></li>
+				<li><a href="https://stackedit.cn/app" target="_blank">写笔记</a></li>
+			</ul>
+		</nav>
+	</div>
+	<div class="share-content stackedit">
+		<div id="div_info" style="text-align: center; height: 600px;">文章加载中......</div>
+	</div>
+
+    <script src="https://code.jquery.com/jquery-2.2.4.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script>
+
+    <!-- built files will be auto injected -->
+    <script>
+        var _hmt = _hmt || [];
+        (function() {
+            var hm = document.createElement("script");
+            hm.src = "https://hm.baidu.com/hm.js?20a1e7a201b42702c49074c87a1f1035";
+            var s = document.getElementsByTagName("script")[0]; 
+            s.parentNode.insertBefore(hm, s);
+        })();
+    </script>
+</body>
+</html>
