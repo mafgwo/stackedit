@@ -76,8 +76,11 @@ const methods = {
 };
 
 store.watch(
-  () => store.getters['data/computedSettings'],
-  (computedSettings) => {
+  () => ({
+    computedSettings: store.getters['data/computedSettings'],
+    isCurrentEditable: store.getters['content/isCurrentEditable'],
+  }),
+  ({ computedSettings, isCurrentEditable }) => {
     Mousetrap.reset();
 
     Object.entries(computedSettings.shortcuts).forEach(([key, shortcut]) => {
@@ -90,7 +93,7 @@ store.watch(
         if (Object.prototype.hasOwnProperty.call(methods, method)) {
           try {
             // editor is editable or 一些非编辑模式下支持的快捷键
-            if (store.getters['content/isCurrentEditable'] || noEditableShortcutMethods.indexOf(method) !== -1) {
+            if (isCurrentEditable || noEditableShortcutMethods.indexOf(method) !== -1) {
               Mousetrap.bind(`${key}`, () => !methods[method].apply(null, params));
             }
           } catch (e) {
@@ -99,7 +102,8 @@ store.watch(
         }
       }
     });
-  }, {
+  },
+  {
     immediate: true,
   },
 );
