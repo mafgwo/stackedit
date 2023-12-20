@@ -169,7 +169,7 @@ export default {
       if (err.status === 404) {
         await request(token, {
           method: 'POST',
-          url: 'https://api.github.com/repos/mafgwo/stackeditplus-appdata-template/generate',
+          url: 'https://api.github.com/repos/mafgwo/stackedit-appdata-template/generate',
           body: {
             owner: token.name,
             name: appDataRepo,
@@ -193,11 +193,29 @@ export default {
     repo,
     sha,
     path,
+    tryTimes,
   }) {
-    return repoRequest(token, owner, repo, {
-      url: 'commits',
-      params: { sha, path },
-    });
+    let tryCount = tryTimes || 1;
+    try {
+      return repoRequest(token, owner, repo, {
+        url: 'commits',
+        params: { sha, path },
+      });
+    } catch (err) {
+      // 主文档 并且 409 则重试3次
+      if (tryCount <= 3 && err.status === 409 && repo === appDataRepo) {
+        tryCount += 1;
+        return this.getCommits({
+          token,
+          owner,
+          repo,
+          sha,
+          path,
+          tryTimes: tryCount,
+        });
+      }
+      throw err;
+    }
   },
 
   /**
@@ -270,22 +288,30 @@ export default {
     path,
     isImg,
   }) {
-    const { sha, content, encoding } = await repoRequest(token, owner, repo, {
-      url: `contents/${encodeURIComponent(path)}`,
-      params: { ref: branch },
-    });
-    let tempContent = content;
-    // 如果是图片且 encoding 为 none 则 需要获取 blob
-    if (isImg && encoding === 'none') {
-      const blobInfo = await repoRequest(token, owner, repo, {
-        url: `git/blobs/${sha}`,
+    try {
+      const { sha, content, encoding } = await repoRequest(token, owner, repo, {
+        url: `contents/${encodeURIComponent(path)}`,
+        params: { ref: branch },
       });
-      tempContent = blobInfo.content;
+      let tempContent = content;
+      // 如果是图片且 encoding 为 none 则 需要获取 blob
+      if (isImg && encoding === 'none') {
+        const blobInfo = await repoRequest(token, owner, repo, {
+          url: `git/blobs/${sha}`,
+        });
+        tempContent = blobInfo.content;
+      }
+      return {
+        sha,
+        data: !isImg ? utils.decodeBase64(tempContent) : tempContent,
+      };
+    } catch (err) {
+      // not .stackedit-data  throw err
+      if (err.status === 404 && path.indexOf('.stackedit-data') >= 0) {
+        return {};
+      }
+      throw err;
     }
-    return {
-      sha,
-      data: !isImg ? utils.decodeBase64(tempContent) : tempContent,
-    };
   },
   /**
    * 获取仓库信息
