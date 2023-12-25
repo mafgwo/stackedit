@@ -14,6 +14,7 @@
       </div>
       <explorer-node v-for="node in node.files" :key="node.item.id" :node="node" :depth="depth + 1"></explorer-node>
     </div>
+    <button ref="copyId" v-clipboard="copyPath()" @click="info('路径已复制到剪切板!')" style="display: none;"></button>
   </div>
 </template>
 
@@ -23,6 +24,7 @@ import workspaceSvc from '../services/workspaceSvc';
 import explorerSvc from '../services/explorerSvc';
 import store from '../store';
 import badgeSvc from '../services/badgeSvc';
+import utils from '../services/utils';
 
 export default {
   name: 'explorer-node', // Required for recursivity
@@ -79,6 +81,9 @@ export default {
     ]),
     ...mapActions('explorer', [
       'setDragTarget',
+    ]),
+    ...mapActions('notification', [
+      'info',
     ]),
     select(id = this.node.item.id, doOpen = true) {
       const node = store.getters['explorer/nodeMap'][id];
@@ -144,6 +149,11 @@ export default {
       // See https://stackoverflow.com/a/3977637/1333165
       evt.dataTransfer.setData('Text', '');
     },
+    copyPath() {
+      let path = utils.getAbsoluteDir(this.node).replaceAll(' ', '%20');
+      path = path.indexOf('/') === 0 ? path : `/${path}`;
+      return this.node.isFolder ? path : `${path}.md`;
+    },
     onDrop() {
       const sourceNode = store.getters['explorer/dragSourceNode'];
       const targetNode = store.getters['explorer/dragTargetNodeFolder'];
@@ -169,22 +179,26 @@ export default {
             top: evt.clientY,
           },
           items: [{
-            name: 'New file',
+            name: '新建文件',
             disabled: !this.node.isFolder || this.node.isTrash,
             perform: () => explorerSvc.newItem(false),
           }, {
-            name: 'New folder',
+            name: '新建文件夹',
             disabled: !this.node.isFolder || this.node.isTrash || this.node.isTemp,
             perform: () => explorerSvc.newItem(true),
           }, {
             type: 'separator',
           }, {
-            name: 'Rename',
+            name: '重命名',
             disabled: this.node.isTrash || this.node.isTemp,
             perform: () => this.setEditingId(this.node.item.id),
           }, {
-            name: 'Delete',
+            name: '删除',
             perform: () => explorerSvc.deleteItem(),
+          }, {
+            name: '复制路径',
+            disabled: this.node.isTrash || this.node.isTemp,
+            perform: () => this.$refs.copyId.click(),
           }],
         });
         if (item) {
