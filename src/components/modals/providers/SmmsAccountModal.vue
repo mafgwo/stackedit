@@ -6,13 +6,13 @@
       </div>
       <p>将您的<b>SM.MS</b>账号链接到<b>StackEdit中文版</b>。</p>
       <form-entry label="跨域代理URL" error="proxyUrl">
-        <input slot="field" class="textfield" type="text" v-model.trim="proxyUrl" @keydown.enter="resolve()">
+        <template v-slot:field><input class="textfield" type="text" v-model.trim="proxyUrl" @keydown.enter="resolve()"></template>
         <div class="form-entry__info">
           跨域代理URL用于图片上传跨域支持(因SM.MS图床已限制了跨域)，跨域代理如：https://cors.zme.ink/ 或 https://cors.eu.org/
         </div>
       </form-entry>
       <form-entry label="Api Secret Token" error="apiSecretToken">
-        <input slot="field" class="textfield" type="text" v-model.trim="apiSecretToken" @keydown.enter="resolve()">
+        <template v-slot:field><input class="textfield" type="text" v-model.trim="apiSecretToken" @keydown.enter="resolve()"></template>
 
         <div class="form-entry__info">
           从 <a href="https://sm.ms/home/apitoken" target="_blank">SM.MS</a> 获取Api Secret Token.

@@ -1,10 +1,10 @@
-import Vue from 'vue';
+import { reactive } from 'vue';
 
 export default {
   namespaced: true,
-  state: {
-    itemsById: {},
-  },
+  state: reactive({
+    itemsById: {}
+  }),
   mutations: {
     setItem: ({ itemsById }, item) => {
       const itemToSet = {
@@ -19,7 +19,7 @@ export default {
           itemToSet.imageUrl = existingItem.imageUrl;
         }
       }
-      Vue.set(itemsById, item.id, itemToSet);
+      itemsById[item.id] = itemToSet;
     },
   },
 };

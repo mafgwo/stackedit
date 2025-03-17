@@ -1,9 +1,10 @@
 import Prism from 'prismjs';
+// https://mdit-plugins.github.io/ 使用最新的md插件
 import markdownitAbbr from 'markdown-it-abbr';
 import markdownitDeflist from 'markdown-it-deflist';
 import markdownitFootnote from 'markdown-it-footnote';
 import markdownitMark from 'markdown-it-mark';
-import markdownitImgsize from 'markdown-it-imsize';
+import { imgSize } from '@mdit/plugin-img-size';
 import markdownitSub from 'markdown-it-sub';
 import markdownitSup from 'markdown-it-sup';
 import markdownitTasklist from './libs/markdownItTasklist';
@@ -48,7 +49,7 @@ const inlineBaseRules2 = [
   'balance_pairs',
   'strikethrough',
   'emphasis',
-  'text_collapse',
+  // 'text_collapse',
 ];
 
 extensionSvc.onGetOptions((options, properties) => Object
@@ -93,7 +94,7 @@ extensionSvc.onInitConverter(0, (markdown, options) => {
     markdown.use(markdownitFootnote);
   }
   if (options.imgsize) {
-    markdown.use(markdownitImgsize);
+    markdown.use(imgSize);
   }
   if (options.mark) {
     markdown.use(markdownitMark);

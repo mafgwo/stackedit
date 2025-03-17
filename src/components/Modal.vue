@@ -1,5 +1,5 @@
 <template>
-  <div class="modal" v-if="config" @keydown.esc.stop="onEscape" @keydown.tab="onTab" @focusin="onFocusInOut" @focusout="onFocusInOut">
+  <div ref="root" class="modal" v-if="config" @keydown.esc.stop="onEscape" @keydown.tab="onTab" @focusin="onFocusInOut" @focusout="onFocusInOut">
     <!-- <div class="modal__sponsor-banner" v-if="!isSponsor">
       StackEdit is <a class="not-tabbable" target="_blank" href="https://github.com/mafgwo/stackedit/">open source</a>, please consider
       <a class="not-tabbable" href="javascript:void(0)" @click="sponsor">sponsoring</a> for just $5.
@@ -201,7 +201,7 @@ export default {
       editorSvc.clEditor.focus();
     },
     onTab(evt) {
-      const tabbables = getTabbables(this.$el);
+      const tabbables = getTabbables(this.$refs.root);
       const firstTabbable = tabbables[0];
       const lastTabbable = tabbables[tabbables.length - 1];
       if (evt.shiftKey && firstTabbable === evt.target) {
@@ -231,10 +231,12 @@ export default {
       () => this.config,
       (isOpen) => {
         if (isOpen) {
-          const tabbables = getTabbables(this.$el);
-          if (tabbables[0]) {
-            tabbables[0].focus();
-          }
+          this.$nextTick(() => {
+            const tabbables = getTabbables(this.$refs.root);
+            if (tabbables[0]) {
+              tabbables[0].focus();
+            }
+          })
         }
       },
       { immediate: true },

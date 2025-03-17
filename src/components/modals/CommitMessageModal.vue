@@ -5,7 +5,7 @@
       <div class="form-entry">
         <label class="form-entry__label">提交信息</label>
         <div class="form-entry__field">
-          <input slot="field" class="textfield" placeholder="提交信息非必填" type="text" v-model.trim="commitMessage" @keydown.enter="resolve()">
+          <input class="textfield" placeholder="提交信息非必填" type="text" v-model.trim="commitMessage" @keydown.enter="resolve()">
         </div>
       </div>
     </div>

@@ -44,101 +44,101 @@
       </div>
     </div>
     <menu-entry v-if="!loginToken" @click.native="signin">
-      <icon-login slot="icon"></icon-login>
+      <template v-slot:icon><icon-login></icon-login></template>
       <div>使用 Gitee 登录</div>
       <span>同步您的主文档空间并解锁功能。</span>
     </menu-entry>
     <menu-entry v-if="!loginToken" @click.native="signinWithGithub">
-      <icon-login slot="icon"></icon-login>
+      <template v-slot:icon><icon-login></icon-login></template>
       <div>使用 GitHub 登录</div>
       <span>同步您的主文档空间并解锁功能。</span>
     </menu-entry>
     <menu-entry @click.native="setPanel('workspaces')">
-      <icon-database slot="icon"></icon-database>
+      <template v-slot:icon><icon-database></icon-database></template>
       <div><div class="menu-entry__label menu-entry__label--count" v-if="workspaceCount">{{workspaceCount}}</div> 文档空间</div>
       <span>切换到另一个文档空间。</span>
     </menu-entry>
     <hr>
     <menu-entry @click.native="setPanel('sync')">
-      <icon-sync slot="icon"></icon-sync>
+      <template v-slot:icon><icon-sync></icon-sync></template>
       <div><div class="menu-entry__label menu-entry__label--count" v-if="syncLocationCount">{{syncLocationCount}}</div> 同步</div>
       <span>在云端同步您的文件。</span>
     </menu-entry>
     <menu-entry @click.native="setPanel('publish')">
-      <icon-upload slot="icon"></icon-upload>
+      <template v-slot:icon><icon-upload></icon-upload></template>
       <div><div class="menu-entry__label menu-entry__label--count" v-if="publishLocationCount">{{publishLocationCount}}</div>发布</div>
       <span>将您的文件导出到 Web。</span>
     </menu-entry>
     <menu-entry @click.native="setPanel('history')">
-      <icon-history slot="icon"></icon-history>
+      <template v-slot:icon><icon-history></icon-history></template>
       <div>历史</div>
       <span>跟踪和恢复文件修订。</span>
     </menu-entry>
     <menu-entry @click.native="fileProperties">
-      <icon-view-list slot="icon"></icon-view-list>
+      <template v-slot:icon><icon-view-list></icon-view-list></template>
       <div>文件属性</div>
       <span>添加元数据并配置扩展。</span>
     </menu-entry>
     <hr>
     <menu-entry @click.native="setPanel('toc')">
-      <icon-toc slot="icon"></icon-toc>
+      <template v-slot:icon><icon-toc></icon-toc></template>
       目录
     </menu-entry>
     <menu-entry @click.native="setPanel('help')">
-      <icon-help-circle slot="icon"></icon-help-circle>
+      <template v-slot:icon><icon-help-circle></icon-help-circle></template>
       Markdown 帮助
     </menu-entry>
     <hr>
     <menu-entry @click.native="setPanel('importExport')">
-      <icon-content-save slot="icon"></icon-content-save>
+      <template v-slot:icon><icon-content-save></icon-content-save></template>
       导入/导出
     </menu-entry>
     <menu-entry @click.native="print">
-      <icon-printer slot="icon"></icon-printer>
+      <template v-slot:icon><icon-printer></icon-printer></template>
       打印
     </menu-entry>
     <hr>
     <menu-entry @click.native="badges">
-      <icon-seal slot="icon"></icon-seal>
+      <template v-slot:icon><icon-seal></icon-seal></template>
       <div><div class="menu-entry__label menu-entry__label--count">{{badgeCount}}/{{featureCount}}</div> 徽章</div>
       <span>列出应用程序功能和获得的徽章。</span>
     </menu-entry>
     <menu-entry @click.native="accounts">
-      <icon-key slot="icon"></icon-key>
+      <template v-slot:icon><icon-key></icon-key></template>
       <div><div class="menu-entry__label menu-entry__label--count">{{accountCount}}</div> 账号</div>
       <span>管理对您的外部账号的访问。</span>
     </menu-entry>
     <menu-entry @click.native="templates">
-      <icon-code-braces slot="icon"></icon-code-braces>
+      <template v-slot:icon><icon-code-braces></icon-code-braces></template>
       <div><div class="menu-entry__label menu-entry__label--count">{{templateCount}}</div> 模板</div>
       <span>为您的导出配置 Handlebars 模板。</span>
     </menu-entry>
     <menu-entry @click.native="setPanel('editTheme')">
-      <icon-select-theme slot="icon"></icon-select-theme>
+      <template v-slot:icon><icon-select-theme></icon-select-theme></template>
       编辑区主题
       <span>编辑区主题样式(自定义主题可编辑)。</span>
     </menu-entry>
     <menu-entry @click.native="setPanel('previewTheme')">
-      <icon-select-theme slot="icon"></icon-select-theme>
+      <template v-slot:icon><icon-select-theme></icon-select-theme></template>
       预览区主题
       <span>预览区主题样式(自定义主题可编辑)。</span>
     </menu-entry>
     <menu-entry @click.native="settings">
-      <icon-settings slot="icon"></icon-settings>
+      <template v-slot:icon><icon-settings></icon-settings></template>
       <div>配置</div>
       <span>调整应用程序和键盘快捷键。</span>
     </menu-entry>
     <hr>
     <menu-entry @click.native="setPanel('workspaceBackups')">
-      <icon-content-save slot="icon"></icon-content-save>
+      <template v-slot:icon><icon-content-save></icon-content-save></template>
       文档空间备份
     </menu-entry>
     <menu-entry @click.native="reset">
-      <icon-logout slot="icon"></icon-logout>
+      <template v-slot:icon><icon-logout></icon-logout></template>
       重置应用程序
     </menu-entry>
     <menu-entry @click.native="about">
-      <icon-help-circle slot="icon"></icon-help-circle>
+      <template v-slot:icon><icon-help-circle></icon-help-circle></template>
       关于 StackEdit
     </menu-entry>
   </div>

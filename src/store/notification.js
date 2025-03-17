@@ -24,10 +24,12 @@ export default {
       }
 
       item.promise = new Promise((resolve, reject) => {
+        // 用于标识同一个对象
+        item.id = utils.uid();
         commit('setItems', [...state.items, item]);
         const removeItem = () => commit(
           'setItems',
-          state.items.filter(otherItem => otherItem !== item),
+          state.items.filter(otherItem => otherItem.id !== item.id),
         );
         setTimeout(
           () => removeItem(),

@@ -40,22 +40,22 @@ export default {
       return `${(this.depth + 1) * 15}px`;
     },
     isSelected() {
-      return store.getters['explorer/selectedNode'] === this.node;
+      return this.equalNode(store.getters['explorer/selectedNode'] , this.node);
     },
     isEditing() {
-      return store.getters['explorer/editingNode'] === this.node;
+      return this.equalNode(store.getters['explorer/editingNode'], this.node);
     },
     isDragTarget() {
-      return store.getters['explorer/dragTargetNode'] === this.node;
+      return this.equalNode(store.getters['explorer/dragTargetNode'], this.node);
     },
     isDragTargetFolder() {
-      return store.getters['explorer/dragTargetNodeFolder'] === this.node;
+      return this.equalNode(store.getters['explorer/dragTargetNodeFolder'], this.node);
     },
     isOpen() {
       return store.state.explorer.openNodes[this.node.item.id] || this.node.isRoot;
     },
     newChild() {
-      return store.getters['explorer/newChildNodeParent'] === this.node
+      return this.equalNode(store.getters['explorer/newChildNodeParent'], this.node)
         && store.state.explorer.newChildNode;
     },
     newChildName: {
@@ -85,6 +85,15 @@ export default {
     ...mapActions('notification', [
       'info',
     ]),
+    equalNode(node1, node2) {
+      if (!node1 || !node2) {
+        return false;
+      }
+      if (node1.isRoot && node2.isRoot) {
+        return true;
+      }
+      return node1.item && node2.item && node1.item.id && node1.item.id === node2.item.id;
+    },
     select(id = this.node.item.id, doOpen = true) {
       const node = store.getters['explorer/nodeMap'][id];
       if (!node) {

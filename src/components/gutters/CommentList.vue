@@ -168,7 +168,7 @@ export default {
 
     // Move preview discussions once previewCtxWithDiffs has been calculated
     if (!editorSvc.previewCtxWithDiffs) {
-      editorSvc.$once('previewCtxWithDiffs', () => {
+      editorSvc.once('previewCtxWithDiffs', () => {
         this.updateTops();
         this.updateSticky();
       });

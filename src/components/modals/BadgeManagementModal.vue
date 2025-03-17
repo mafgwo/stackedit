@@ -33,7 +33,7 @@
 </template>
 
 <script>
-import Vue from 'vue';
+import { reactive } from 'vue';
 import { mapGetters } from 'vuex';
 import ModalInner from './common/ModalInner';
 import store from '../../store';
@@ -43,7 +43,7 @@ export default {
     ModalInner,
   },
   data: () => ({
-    shown: {},
+    shown: reactive({}),
   }),
   computed: {
     ...mapGetters('modal', [
@@ -61,7 +61,7 @@ export default {
   },
   methods: {
     show(featureId) {
-      Vue.set(this.shown, featureId, true);
+      this.shown[featureId] = true;
     },
   },
 };

@@ -6,19 +6,19 @@
       </div>
       <p>创建一个与<b>GitLab</b>仓库文件夹同步的文档空间。</p>
       <form-entry label="Project URL" error="projectUrl">
-        <input slot="field" class="textfield" type="text" v-model.trim="projectUrl" @keydown.enter="resolve()">
+        <template v-slot:field><input class="textfield" type="text" v-model.trim="projectUrl" @keydown.enter="resolve()"></template>
         <div class="form-entry__info">
           <b>例如:</b> {{config.token.serverUrl}}/path/to/project
         </div>
       </form-entry>
       <form-entry label="文件夹路径" info="可选的">
-        <input slot="field" class="textfield" type="text" v-model.trim="path" @keydown.enter="resolve()">
+        <template v-slot:field><input class="textfield" type="text" v-model.trim="path" @keydown.enter="resolve()"></template>
         <div class="form-entry__info">
           如果不提供，将使用根文件夹。
         </div>
       </form-entry>
       <form-entry label="分支" info="可选的">
-        <input slot="field" class="textfield" type="text" v-model.trim="branch" @keydown.enter="resolve()">
+        <template v-slot:field><input class="textfield" type="text" v-model.trim="branch" @keydown.enter="resolve()"></template>
         <div class="form-entry__info">
           如果未提供，将使用<code> master </code>分支。
         </div>

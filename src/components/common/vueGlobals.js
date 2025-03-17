@@ -1,10 +1,9 @@
-import Vue from 'vue';
 import Clipboard from 'clipboard';
 import timeSvc from '../../services/timeSvc';
 import store from '../../store';
 
 // Global directives
-Vue.directive('focus', {
+this.$app.directive('focus', {
   inserted(el) {
     el.focus();
     const { value } = el;
@@ -22,7 +21,7 @@ const setVisible = (el, value) => {
     el.setAttribute('aria-hidden', 'true');
   }
 };
-Vue.directive('show', {
+this.$app.directive('show', {
   bind(el, { value }) {
     setVisible(el, value);
   },
@@ -37,7 +36,7 @@ const setElTitle = (el, title) => {
   el.title = title;
   el.setAttribute('aria-label', title);
 };
-Vue.directive('title', {
+this.$app.directive('title', {
   bind(el, { value }) {
     setElTitle(el, value);
   },
@@ -58,7 +57,7 @@ const destroyClipboard = (el) => {
     el.seClipboard = null;
   }
 };
-Vue.directive('clipboard', {
+this.$app.directive('clipboard', {
   bind(el, { value }) {
     createClipboard(el, value);
   },
@@ -74,7 +73,7 @@ Vue.directive('clipboard', {
 });
 
 // Global filters
-Vue.filter('formatTime', time =>
+this.$app.filter('formatTime', time =>
   // Access the time counter for reactive refresh
   timeSvc.format(time, store.state.timeCounter));
 

@@ -1,6 +1,6 @@
 import utils from './utils';
 import store from '../store';
-import welcomeFile from '../data/welcomeFile.md';
+import welcomeFile from '../data/welcomeFile.md?raw';
 import workspaceSvc from './workspaceSvc';
 import constants from '../data/constants';
 
@@ -284,10 +284,8 @@ const localDbSvc = {
     Object.entries(storeItemMap).forEach(([, storeItem]) => {
       // Store object has changed
       if (this.hashMap[storeItem.type][storeItem.id] !== storeItem.hash) {
-        const item = {
-          ...storeItem,
-          tx: incrementedTx,
-        };
+        const item = JSON.parse(JSON.stringify(storeItem));
+        item.tx = incrementedTx;
         dbStore.put(item);
         this.hashMap[item.type][item.id] = item.hash;
         this.lastTx = incrementedTx;

@@ -118,7 +118,7 @@ const forceScrollSync = () => {
 };
 store.watch(() => store.getters['data/layoutSettings'].scrollSync, forceScrollSync);
 
-editorSvc.$on('inited', () => {
+editorSvc.on('inited', () => {
   editorScrollerElt = editorSvc.editorElt.parentNode;
   previewScrollerElt = editorSvc.previewElt.parentNode;
 
@@ -141,13 +141,13 @@ editorSvc.$on('inited', () => {
   });
 });
 
-editorSvc.$on('sectionList', () => {
+editorSvc.on('sectionList', () => {
   clearTimeout(timeoutId);
   isPreviewRefreshing = true;
   sectionDescList = [];
 });
 
-editorSvc.$on('previewCtx', () => {
+editorSvc.on('previewCtx', () => {
   // Assume the user is writing in the editor
   isScrollEditor = store.getters['layout/styles'].showEditor;
   // A preview scrolling event can occur if height is smaller
@@ -172,7 +172,7 @@ store.watch(
   },
 );
 
-editorSvc.$on('previewCtxMeasured', (previewCtxMeasured) => {
+editorSvc.on('previewCtxMeasured', (previewCtxMeasured) => {
   if (previewCtxMeasured) {
     ({ sectionDescList } = previewCtxMeasured);
     forceScrollSync();

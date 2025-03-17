@@ -6,7 +6,7 @@
       </div>
       <p><b>ChatGPT内容生成</b><br>生成时长受ChatGPT服务响应与网络响应时长影响，时间可能较长</p>
       <form-entry label="生成内容要求详细描述" error="content">
-        <textarea slot="field" class="text-input" type="text" placeholder="输入内容(支持换行)" v-model.trim="content" :disabled="generating"></textarea>
+        <template v-slot:field><textarea class="text-input" type="text" placeholder="输入内容(支持换行)" v-model.trim="content" :disabled="generating || !chatGptConfig.apiKey"></textarea></template>
         <div class="form-entry__info">
           使用 <a href="https://api35.pxj123.cn/" target="_blank">api35.pxj123.cn</a> 的免费接口生成内容，AI模型是：GPT-3.5 Turbo。
         </div>

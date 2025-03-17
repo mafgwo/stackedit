@@ -7,12 +7,12 @@
       <div class="side-bar__info" v-if="publishLocations.length">
         <p>{{currentFileName}} 已经发布。</p>
         <menu-entry @click.native="requestPublish">
-          <icon-upload slot="icon"></icon-upload>
+          <template v-slot:icon><icon-upload></icon-upload></template>
           <div>立即发布</div>
           <span>发布 {{currentFileName}} 的更新。</span>
         </menu-entry>
         <menu-entry @click.native="managePublish">
-          <icon-view-list slot="icon"></icon-view-list>
+          <template v-slot:icon><icon-view-list></icon-view-list></template>
           <div><div class="menu-entry__label menu-entry__label--count">{{locationCount}}</div> 文件发布</div>
           <span>管理 {{currentFileName}} 的发布位置。</span>
         </menu-entry>
@@ -23,117 +23,117 @@
       <hr>
       <div v-for="token in bloggerTokens" :key="'blogger-' + token.sub">
         <menu-entry @click.native="publishBlogger(token)">
-          <icon-provider slot="icon" provider-id="blogger"></icon-provider>
+          <template v-slot:icon><icon-provider provider-id="blogger"></icon-provider></template>
           <div>发布到 Blogger</div>
           <span>{{token.name}}</span>
         </menu-entry>
         <menu-entry @click.native="publishBloggerPage(token)">
-          <icon-provider slot="icon" provider-id="bloggerPage"></icon-provider>
+          <template v-slot:icon><icon-provider provider-id="bloggerPage"></icon-provider></template>
           <div>发布到 Blogger Page</div>
           <span>{{token.name}}</span>
         </menu-entry>
       </div>
       <div v-for="token in dropboxTokens" :key="token.sub">
         <menu-entry @click.native="publishDropbox(token)">
-          <icon-provider slot="icon" provider-id="dropbox"></icon-provider>
+          <template v-slot:icon><icon-provider provider-id="dropbox"></icon-provider></template>
           <div>发布到 Dropbox</div>
           <span>{{token.name}}</span>
         </menu-entry>
       </div>
       <div v-for="token in githubTokens" :key="token.sub">
         <menu-entry @click.native="publishGist(token)">
-          <icon-provider slot="icon" provider-id="gist"></icon-provider>
+          <template v-slot:icon><icon-provider provider-id="gist"></icon-provider></template>
           <div>发布到 GitHubGist</div>
           <span>{{token.name}}</span>
         </menu-entry>
         <menu-entry @click.native="publishGithub(token)">
-          <icon-provider slot="icon" provider-id="github"></icon-provider>
+          <template v-slot:icon><icon-provider provider-id="github"></icon-provider></template>
           <div>发布到 GitHub</div>
           <span>{{token.name}}</span>
         </menu-entry>
       </div>
       <div v-for="token in giteeTokens" :key="token.sub">
         <menu-entry @click.native="publishGiteeGist(token)">
-          <icon-provider slot="icon" provider-id="giteegist"></icon-provider>
+          <template v-slot:icon><icon-provider provider-id="giteegist"></icon-provider></template>
           <div>发布到 GiteeGist</div>
           <span>{{token.name}}</span>
         </menu-entry>
         <menu-entry @click.native="publishGitee(token)">
-          <icon-provider slot="icon" provider-id="gitee"></icon-provider>
+          <template v-slot:icon><icon-provider provider-id="gitee"></icon-provider></template>
           <div>发布到 Gitee</div>
           <span>{{token.name}}</span>
         </menu-entry>
       </div>
       <div v-for="token in gitlabTokens" :key="token.sub">
         <menu-entry @click.native="publishGitlab(token)">
-          <icon-provider slot="icon" provider-id="gitlab"></icon-provider>
+          <template v-slot:icon><icon-provider provider-id="gitlab"></icon-provider></template>
           <div>发布到 GitLab</div>
           <span>{{token.name}}</span>
         </menu-entry>
       </div>
       <div v-for="token in giteaTokens" :key="token.sub">
         <menu-entry @click.native="publishGitea(token)">
-          <icon-provider slot="icon" provider-id="gitea"></icon-provider>
+          <template v-slot:icon><icon-provider provider-id="gitea"></icon-provider></template>
           <div>发布到 Gitea</div>
           <span>{{token.name}}</span>
         </menu-entry>
       </div>
       <div v-for="token in googleDriveTokens" :key="token.sub">
         <menu-entry @click.native="publishGoogleDrive(token)">
-          <icon-provider slot="icon" provider-id="googleDrive"></icon-provider>
+          <template v-slot:icon><icon-provider provider-id="googleDrive"></icon-provider></template>
           <div>发布到 Google Drive</div>
           <span>{{token.name}}</span>
         </menu-entry>
       </div>
       <div v-for="token in wordpressTokens" :key="token.sub">
         <menu-entry @click.native="publishWordpress(token)">
-          <icon-provider slot="icon" provider-id="wordpress"></icon-provider>
+          <template v-slot:icon><icon-provider provider-id="wordpress"></icon-provider></template>
           <div>发布到 WordPress</div>
           <span>{{token.name}}</span>
         </menu-entry>
       </div>
       <div v-for="token in zendeskTokens" :key="token.sub">
         <menu-entry @click.native="publishZendesk(token)">
-          <icon-provider slot="icon" provider-id="zendesk"></icon-provider>
+          <template v-slot:icon><icon-provider provider-id="zendesk"></icon-provider></template>
           <div>发布到 Zendesk Help Center</div>
           <span>{{token.name}} — {{token.subdomain}}</span>
         </menu-entry>
       </div>
       <hr>
       <menu-entry @click.native="addBloggerAccount">
-        <icon-provider slot="icon" provider-id="blogger"></icon-provider>
+        <template v-slot:icon><icon-provider provider-id="blogger"></icon-provider></template>
         <span>添加 Blogger 账号</span>
       </menu-entry>
       <menu-entry @click.native="addDropboxAccount">
-        <icon-provider slot="icon" provider-id="dropbox"></icon-provider>
+        <template v-slot:icon><icon-provider provider-id="dropbox"></icon-provider></template>
         <span>添加 Dropbox 账号</span>
       </menu-entry>
       <menu-entry @click.native="addGithubAccount">
-        <icon-provider slot="icon" provider-id="github"></icon-provider>
+        <template v-slot:icon><icon-provider provider-id="github"></icon-provider></template>
         <span>添加 GitHub 账号</span>
       </menu-entry>
       <menu-entry @click.native="addGiteeAccount">
-        <icon-provider slot="icon" provider-id="gitee"></icon-provider>
+        <template v-slot:icon><icon-provider provider-id="gitee"></icon-provider></template>
         <span>添加 Gitee 账号</span>
       </menu-entry>
       <menu-entry @click.native="addGitlabAccount">
-        <icon-provider slot="icon" provider-id="gitlab"></icon-provider>
+        <template v-slot:icon><icon-provider provider-id="gitlab"></icon-provider></template>
         <span>添加 GitLab 账号</span>
       </menu-entry>
       <menu-entry @click.native="addGiteaAccount">
-        <icon-provider slot="icon" provider-id="gitea"></icon-provider>
+        <template v-slot:icon><icon-provider provider-id="gitea"></icon-provider></template>
         <span>添加 Gitea 账号</span>
       </menu-entry>
       <menu-entry @click.native="addGoogleDriveAccount">
-        <icon-provider slot="icon" provider-id="googleDrive"></icon-provider>
+        <template v-slot:icon><icon-provider provider-id="googleDrive"></icon-provider></template>
         <span>添加 Google Drive 账号</span>
       </menu-entry>
       <menu-entry @click.native="addWordpressAccount">
-        <icon-provider slot="icon" provider-id="wordpress"></icon-provider>
+        <template v-slot:icon><icon-provider provider-id="wordpress"></icon-provider></template>
         <span>添加 WordPress 账号</span>
       </menu-entry>
       <menu-entry @click.native="addZendeskAccount">
-        <icon-provider slot="icon" provider-id="zendesk"></icon-provider>
+        <template v-slot:icon><icon-provider provider-id="zendesk"></icon-provider></template>
         <span>添加 Zendesk 账号</span>
       </menu-entry>
     </div>

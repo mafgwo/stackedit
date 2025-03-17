@@ -58,7 +58,7 @@
 </template>
 
 <script>
-import Vue from 'vue';
+import { reactive } from 'vue';
 import store from '../store';
 
 const steps = [
@@ -73,7 +73,7 @@ const steps = [
 export default {
   data: () => ({
     stepIdx: 0,
-    stepStyles: {},
+    stepStyles: reactive({}),
   }),
   computed: {
     step() {
@@ -112,7 +112,7 @@ export default {
             default:
               return;
           }
-          Vue.set(this.stepStyles, step, style);
+          this.stepStyles[step] = style;
         });
       });
     },
@@ -190,7 +190,7 @@ $tour-step-width: 240px;
 
   .tour-step--welcome &,
   .tour-step--end & {
-    left: -$tour-step-width/2;
+    left: calc(-1 * $tour-step-width / 2);
     top: 36px;
     border-bottom-right-radius: 0;
 

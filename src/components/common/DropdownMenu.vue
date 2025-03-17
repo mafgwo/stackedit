@@ -97,8 +97,8 @@
     background-color: #666;
     border: 1px solid #666;
     border-radius: 4px;
-    -webkit-box-shadow: 0 6px 12px rgb(0, 0, 0 / 18%);
-    box-shadow: 0 6px 12px rgb(0, 0, 0 / 18%);
+    -webkit-box-shadow: 0 6px 12px rgba(0, 0, 0, 0.18);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.18);
     background-clip: padding-box;
 
     li {

@@ -6,20 +6,20 @@
       </div>
       <p>保存 <b>{{currentFileName}}</b> 并与您的 <b>Gitee</b> 仓库保持同步.</p>
       <form-entry label="仓库URL" error="repoUrl">
-        <input slot="field" class="textfield" type="text" v-model.trim="repoUrl" @keydown.enter="resolve()">
+        <template v-slot:field><input class="textfield" type="text" v-model.trim="repoUrl" @keydown.enter="resolve()"></template>
         <div class="form-entry__info">
           <b>例如:</b> https://gitee.com/owner/my-repo
         </div>
       </form-entry>
       <form-entry label="File path" error="path">
-        <input slot="field" class="textfield" type="text" v-model.trim="path" @keydown.enter="resolve()">
+        <template v-slot:field><input class="textfield" type="text" v-model.trim="path" @keydown.enter="resolve()"></template>
         <div class="form-entry__info">
           <b>例如:</b> path/to/README.md<br>
           如果文件存在，将被覆盖。
         </div>
       </form-entry>
       <form-entry label="分支" info="可选的">
-        <input slot="field" class="textfield" type="text" v-model.trim="branch" @keydown.enter="resolve()">
+        <template v-slot:field><input class="textfield" type="text" v-model.trim="branch" @keydown.enter="resolve()"></template>
         <div class="form-entry__info">
           如果未提供，将使用<code> master </code>分支。
         </div>

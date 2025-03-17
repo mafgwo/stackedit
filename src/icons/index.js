@@ -1,4 +1,3 @@
-import Vue from 'vue';
 import Provider from './Provider';
 import FormatBold from './FormatBold';
 import FormatItalic from './FormatItalic';
@@ -67,70 +66,72 @@ import Ellipsis from './Ellipsis';
 import Share from './Share';
 import ChatGpt from './ChatGpt';
 
-Vue.component('iconProvider', Provider);
-Vue.component('iconFormatBold', FormatBold);
-Vue.component('iconFormatItalic', FormatItalic);
-Vue.component('iconFormatQuoteClose', FormatQuoteClose);
-Vue.component('iconLinkVariant', LinkVariant);
-Vue.component('iconFileImage', FileImage);
-Vue.component('iconTable', Table);
-Vue.component('iconFormatListNumbers', FormatListNumbers);
-Vue.component('iconFormatListBulleted', FormatListBulleted);
-Vue.component('iconFormatSize', FormatSize);
-Vue.component('iconFormatStrikethrough', FormatStrikethrough);
-Vue.component('iconStatusBar', StatusBar);
-Vue.component('iconNavigationBar', NavigationBar);
-Vue.component('iconSidePreview', SidePreview);
-Vue.component('iconEye', Eye);
-Vue.component('iconSettings', Settings);
-Vue.component('iconFilePlus', FilePlus);
-Vue.component('iconFileMultiple', FileMultiple);
-Vue.component('iconFileSearch', FileSearch);
-Vue.component('iconFolderPlus', FolderPlus);
-Vue.component('iconDelete', Delete);
-Vue.component('iconClose', Close);
-Vue.component('iconPen', Pen);
-Vue.component('iconTarget', Target);
-Vue.component('iconArrowLeft', ArrowLeft);
-Vue.component('iconHelpCircle', HelpCircle);
-Vue.component('iconToc', Toc);
-Vue.component('iconLogin', Login);
-Vue.component('iconLogout', Logout);
-Vue.component('iconSync', Sync);
-Vue.component('iconSyncOff', SyncOff);
-Vue.component('iconSyncAuto', SyncAuto);
-Vue.component('iconSyncStop', SyncStop);
-Vue.component('iconUpload', Upload);
-Vue.component('iconViewList', ViewList);
-Vue.component('iconDownload', Download);
-Vue.component('iconCodeTags', CodeTags);
-Vue.component('iconCodeBraces', CodeBraces);
-Vue.component('iconOpenInNew', OpenInNew);
-Vue.component('iconInformation', Information);
-Vue.component('iconAlert', Alert);
-Vue.component('iconSignalOff', SignalOff);
-Vue.component('iconFolder', Folder);
-Vue.component('iconScrollSync', ScrollSync);
-Vue.component('iconPrinter', Printer);
-Vue.component('iconUndo', Undo);
-Vue.component('iconRedo', Redo);
-Vue.component('iconContentSave', ContentSave);
-Vue.component('iconMessage', Message);
-Vue.component('iconHistory', History);
-Vue.component('iconDatabase', Database);
-Vue.component('iconMagnify', Magnify);
-Vue.component('iconFormatListChecks', FormatListChecks);
-Vue.component('iconCheckCircle', CheckCircle);
-Vue.component('iconCheckCircleUn', CheckCircleUn);
-Vue.component('iconContentCopy', ContentCopy);
-Vue.component('iconKey', Key);
-Vue.component('iconDotsHorizontal', DotsHorizontal);
-Vue.component('iconSeal', Seal);
-Vue.component('iconSwitchTheme', SwitchTheme);
-Vue.component('iconSearch', Search);
-Vue.component('iconFindReplace', FindReplace);
-Vue.component('iconSelectTheme', SelectTheme);
-Vue.component('iconCopy', Copy);
-Vue.component('iconEllipsis', Ellipsis);
-Vue.component('iconShare', Share);
-Vue.component('iconChatGpt', ChatGpt);
+export default ({
+  'iconProvider': Provider,
+  'iconFormatBold': FormatBold,
+  'iconFormatItalic': FormatItalic,
+  'iconFormatQuoteClose': FormatQuoteClose,
+  'iconLinkVariant': LinkVariant,
+  'iconFileImage': FileImage,
+  'iconTable': Table,
+  'iconFormatListNumbers': FormatListNumbers,
+  'iconFormatListBulleted': FormatListBulleted,
+  'iconFormatSize': FormatSize,
+  'iconFormatStrikethrough': FormatStrikethrough,
+  'iconStatusBar': StatusBar,
+  'iconNavigationBar': NavigationBar,
+  'iconSidePreview': SidePreview,
+  'iconEye': Eye,
+  'iconSettings': Settings,
+  'iconFilePlus': FilePlus,
+  'iconFileMultiple': FileMultiple,
+  'iconFileSearch': FileSearch,
+  'iconFolderPlus': FolderPlus,
+  'iconDelete': Delete,
+  'iconClose': Close,
+  'iconPen': Pen,
+  'iconTarget': Target,
+  'iconArrowLeft': ArrowLeft,
+  'iconHelpCircle': HelpCircle,
+  'iconToc': Toc,
+  'iconLogin': Login,
+  'iconLogout': Logout,
+  'iconSync': Sync,
+  'iconSyncOff': SyncOff,
+  'iconSyncAuto': SyncAuto,
+  'iconSyncStop': SyncStop,
+  'iconUpload': Upload,
+  'iconViewList': ViewList,
+  'iconDownload': Download,
+  'iconCodeTags': CodeTags,
+  'iconCodeBraces': CodeBraces,
+  'iconOpenInNew': OpenInNew,
+  'iconInformation': Information,
+  'iconAlert': Alert,
+  'iconSignalOff': SignalOff,
+  'iconFolder': Folder,
+  'iconScrollSync': ScrollSync,
+  'iconPrinter': Printer,
+  'iconUndo': Undo,
+  'iconRedo': Redo,
+  'iconContentSave': ContentSave,
+  'iconMessage': Message,
+  'iconHistory': History,
+  'iconDatabase': Database,
+  'iconMagnify': Magnify,
+  'iconFormatListChecks': FormatListChecks,
+  'iconCheckCircle': CheckCircle,
+  'iconCheckCircleUn': CheckCircleUn,
+  'iconContentCopy': ContentCopy,
+  'iconKey': Key,
+  'iconDotsHorizontal': DotsHorizontal,
+  'iconSeal': Seal,
+  'iconSwitchTheme': SwitchTheme,
+  'iconSearch': Search,
+  'iconFindReplace': FindReplace,
+  'iconSelectTheme': SelectTheme,
+  'iconCopy': Copy,
+  'iconEllipsis': Ellipsis,
+  'iconShare': Share,
+  'iconChatGpt': ChatGpt,
+});

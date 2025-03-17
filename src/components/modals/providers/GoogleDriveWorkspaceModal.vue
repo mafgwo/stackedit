@@ -6,7 +6,7 @@
       </div>
       <p>创建一个与<b> Google Drive </b>文件夹同步的文档空间。</p>
       <form-entry label="Folder ID" info="可选的">
-        <input slot="field" class="textfield" type="text" v-model.trim="folderId" @keydown.enter="resolve()">
+        <template v-slot:field><input class="textfield" type="text" v-model.trim="folderId" @keydown.enter="resolve()"></template>
         <div class="form-entry__info">
           如果不提供，将在驱动器根文件夹中创建一个新的Workspace文件夹。
         </div>

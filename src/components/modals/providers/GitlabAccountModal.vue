@@ -7,8 +7,10 @@
       <p>将您的<b>GitLab</b>链接到<b>StackEdit中文版</b>。</p>
       <template v-if="!useServerConf">
         <form-entry label="GitLab URL" error="serverUrl">
-          <input v-if="config.forceServerUrl" slot="field" class="textfield" type="text" disabled="disabled" v-model="config.forceServerUrl">
-          <input v-else slot="field" class="textfield" type="text" v-model.trim="serverUrl" @keydown.enter="resolve()">
+          <template v-slot:field>
+            <input v-if="config.forceServerUrl" class="textfield" type="text" disabled="disabled" v-model="config.forceServerUrl">
+            <input v-else class="textfield" type="text" v-model.trim="serverUrl" @keydown.enter="resolve()">
+          </template>
           <div class="form-entry__info">
             <b>例如:</b> https://gitlab.example.com/
             <span v-if="httpAppUrl">
@@ -17,10 +19,10 @@
           </div>
         </form-entry>
         <form-entry label="Application ID" error="applicationId">
-          <input slot="field" class="textfield" type="text" v-model.trim="applicationId" @keydown.enter="resolve()">
+          <template v-slot:field><input class="textfield" type="text" v-model.trim="applicationId" @keydown.enter="resolve()"></template>
         </form-entry>
         <form-entry label="Application Secret" error="applicationSecret">
-          <input slot="field" class="textfield" type="text" v-model.trim="applicationSecret" @keydown.enter="resolve()">
+          <template v-slot:field><input class="textfield" type="text" v-model.trim="applicationSecret" @keydown.enter="resolve()"></template>
           <div class="form-entry__info">
             您必须使用重定向url <b>{{redirectUrl}}</b>配置OAuth2应用程序
           </div>

@@ -6,20 +6,20 @@
       </div>
       <p>创建一个用于存储图片的<b> Gitea </b>公开仓库文件夹图床。</p>
       <form-entry label="仓库 URL" error="projectUrl">
-        <input slot="field" class="textfield" type="text" v-model.trim="projectUrl" @keydown.enter="resolve()">
+        <template v-slot:field><input class="textfield" type="text" v-model.trim="projectUrl" @keydown.enter="resolve()"></template>
         <div class="form-entry__info">
           <b>例如:</b> {{config.token.serverUrl}}/{owner}/{repo}
         </div>
       </form-entry>
       <form-entry label="文件夹路径" info="可选的">
-        <input slot="field" class="textfield" type="text" placeholder="如：imgs/{YYYY}-{MM}-{DD}" v-model.trim="path" @keydown.enter="resolve()">
+        <template v-slot:field><input class="textfield" type="text" placeholder="如：imgs/{YYYY}-{MM}-{DD}" v-model.trim="path" @keydown.enter="resolve()"></template>
         <div class="form-entry__info">
           如果不提供，默认为 imgs/{YYYY}-{MM}-{DD} 。<br/>
           变量说明：{YYYY}为年变量、{MM}为月变量、{DD}为日变量、{MDNAME}为当前文档名称。
         </div>
       </form-entry>
       <form-entry label="分支" info="可选的">
-        <input slot="field" class="textfield" type="text" v-model.trim="branch" @keydown.enter="resolve()">
+        <template v-slot:field><input class="textfield" type="text" v-model.trim="branch" @keydown.enter="resolve()"></template>
         <div class="form-entry__info">
           如果未提供，将使用<code> master </code>分支。
         </div>

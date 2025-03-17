@@ -31,7 +31,7 @@ export default class PreviewClassApplier {
       }
     };
 
-    editorSvc.$on('previewCtxWithDiffs', this.restoreClass);
+    editorSvc.on('previewCtxWithDiffs', this.restoreClass);
     nextTick(() => this.restoreClass());
   }
 

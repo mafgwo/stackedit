@@ -93,7 +93,7 @@ export default {
     }, 25);
 
     // Watch preview refresh and file name changes
-    editorSvc.$on('previewCtx', onChange);
+    editorSvc.on('previewCtx', onChange);
     store.watch(() => store.getters['file/current'].name, onChange);
   },
 };

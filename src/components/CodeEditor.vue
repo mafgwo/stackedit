@@ -1,5 +1,5 @@
 <template>
-  <pre class="code-editor textfield prism" :disabled="disabled"></pre>
+  <pre ref="codeEditorRoot" class="code-editor textfield prism" :disabled="disabled"></pre>
 </template>
 
 <script>
@@ -9,7 +9,7 @@ import cledit from '../services/editor/cledit';
 export default {
   props: ['value', 'lang', 'disabled', 'scrollClass'],
   mounted() {
-    const preElt = this.$el;
+    const preElt = this.$refs.codeEditorRoot;
     let scrollElt = preElt;
     const scrollCls = this.scrollClass || 'modal';
     while (scrollElt && !scrollElt.classList.contains(scrollCls)) {
@@ -20,7 +20,7 @@ export default {
       clEditor.on('contentChanged', value => this.$emit('changed', value));
       clEditor.init({
         content: this.value,
-        sectionHighlighter: section => Prism.highlight(section.text, Prism.languages[this.lang]),
+        sectionHighlighter: section => Prism.highlight(section.text, Prism.languages[this.lang], this.lang),
       });
       clEditor.toggleEditable(!this.disabled);
     }

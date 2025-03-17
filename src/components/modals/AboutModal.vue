@@ -29,14 +29,15 @@
 import { mapGetters } from 'vuex';
 import ModalInner from './common/ModalInner';
 import markdownConversionSvc from '../../services/markdownConversionSvc';
-import faq from '../../data/faq.md';
+import faq from '../../data/faq.md?raw';
+import pkg from '@/../package.json'
 
 export default {
   components: {
     ModalInner,
   },
   data: () => ({
-    version: VERSION,
+    version: pkg.version,
   }),
   computed: {
     ...mapGetters('modal', [

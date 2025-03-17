@@ -1,4 +1,4 @@
-import md5 from 'js-md5';
+import CryptoJS from 'crypto-js';
 import networkSvc from '../../networkSvc';
 import store from '../../../store';
 import userSvc from '../../userSvc';
@@ -43,7 +43,7 @@ export default {
     token,
     file,
   }) {
-    const newFileName = `${md5(await utils.encodeFiletoBase64(file))}.${file.type.split('/')[1]}`;
+    const newFileName = `${CryptoJS.MD5(await utils.encodeFiletoBase64(file)).toString()}.${file.type.split('/')[1]}`;
     const newfile = new File([file], newFileName, { type: file.type });
     const headers = token.customHeaders || {};
     const formData = token.customParams || {};

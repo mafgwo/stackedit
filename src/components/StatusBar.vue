@@ -56,10 +56,10 @@ export default {
     'styles',
   ]),
   created() {
-    editorSvc.$on('sectionList', () => this.computeText());
-    editorSvc.$on('selectionRange', () => this.computeText());
-    editorSvc.$on('previewCtx', () => this.computeHtml());
-    editorSvc.$on('previewSelectionRange', () => this.computeHtml());
+    editorSvc.on('sectionList', () => this.computeText());
+    editorSvc.on('selectionRange', () => this.computeText());
+    editorSvc.on('previewCtx', () => this.computeHtml());
+    editorSvc.on('previewSelectionRange', () => this.computeHtml());
   },
 
   methods: {

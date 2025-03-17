@@ -182,7 +182,7 @@ function tabKeyHandler(evt, state) {
   return true;
 }
 
-editorSvc.$on('inited', () => {
+editorSvc.on('inited', () => {
   editorSvc.clEditor.addKeystroke(new Keystroke(enterKeyHandler, 50));
   editorSvc.clEditor.addKeystroke(new Keystroke(tabKeyHandler, 50));
 });

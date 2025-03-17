@@ -7,12 +7,12 @@
       <div class="side-bar__info" v-if="syncLocations.length">
         <p>{{currentFileName}} 已同步。</p>
         <menu-entry @click.native="requestSync">
-          <icon-sync slot="icon"></icon-sync>
+          <template v-slot:icon><icon-sync></icon-sync></template>
           <div>立即同步</div>
           <span>下载/上载文件更改。</span>
         </menu-entry>
         <menu-entry @click.native="manageSync">
-          <icon-view-list slot="icon"></icon-view-list>
+          <template v-slot:icon><icon-view-list></icon-view-list></template>
           <div><div class="menu-entry__label menu-entry__label--count">{{locationCount}}</div> 文件同步</div>
           <span>管理 {{currentFileName}} 的同步位置。</span>
         </menu-entry>
@@ -23,109 +23,109 @@
       <hr>
       <div v-for="token in dropboxTokens" :key="token.sub">
         <menu-entry @click.native="openDropbox(token)">
-          <icon-provider slot="icon" provider-id="dropbox"></icon-provider>
+          <template v-slot:icon><icon-provider provider-id="dropbox"></icon-provider></template>
           <div>从 Dropbox 打开</div>
           <span>{{token.name}}</span>
         </menu-entry>
         <menu-entry @click.native="saveDropbox(token)">
-          <icon-provider slot="icon" provider-id="dropbox"></icon-provider>
+          <template v-slot:icon><icon-provider provider-id="dropbox"></icon-provider></template>
           <div>在Dropbox上保存</div>
           <span>{{token.name}}</span>
         </menu-entry>
       </div>
       <div v-for="token in githubTokens" :key="token.sub">
         <menu-entry @click.native="openGithub(token)">
-          <icon-provider slot="icon" provider-id="github"></icon-provider>
+          <template v-slot:icon><icon-provider provider-id="github"></icon-provider></template>
           <div>从 GitHub 打开</div>
           <span>{{token.name}}</span>
         </menu-entry>
         <menu-entry @click.native="saveGithub(token)">
-          <icon-provider slot="icon" provider-id="github"></icon-provider>
+          <template v-slot:icon><icon-provider provider-id="github"></icon-provider></template>
           <div>在GitHub上保存</div>
           <span>{{token.name}}</span>
         </menu-entry>
         <menu-entry @click.native="saveGist(token)">
-          <icon-provider slot="icon" provider-id="gist"></icon-provider>
+          <template v-slot:icon><icon-provider provider-id="gist"></icon-provider></template>
           <div>在GitHubGist上保存</div>
           <span>{{token.name}}</span>
         </menu-entry>
       </div>
       <div v-for="token in giteeTokens" :key="token.sub">
         <menu-entry @click.native="openGitee(token)">
-          <icon-provider slot="icon" provider-id="gitee"></icon-provider>
+          <template v-slot:icon><icon-provider provider-id="gitee"></icon-provider></template>
           <div>从 Gitee 打开</div>
           <span>{{token.name}}</span>
         </menu-entry>
         <menu-entry @click.native="saveGitee(token)">
-          <icon-provider slot="icon" provider-id="gitee"></icon-provider>
+          <template v-slot:icon><icon-provider provider-id="gitee"></icon-provider></template>
           <div>在Gitee上保存</div>
           <span>{{token.name}}</span>
         </menu-entry>
         <menu-entry @click.native="saveGiteeGist(token)">
-          <icon-provider slot="icon" provider-id="giteegist"></icon-provider>
+          <template v-slot:icon><icon-provider provider-id="giteegist"></icon-provider></template>
           <div>在GiteeGist上保存</div>
           <span>{{token.name}}</span>
         </menu-entry>
       </div>
       <div v-for="token in gitlabTokens" :key="token.sub">
         <menu-entry @click.native="openGitlab(token)">
-          <icon-provider slot="icon" provider-id="gitlab"></icon-provider>
+          <template v-slot:icon><icon-provider provider-id="gitlab"></icon-provider></template>
           <div>从 GitLab 打开</div>
           <span>{{token.name}}</span>
         </menu-entry>
         <menu-entry @click.native="saveGitlab(token)">
-          <icon-provider slot="icon" provider-id="gitlab"></icon-provider>
+          <template v-slot:icon><icon-provider provider-id="gitlab"></icon-provider></template>
           <div>在GitLab上保存</div>
           <span>{{token.name}}</span>
         </menu-entry>
       </div>
       <div v-for="token in giteaTokens" :key="token.sub">
         <menu-entry @click.native="openGitea(token)">
-          <icon-provider slot="icon" provider-id="gitea"></icon-provider>
+          <template v-slot:icon><icon-provider provider-id="gitea"></icon-provider></template>
           <div>从 Gitea 打开</div>
           <span>{{token.name}}</span>
         </menu-entry>
         <menu-entry @click.native="saveGitea(token)">
-          <icon-provider slot="icon" provider-id="gitea"></icon-provider>
+          <template v-slot:icon><icon-provider provider-id="gitea"></icon-provider></template>
           <div>在Gitea上保存</div>
           <span>{{token.name}}</span>
         </menu-entry>
       </div>
       <div v-for="token in googleDriveTokens" :key="token.sub">
         <menu-entry @click.native="openGoogleDrive(token)">
-          <icon-provider slot="icon" provider-id="googleDrive"></icon-provider>
+          <template v-slot:icon><icon-provider provider-id="googleDrive"></icon-provider></template>
           <div>从 Google Drive 打开</div>
           <span>{{token.name}}</span>
         </menu-entry>
         <menu-entry @click.native="saveGoogleDrive(token)">
-          <icon-provider slot="icon" provider-id="googleDrive"></icon-provider>
+          <template v-slot:icon><icon-provider provider-id="googleDrive"></icon-provider></template>
           <div>在Google Drive上保存</div>
           <span>{{token.name}}</span>
         </menu-entry>
       </div>
       <hr>
       <menu-entry @click.native="addDropboxAccount">
-        <icon-provider slot="icon" provider-id="dropbox"></icon-provider>
+        <template v-slot:icon><icon-provider provider-id="dropbox"></icon-provider></template>
         <span>添加 Dropbox 账号</span>
       </menu-entry>
       <menu-entry @click.native="addGithubAccount">
-        <icon-provider slot="icon" provider-id="github"></icon-provider>
+        <template v-slot:icon><icon-provider provider-id="github"></icon-provider></template>
         <span>添加 GitHub 账号</span>
       </menu-entry>
       <menu-entry @click.native="addGiteeAccount">
-        <icon-provider slot="icon" provider-id="gitee"></icon-provider>
+        <template v-slot:icon><icon-provider provider-id="gitee"></icon-provider></template>
         <span>添加 Gitee 账号</span>
       </menu-entry>
       <menu-entry @click.native="addGitlabAccount">
-        <icon-provider slot="icon" provider-id="gitlab"></icon-provider>
+        <template v-slot:icon><icon-provider provider-id="gitlab"></icon-provider></template>
         <span>添加 GitLab 账号</span>
       </menu-entry>
       <menu-entry @click.native="addGiteaAccount">
-        <icon-provider slot="icon" provider-id="gitea"></icon-provider>
+        <template v-slot:icon><icon-provider provider-id="gitea"></icon-provider></template>
         <span>添加 Gitea 账号</span>
       </menu-entry>
       <menu-entry @click.native="addGoogleDriveAccount">
-        <icon-provider slot="icon" provider-id="googleDrive"></icon-provider>
+        <template v-slot:icon><icon-provider provider-id="googleDrive"></icon-provider></template>
         <span>添加 Google Drive 账号</span>
       </menu-entry>
     </div>

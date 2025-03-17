@@ -6,7 +6,7 @@
       </div>
       <p>发布<b> {{CurrentFileName}} </b>到<b>GiteeGist</b>。</p>
       <form-entry label="文件名" error="filename">
-        <input slot="field" class="textfield" type="text" v-model.trim="filename" @keydown.enter="resolve()">
+        <template v-slot:field><input class="textfield" type="text" v-model.trim="filename" @keydown.enter="resolve()"></template>
       </form-entry>
       <div class="form-entry">
         <div class="form-entry__checkbox">
@@ -16,17 +16,19 @@
         </div>
       </div>
       <form-entry label="存在Gist ID" info="可选的">
-        <input slot="field" class="textfield" type="text" v-model.trim="gistId" @keydown.enter="resolve()">
+        <template v-slot:field><input class="textfield" type="text" v-model.trim="gistId" @keydown.enter="resolve()"></template>
         <div class="form-entry__info">
           如果文件存在于GiteeGist中，则将被覆盖。
         </div>
       </form-entry>
       <form-entry label="Template">
-        <select slot="field" class="textfield" v-model="selectedTemplate" @keydown.enter="resolve()">
-          <option v-for="(template, id) in allTemplatesById" :key="id" :value="id">
-            {{ template.name }}
-          </option>
-        </select>
+        <template v-slot:field>
+          <select class="textfield" v-model="selectedTemplate" @keydown.enter="resolve()">
+            <option v-for="(template, id) in allTemplatesById" :key="id" :value="id">
+              {{ template.name }}
+            </option>
+          </select>
+        </template>
         <div class="form-entry__actions">
           <a href="javascript:void(0)" @click="configureTemplates">配置模板</a>
         </div>

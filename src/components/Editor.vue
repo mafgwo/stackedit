@@ -1,5 +1,5 @@
 <template>
-  <div class="editor" ondrop="return false;">
+  <div ref="editorRoot" class="editor" ondrop="return false;">
     <pre class="editor__inner markdown-highlighting" :style="{padding: styles.editorPadding}" :class="{monospaced: computedSettings.editor.monospacedFontOnly}"></pre>
     <div class="gutter" :style="{left: styles.editorGutterLeft + 'px'}">
       <comment-list v-if="styles.editorGutterWidth"></comment-list>
@@ -78,7 +78,7 @@ export default {
     if (workspaceImgPath) {
       store.commit('img/setWorkspaceImgPath', JSON.parse(workspaceImgPath));
     }
-    const editorElt = this.$el.querySelector('.editor__inner');
+    const editorElt = this.$refs.editorRoot.querySelector('.editor__inner');
     const onDiscussionEvt = cb => (evt) => {
       let elt = evt.target;
       while (elt && elt !== editorElt) {

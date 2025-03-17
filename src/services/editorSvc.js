@@ -1,8 +1,8 @@
-import Vue from 'vue';
+import mitt from 'mitt';
 import DiffMatchPatch from 'diff-match-patch';
 import Prism from 'prismjs';
 import markdownItPandocRenderer from 'markdown-it-pandoc-renderer';
-import md5 from 'js-md5';
+import CryptoJS from 'crypto-js';
 import cledit from './editor/cledit';
 import pagedown from '../libs/pagedown';
 import htmlSanitizer from '../libs/htmlSanitizer';
@@ -53,7 +53,7 @@ const getImgUrl = async (uri) => {
     if (pathUrlMap[absoluteImgPath]) {
       return pathUrlMap[absoluteImgPath];
     }
-    const md5Id = md5(absoluteImgPath);
+    const md5Id = CryptoJS.MD5(absoluteImgPath).toString();
     let imgItem = await localDbSvc.getImgItem(md5Id);
     if (!imgItem) {
       await syncSvc.syncImg(absoluteImgPath);
@@ -71,8 +71,8 @@ const getImgUrl = async (uri) => {
   return uri;
 };
 
-// Use a vue instance as an event bus
-const editorSvc = Object.assign(new Vue(), editorSvcDiscussions, editorSvcUtils, {
+// Use a mitt() instance as an event bus
+const editorSvc = Object.assign(mitt() , editorSvcDiscussions, editorSvcUtils, {
   // Elements
   editorElt: null,
   previewElt: null,
@@ -118,9 +118,9 @@ const editorSvc = Object.assign(new Vue(), editorSvcDiscussions, editorSvcUtils,
    */
   initClEditor() {
     this.previewCtxMeasured = null;
-    editorSvc.$emit('previewCtxMeasured', null);
+    editorSvc.emit('previewCtxMeasured', null);
     this.previewCtxWithDiffs = null;
-    editorSvc.$emit('previewCtxWithDiffs', null);
+    editorSvc.emit('previewCtxWithDiffs', null);
     const options = {
       sectionHighlighter: section => Prism
         .highlight(section.text, this.prismGrammars[section.data]),
@@ -144,7 +144,7 @@ const editorSvc = Object.assign(new Vue(), editorSvcDiscussions, editorSvcUtils,
    */
   convert() {
     this.conversionCtx = markdownConversionSvc.convert(this.parsingCtx, this.conversionCtx);
-    this.$emit('conversionCtx', this.conversionCtx);
+    this.emit('conversionCtx', this.conversionCtx);
     ({ tokens } = this.parsingCtx.markdownState);
   },
 
@@ -271,7 +271,7 @@ const editorSvc = Object.assign(new Vue(), editorSvcDiscussions, editorSvcUtils,
       text: this.previewElt.textContent,
       sectionDescList,
     };
-    this.$emit('previewCtx', this.previewCtx);
+    this.emit('previewCtx', this.previewCtx);
     this.makeTextToPreviewDiffs();
 
     // Wait for images to load
@@ -308,7 +308,7 @@ const editorSvc = Object.assign(new Vue(), editorSvcDiscussions, editorSvcUtils,
       if (restoreScrollPosition) {
         editorSvc.restoreScrollPosition();
       }
-      editorSvc.$emit('previewCtxMeasured', editorSvc.previewCtxMeasured);
+      editorSvc.emit('previewCtxMeasured', editorSvc.previewCtxMeasured);
     }
   }, 500),
 
@@ -341,7 +341,7 @@ const editorSvc = Object.assign(new Vue(), editorSvcDiscussions, editorSvcUtils,
           setTimeout(() => makeOne(), 10);
         } else {
           editorSvc.previewCtxWithDiffs = editorSvc.previewCtx;
-          editorSvc.$emit('previewCtxWithDiffs', editorSvc.previewCtxWithDiffs);
+          editorSvc.emit('previewCtxWithDiffs', editorSvc.previewCtxWithDiffs);
         }
       };
       makeOne();
@@ -398,7 +398,7 @@ const editorSvc = Object.assign(new Vue(), editorSvcDiscussions, editorSvcUtils,
         }
       }
       editorSvc.previewSelectionRange = range;
-      editorSvc.$emit('previewSelectionRange', editorSvc.previewSelectionRange);
+      editorSvc.emit('previewSelectionRange', editorSvc.previewSelectionRange);
     }
   }, 50),
 
@@ -483,12 +483,12 @@ const editorSvc = Object.assign(new Vue(), editorSvcDiscussions, editorSvcUtils,
     const onEditorChanged = allowDebounce(() => {
       if (this.sectionList !== newSectionList) {
         this.sectionList = newSectionList;
-        this.$emit('sectionList', this.sectionList);
+        this.emit('sectionList', this.sectionList);
         refreshPreview(!instantPreview);
       }
       if (this.selectionRange !== newSelectionRange) {
         this.selectionRange = newSelectionRange;
-        this.$emit('selectionRange', this.selectionRange);
+        this.emit('selectionRange', this.selectionRange);
       }
       this.saveContentState();
     }, 10);
@@ -678,7 +678,7 @@ const editorSvc = Object.assign(new Vue(), editorSvcDiscussions, editorSvcUtils,
     );
 
     this.initHighlighters();
-    this.$emit('inited');
+    this.emit('inited');
   },
 });
 

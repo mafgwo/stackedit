@@ -6,7 +6,7 @@
       </div>
       <p>创建一个与<b>CouchDB</b>数据库同步的文档空间。</p>
       <form-entry label="Database URL" error="dbUrl">
-        <input slot="field" class="textfield" type="text" v-model.trim="dbUrl" @keydown.enter="resolve()">
+        <template v-slot:field><input class="textfield" type="text" v-model.trim="dbUrl" @keydown.enter="resolve()"></template>
         <div class="form-entry__info">
           <b>例如:</b> https://instance.smileupps.com/stackedit-workspace
         </div>

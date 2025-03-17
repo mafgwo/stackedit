@@ -1,5 +1,5 @@
 <template>
-  <div class="find-replace" @keydown.esc.stop="onEscape">
+  <div ref="findReplaceRoot" class="find-replace" @keydown.esc.stop="onEscape">
     <button class="find-replace__close-button button not-tabbable" @click="close()" v-title="'关闭'">
       <icon-close></icon-close>
     </button>
@@ -192,7 +192,7 @@ export default {
           start: this.selectedClassApplier.startMarker.offset,
           end: this.selectedClassApplier.endMarker.offset,
         });
-        selectionMgr.updateCursorCoordinates(this.$el.parentNode.clientHeight);
+        selectionMgr.updateCursorCoordinates(this.$refs.findReplaceRoot.parentNode.clientHeight);
         // Deduce the findPosition
         Object.keys(this.classAppliers).forEach((key, i) => {
           if (this.selectedClassApplier !== this.classAppliers[key]) {
@@ -246,7 +246,7 @@ export default {
 
     // Last open changes trigger focus on text input and find occurence in selection
     this.$watch(() => this.lastOpen, () => {
-      const elt = this.$el.querySelector(`.find-replace__text-input--${this.type}`);
+      const elt = this.$refs.findReplaceRoot.querySelector(`.find-replace__text-input--${this.type}`);
       elt.focus();
       elt.setSelectionRange(0, this[`${this.type}Text`].length);
       // Highlight and find in selection
@@ -266,7 +266,7 @@ export default {
     window.addEventListener('keyup', this.onKeyup);
 
     // Unselect class applier when focus is out of the panel
-    this.onFocusIn = () => this.$el.contains(document.activeElement) ||
+    this.onFocusIn = () => this.$refs.findReplaceRoot.contains(document.activeElement) ||
       setTimeout(() => this.unselectClassApplier(), 15);
     window.addEventListener('focusin', this.onFocusIn);
   },

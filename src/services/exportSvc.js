@@ -1,12 +1,12 @@
-import md5 from 'js-md5';
+import CryptoJS from 'crypto-js';
 import FileSaver from 'file-saver';
-import TemplateWorker from 'worker-loader!./templateWorker.js'; // eslint-disable-line
 import localDbSvc from './localDbSvc';
 import markdownConversionSvc from './markdownConversionSvc';
 import extensionSvc from './extensionSvc';
 import utils from './utils';
 import store from '../store';
 import htmlSanitizer from '../libs/htmlSanitizer';
+import TemplateWorker from './templateWorker.js?worker';
 
 function groupHeadings(headings, level = 1) {
   const result = [];
@@ -39,7 +39,7 @@ const getImgBase64 = async (uri) => {
   if (uri.indexOf('http://') !== 0 && uri.indexOf('https://') !== 0) {
     const currDirNode = store.getters['explorer/selectedNodeFolder'];
     const absoluteImgPath = utils.getAbsoluteFilePath(currDirNode, uri);
-    const md5Id = md5(absoluteImgPath);
+    const md5Id = CryptoJS.MD5(absoluteImgPath).toString();
     const imgItem = await localDbSvc.getImgItem(md5Id);
     if (imgItem) {
       const potIdx = uri.lastIndexOf('.');
@@ -165,14 +165,19 @@ export default {
         reject(new Error('Template generation timeout.'));
       }, 10000);
       worker.addEventListener('message', (e) => {
-        clearTimeout(timeoutId);
-        worker.terminate();
-        // e.data can contain unsafe data if helpers attempts to call postMessage
-        const [err, result] = e.data;
-        if (err) {
-          reject(new Error(`${err}`));
-        } else {
-          resolve(`${result}`);
+        try {
+          clearTimeout(timeoutId);
+          worker.terminate();
+          // e.data can contain unsafe data if helpers attempts to call postMessage
+          const [err, result] = e.data;
+          if (err) {
+            reject(new Error(`${err}`));
+          } else {
+            resolve(`${result}`);
+          }
+        } catch (error) {
+          console.log('event-listener...');
+          console.log(error);
         }
       });
       worker.postMessage([template.value, view, template.helpers]);

@@ -56,8 +56,8 @@ import utils from '../../services/utils';
 import badgeSvc from '../../services/badgeSvc';
 import ModalInner from './common/ModalInner';
 import CodeEditor from '../CodeEditor';
-import emptyTemplateValue from '../../data/empties/emptyTemplateValue.html';
-import emptyTemplateHelpers from '!raw-loader!../../data/empties/emptyTemplateHelpers.js'; // eslint-disable-line
+import emptyTemplateValue from '../../data/empties/emptyTemplateValue.html?raw';
+import emptyTemplateHelpers from '../../data/empties/emptyTemplateHelpers.js?raw'; // eslint-disable-line
 import store from '../../store';
 
 const collator = new Intl.Collator(undefined, { sensitivity: 'base' });

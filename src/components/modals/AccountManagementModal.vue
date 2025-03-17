@@ -46,51 +46,51 @@
         </div>
       </div>
       <menu-entry @click.native="addBloggerAccount">
-        <icon-provider slot="icon" provider-id="blogger"></icon-provider>
+        <template v-slot:icon><icon-provider provider-id="blogger"></icon-provider></template>
         <span>添加Blogger账号</span>
       </menu-entry>
       <menu-entry @click.native="addDropboxAccount">
-        <icon-provider slot="icon" provider-id="dropbox"></icon-provider>
+        <template v-slot:icon><icon-provider provider-id="dropbox"></icon-provider></template>
         <span>添加Dropbox账号</span>
       </menu-entry>
       <menu-entry @click.native="addGithubAccount">
-        <icon-provider slot="icon" provider-id="github"></icon-provider>
+        <template v-slot:icon><icon-provider provider-id="github"></icon-provider></template>
         <span>添加GitHub账号</span>
       </menu-entry>
       <menu-entry @click.native="addGiteeAccount">
-        <icon-provider slot="icon" provider-id="gitee"></icon-provider>
+        <template v-slot:icon><icon-provider provider-id="gitee"></icon-provider></template>
         <span>添加Gitee账号</span>
       </menu-entry>
       <menu-entry @click.native="addGitlabAccount">
-        <icon-provider slot="icon" provider-id="gitlab"></icon-provider>
+        <template v-slot:icon><icon-provider provider-id="gitlab"></icon-provider></template>
         <span>添加GitLab账号</span>
       </menu-entry>
       <menu-entry @click.native="addGiteaAccount">
-        <icon-provider slot="icon" provider-id="gitea"></icon-provider>
+        <template v-slot:icon><icon-provider provider-id="gitea"></icon-provider></template>
         <span>添加Gitea账号</span>
       </menu-entry>
       <menu-entry @click.native="addGoogleDriveAccount">
-        <icon-provider slot="icon" provider-id="googleDrive"></icon-provider>
+        <template v-slot:icon><icon-provider provider-id="googleDrive"></icon-provider></template>
         <span>添加Google Drive账号</span>
       </menu-entry>
       <menu-entry @click.native="addGooglePhotosAccount">
-        <icon-provider slot="icon" provider-id="googlePhotos"></icon-provider>
+        <template v-slot:icon><icon-provider provider-id="googlePhotos"></icon-provider></template>
         <span>添加Google Photos账号</span>
       </menu-entry>
       <menu-entry @click.native="addWordpressAccount">
-        <icon-provider slot="icon" provider-id="wordpress"></icon-provider>
+        <template v-slot:icon><icon-provider provider-id="wordpress"></icon-provider></template>
         <span>添加WordPress账号</span>
       </menu-entry>
       <menu-entry @click.native="addZendeskAccount">
-        <icon-provider slot="icon" provider-id="zendesk"></icon-provider>
+        <template v-slot:icon><icon-provider provider-id="zendesk"></icon-provider></template>
         <span>添加Zendesk账号</span>
       </menu-entry>
       <menu-entry @click.native="addSmmsAccount">
-        <icon-provider slot="icon" provider-id="smms"></icon-provider>
+        <template v-slot:icon><icon-provider provider-id="smms"></icon-provider></template>
         <span>添加SM.MS账号</span>
       </menu-entry>
       <menu-entry @click.native="addCustomAccount">
-        <icon-provider slot="icon" provider-id="custom"></icon-provider>
+        <template v-slot:icon><icon-provider provider-id="custom"></icon-provider></template>
         <span>添加自定义图床账号</span>
       </menu-entry>
     </div>

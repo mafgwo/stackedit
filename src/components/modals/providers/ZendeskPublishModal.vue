@@ -6,26 +6,28 @@
       </div>
       <p>向您的<b>Zendesk帮助中心</b>发布<b> {{CurrentFileName}} </b>。</p>
       <form-entry label="Section ID" error="sectionId">
-        <input slot="field" class="textfield" type="text" v-model.trim="sectionId" @keydown.enter="resolve()">
+        <template v-slot:field><input class="textfield" type="text" v-model.trim="sectionId" @keydown.enter="resolve()"></template>
         <div class="form-entry__info">
           https://example.zendesk.com/hc/en-us/sections/<b>21857469</b>-Section-name
         </div>
       </form-entry>
       <form-entry label="现有的文章ID" info="可选的">
-        <input slot="field" class="textfield" type="text" v-model.trim="articleId" @keydown.enter="resolve()">
+        <template v-slot:field><input class="textfield" type="text" v-model.trim="articleId" @keydown.enter="resolve()"></template>
       </form-entry>
       <form-entry label="语言环境" info="可选的">
-        <input slot="field" class="textfield" type="text" v-model.trim="locale" @keydown.enter="resolve()">
+        <template v-slot:field><input class="textfield" type="text" v-model.trim="locale" @keydown.enter="resolve()"></template>
         <div class="form-entry__info">
           <b>默认:</b> en-us
         </div>
       </form-entry>
       <form-entry label="模板">
-        <select slot="field" class="textfield" v-model="selectedTemplate" @keydown.enter="resolve()">
-          <option v-for="(template, id) in allTemplatesById" :key="id" :value="id">
-            {{ template.name }}
-          </option>
-        </select>
+        <template v-slot:field>
+          <select class="textfield" v-model="selectedTemplate" @keydown.enter="resolve()">
+            <option v-for="(template, id) in allTemplatesById" :key="id" :value="id">
+              {{ template.name }}
+            </option>
+          </select>
+        </template>
         <div class="form-entry__actions">
           <a href="javascript:void(0)" @click="configureTemplates">配置模板</a>
         </div>

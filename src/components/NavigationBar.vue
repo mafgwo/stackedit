@@ -18,9 +18,9 @@
         <icon-sync-off v-if="offline"></icon-sync-off>
       </div>
       <!-- Title -->
-      <div class="navigation-bar__title navigation-bar__title--fake text-input"></div>
+      <div ref="titleFakeElt" class="navigation-bar__title navigation-bar__title--fake text-input"></div>
       <div class="navigation-bar__title navigation-bar__title--text text-input" :style="{width: titleWidth + 'px'}">{{title}}</div>
-      <input class="navigation-bar__title navigation-bar__title--input text-input" :class="{'navigation-bar__title--focus': titleFocus, 'navigation-bar__title--scrolling': titleScrolling}" :style="{width: titleWidth + 'px'}" @focus="editTitle(true)" @blur="editTitle(false)" @keydown.enter="submitTitle(false)" @keydown.esc.stop="submitTitle(true)" @mouseenter="titleHover = true" @mouseleave="titleHover = false" v-model="title">
+      <input ref="titleInputElt" class="navigation-bar__title navigation-bar__title--input text-input" :class="{'navigation-bar__title--focus': titleFocus, 'navigation-bar__title--scrolling': titleScrolling}" :style="{width: titleWidth + 'px'}" @focus="editTitle(true)" @blur="editTitle(false)" @keydown.enter="submitTitle(false)" @keydown.esc.stop="submitTitle(true)" @mouseenter="titleHover = true" @mouseleave="titleHover = false" v-model="title">
       <!-- Sync/Publish -->
       <div class="flex flex--row" :class="{'navigation-bar__hidden': styles.hideLocations}">
         <a class="navigation-bar__button navigation-bar__button--location button" :class="{'navigation-bar__button--blink': location.id === currentLocation.id}" v-for="location in syncLocations" :key="location.id" :href="location.url" target="_blank" v-title="'同步位置'"><icon-provider :provider-id="location.providerId"></icon-provider></a>
@@ -86,6 +86,8 @@ export default {
     title: '',
     titleFocus: false,
     titleHover: false,
+    titleFakeElt: null,
+    titleInputElt: null,
   }),
   computed: {
     ...mapState([
@@ -242,8 +244,8 @@ export default {
     );
   },
   mounted() {
-    this.titleFakeElt = this.$el.querySelector('.navigation-bar__title--fake');
-    this.titleInputElt = this.$el.querySelector('.navigation-bar__title--input');
+    this.titleFakeElt = this.$refs.titleFakeElt;
+    this.titleInputElt = this.$refs.titleInputElt;
     this.mounted = true;
   },
 };
@@ -480,7 +482,7 @@ export default {
 
 $r: 10px;
 $d: $r * 2;
-$b: $d/10;
+$b: calc($d / 10);
 $t: 3000ms;
 
 .navigation-bar__spinner {
@@ -525,7 +527,7 @@ $t: 3000ms;
     height: $r * 0.6;
     left: $r - $b * 1.5;
     top: 50%;
-    animation: spin $t/4 linear infinite;
+    animation: spin calc($t / 4) linear infinite;
   }
 }
 

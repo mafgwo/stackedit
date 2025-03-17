@@ -10,7 +10,7 @@
       </div>
     </label>
     <menu-entry @click.native="exportWorkspace">
-      <icon-content-save slot="icon"></icon-content-save>
+      <template v-slot:icon><icon-content-save></icon-content-save></template>
       导出文档空间备份
     </menu-entry>
   </div>

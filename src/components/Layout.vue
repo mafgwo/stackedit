@@ -1,5 +1,5 @@
 <template>
-  <div class="layout" :class="{'layout--revision': revisionContent}">
+  <div ref="layoutRoot" class="layout" :class="{'layout--revision': revisionContent}">
     <div class="layout__panel flex flex--row" :class="{'flex--end': styles.showSideBar}">
       <div class="layout__panel layout__panel--explorer" v-show="styles.showExplorer" :aria-hidden="!styles.showExplorer" :style="{width: styles.layoutOverflow ? '100%' : constants.explorerWidth + 'px'}">
         <explorer></explorer>
@@ -131,9 +131,9 @@ export default {
     window.addEventListener('contextmenu', this.saveSelection);
   },
   mounted() {
-    const editorElt = this.$el.querySelector('.editor__inner');
-    const previewElt = this.$el.querySelector('.preview__inner-2');
-    const tocElt = this.$el.querySelector('.toc__inner');
+    const editorElt = this.$refs.layoutRoot.querySelector('.editor__inner');
+    const previewElt = this.$refs.layoutRoot.querySelector('.preview__inner-2');
+    const tocElt = this.$refs.layoutRoot.querySelector('.toc__inner');
     editorSvc.init(editorElt, previewElt, tocElt);
 
     // Focus on the editor every time reader mode is disabled

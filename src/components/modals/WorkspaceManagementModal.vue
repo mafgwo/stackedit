@@ -73,7 +73,7 @@
 </template>
 
 <script>
-import Vue from 'vue';
+import { reactive } from 'vue';
 import { mapGetters, mapActions } from 'vuex';
 import ModalInner from './common/ModalInner';
 import workspaceSvc from '../../services/workspaceSvc';
@@ -88,7 +88,7 @@ export default {
   data: () => ({
     editedId: null,
     editingName: '',
-    availableOffline: {},
+    availableOffline: reactive({}),
   }),
   computed: {
     ...mapGetters('modal', [
@@ -183,7 +183,7 @@ export default {
   created() {
     Object.keys(this.workspacesById).forEach(async (workspaceId) => {
       const cancel = localDbSvc.getWorkspaceItems(workspaceId, () => {
-        Vue.set(this.availableOffline, workspaceId, true);
+        this.availableOffline[workspaceId] = true;
         cancel();
       });
     });

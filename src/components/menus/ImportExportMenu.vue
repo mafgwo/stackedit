@@ -22,25 +22,25 @@
     </label>
     <hr>
     <menu-entry @click.native="exportMarkdown">
-      <icon-download slot="icon"></icon-download>
+      <template v-slot:icon><icon-download></icon-download></template>
       <div>导出为 Markdown</div>
       <span>保存纯文本文件。</span>
     </menu-entry>
     <menu-entry @click.native="exportHtml">
-      <icon-download slot="icon"></icon-download>
+      <template v-slot:icon><icon-download></icon-download></template>
       <div>导出为 HTML</div>
       <span>从模板生成HTML页面。</span>
     </menu-entry>
     <menu-entry @click.native="exportPdf">
-      <icon-download slot="icon"></icon-download>
+      <template v-slot:icon><icon-download></icon-download></template>
       <div>导出为 HTML PDF</div>
       <span>从HTML模板生成PDF。</span>
     </menu-entry>
-    <!-- <menu-entry @click.native="exportPandoc">
-      <icon-download slot="icon"></icon-download>
+    <menu-entry @click.native="exportPandoc">
+      <template v-slot:icon><icon-download></icon-download></template>
       <div>导出为 HTML Pandoc</div>
       <span>转换为PDF、Word、EPUB...</span>
-    </menu-entry> -->
+    </menu-entry>
   </div>
 </template>
 

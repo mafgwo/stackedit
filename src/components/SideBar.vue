@@ -17,7 +17,7 @@
       <sync-menu v-else-if="panel === 'sync'"></sync-menu>
       <publish-menu v-else-if="panel === 'publish'"></publish-menu>
       <history-menu v-else-if="panel === 'history'"></history-menu>
-      <export-menu v-else-if="panel === 'export'"></export-menu>
+      <import-export-menu v-else-if="panel === 'export'"></import-export-menu>
       <import-export-menu v-else-if="panel === 'importExport'"></import-export-menu>
       <workspace-backup-menu v-else-if="panel === 'workspaceBackups'"></workspace-backup-menu>
       <div v-else-if="panel === 'help'" class="side-bar__panel side-bar__panel--help">
@@ -45,7 +45,7 @@ import ImportExportMenu from './menus/ImportExportMenu';
 import WorkspaceBackupMenu from './menus/WorkspaceBackupMenu';
 import EditThemeMenu from './menus/EditThemeMenu';
 import PreviewThemeMenu from './menus/PreviewThemeMenu';
-import markdownSample from '../data/markdownSample.md';
+import markdownSample from '../data/markdownSample.md?raw';
 import markdownConversionSvc from '../services/markdownConversionSvc';
 import store from '../store';
 

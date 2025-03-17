@@ -1,4 +1,4 @@
-import 'mermaid';
+import mermaid from 'mermaid';
 import extensionSvc from '../services/extensionSvc';
 import utils from '../services/utils';
 
@@ -39,12 +39,8 @@ const config = {
   },
 };
 
-const containerElt = document.createElement('div');
-containerElt.className = 'hidden-rendering-container';
-document.body.appendChild(containerElt);
-
 let init = () => {
-  window.mermaid.initialize(config);
+  mermaid.initialize(config);
   init = () => {};
 };
 
@@ -52,12 +48,9 @@ const render = (elt) => {
   try {
     init();
     const svgId = `mermaid-svg-${utils.uid()}`;
-    window.mermaid.mermaidAPI.render(svgId, elt.textContent, () => {
-      while (elt.firstChild) {
-        elt.removeChild(elt.lastChild);
-      }
-      elt.appendChild(containerElt.querySelector(`#${svgId}`));
-    }, containerElt);
+    mermaid.render(svgId, elt.textContent).then(({svg}) => {
+      elt.innerHTML = svg;
+    });
   } catch (e) {
     console.error(e); // eslint-disable-line no-console
   }

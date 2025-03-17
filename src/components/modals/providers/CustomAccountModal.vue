@@ -6,37 +6,37 @@
       </div>
       <p>将您的<b>自定义图床</b>账号链接到<b>StackEdit中文版</b>。</p>
       <form-entry label="自定义标识" error="name">
-        <input slot="field" class="textfield" type="text" v-model.trim="name" @keydown.enter="resolve()">
+        <template v-slot:field><input class="textfield" type="text" v-model.trim="name" @keydown.enter="resolve()"></template>
         <div class="form-entry__info">
           自定义标识如果一样会覆盖之前的自定义图床账号。
         </div>
       </form-entry>
       <form-entry label="上传图片接口地址" error="uploadUrl">
-        <input slot="field" class="textfield" type="text" v-model.trim="uploadUrl" @keydown.enter="resolve()">
+        <template v-slot:field><input class="textfield" type="text" v-model.trim="uploadUrl" @keydown.enter="resolve()"></template>
         <div class="form-entry__info">
           填入您个人的图床上传接口地址，上传接口仅支持POST提交。
         </div>
       </form-entry>
       <form-entry label="文件参数名" error="fileParamName">
-        <input slot="field" class="textfield" type="text" v-model.trim="fileParamName" @keydown.enter="resolve()">
+        <template v-slot:field><input class="textfield" type="text" v-model.trim="fileParamName" @keydown.enter="resolve()"></template>
         <div class="form-entry__info">
           文件参数名如：file
         </div>
       </form-entry>
       <form-entry label="自定义请求头配置" error="customHeaders">
-        <input slot="field" class="textfield" type="text" v-model.trim="customHeaders" @keydown.enter="resolve()">
+        <template v-slot:field><input class="textfield" type="text" v-model.trim="customHeaders" @keydown.enter="resolve()"></template>
         <div class="form-entry__info">
           非必填，自定义请求头是JSON字符串格式，如：{"token": "..."}
         </div>
       </form-entry>
       <form-entry label="自定义FORM参数设置" error="customParams">
-        <input slot="field" class="textfield" type="text" v-model.trim="customParams" @keydown.enter="resolve()">
+        <template v-slot:field><input class="textfield" type="text" v-model.trim="customParams" @keydown.enter="resolve()"></template>
         <div class="form-entry__info">
           非必填，自定义FORM参数是JSON字符串格式，如：{"param1": "..."}
         </div>
       </form-entry>
       <form-entry label="响应图片URL参数" error="resultUrlParam">
-        <input slot="field" class="textfield" type="text" v-model.trim="resultUrlParam" @keydown.enter="resolve()">
+        <template v-slot:field><input class="textfield" type="text" v-model.trim="resultUrlParam" @keydown.enter="resolve()"></template>
         <div class="form-entry__info">
           响应JSON中图片URL的路径，如 data.url
         </div>

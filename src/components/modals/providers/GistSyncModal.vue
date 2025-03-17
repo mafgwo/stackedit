@@ -6,7 +6,7 @@
       </div>
       <p>将<b> {{currentFileName}} </b>保存到<b>GitHubGist</b>并保持同步。</p>
       <form-entry label="文件名" error="filename">
-        <input slot="field" class="textfield" type="text" v-model.trim="filename" @keydown.enter="resolve()">
+        <template v-slot:field><input class="textfield" type="text" v-model.trim="filename" @keydown.enter="resolve()"></template>
       </form-entry>
       <div class="form-entry">
         <div class="form-entry__checkbox">
@@ -16,7 +16,7 @@
         </div>
       </div>
       <form-entry label="存在Gist ID" info="可选的">
-        <input slot="field" class="textfield" type="text" v-model.trim="gistId" @keydown.enter="resolve()">
+        <template v-slot:field><input class="textfield" type="text" v-model.trim="gistId" @keydown.enter="resolve()"></template>
         <div class="form-entry__info">
           如果文件存在于GitHubGist中，则将被覆盖。
         </div>

@@ -3,11 +3,13 @@
     <div class="modal__content">
       <p>请为您的<b> HTML导出</b>选择模板。</p>
       <form-entry label="模板">
-        <select class="textfield" slot="field" v-model="selectedTemplate" @keydown.enter="resolve()">
-          <option v-for="(template, id) in allTemplatesById" :key="id" :value="id">
-            {{ template.name }}
-          </option>
-        </select>
+        <template v-slot:field>
+          <select class="textfield" v-model="selectedTemplate" @keydown.enter="resolve()">
+            <option v-for="(template, id) in allTemplatesById" :key="id" :value="id">
+              {{ template.name }}
+            </option>
+          </select>
+        </template>
         <div class="form-entry__actions">
           <a href="javascript:void(0)" @click="configureTemplates">配置模板</a>
         </div>

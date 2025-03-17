@@ -36,7 +36,7 @@ import { mapGetters } from 'vuex';
 import ModalInner from './common/ModalInner';
 import Tab from './common/Tab';
 import CodeEditor from '../CodeEditor';
-import defaultSettings from '../../data/defaults/defaultSettings.yml';
+import defaultSettings from '../../data/defaults/defaultSettings.yml?raw';
 import store from '../../store';
 import badgeSvc from '../../services/badgeSvc';
 
@@ -70,7 +70,7 @@ export default {
     setCustomSettings(value) {
       this.customSettings = value;
       try {
-        yaml.safeLoad(this.strippedCustomSettings);
+        yaml.load(this.strippedCustomSettings);
         this.error = null;
       } catch (e) {
         this.error = e.message;
@@ -80,7 +80,7 @@ export default {
       if (!this.error) {
         const settings = this.strippedCustomSettings;
         await store.dispatch('data/setSettings', settings);
-        const customSettings = yaml.safeLoad(settings);
+        const customSettings = yaml.load(settings);
         if (customSettings.shortcuts) {
           badgeSvc.addBadge('changeShortcuts');
         }

@@ -6,7 +6,7 @@
       </div>
       <p>在当前文档空间增加图片上传路径。</p>
       <form-entry label="图片上传路径" error="path">
-        <input slot="field" class="textfield" type="text" placeholder="如：/imgs/{YYYY}-{MM}-{DD}" v-model.trim="path" @keydown.enter="resolve()">
+        <template v-slot:field><input class="textfield" type="text" placeholder="如：/imgs/{YYYY}-{MM}-{DD}" v-model.trim="path" @keydown.enter="resolve()"></template>
         <div class="form-entry__info">
           如果不提供，默认为 /imgs/{YYYY}-{MM}-{DD}。<br/>
           支持相对路径，如 ./imgs、../imgs 或 imgs 都是相对当前编辑中文档的路径。<br/>

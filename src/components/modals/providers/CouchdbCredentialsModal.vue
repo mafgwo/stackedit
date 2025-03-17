@@ -6,10 +6,10 @@
       </div>
       <p>请提供您的凭据，以登录<b>CouchDB</b>。</p>
       <form-entry label="用户名" error="name">
-        <input slot="field" class="textfield" type="text" v-model.trim="name" @keydown.enter="resolve()">
+        <template v-slot:field><input class="textfield" type="text" v-model.trim="name" @keydown.enter="resolve()"></template>
       </form-entry>
       <form-entry label="密码" error="password">
-        <input slot="field" class="textfield" type="password" v-model.trim="password" @keydown.enter="resolve()">
+        <template v-slot:field><input class="textfield" type="password" v-model.trim="password" @keydown.enter="resolve()"></template>
       </form-entry>
     </div>
     <div class="modal__button-bar">

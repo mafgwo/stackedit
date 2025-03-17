@@ -3,19 +3,21 @@
     <div class="modal__content">
       <p>请为您的<b> pandoc导出</b>选择格式。</p>
       <form-entry label="Template">
-        <select class="textfield" slot="field" v-model="selectedFormat" @keydown.enter="resolve()">
-          <option value="asciidoc">AsciiDoc</option>
-          <option value="context">ConTeXt</option>
-          <option value="epub">EPUB</option>
-          <option value="epub3">EPUB v3</option>
-          <option value="latex">LaTeX</option>
-          <option value="odt">OpenOffice</option>
-          <option value="pdf">PDF</option>
-          <option value="rst">reStructuredText</option>
-          <option value="rtf">Rich Text Format</option>
-          <option value="textile">Textile</option>
-          <option value="docx">Word</option>
-        </select>
+        <template v-slot:field>
+          <select class="textfield" v-model="selectedFormat" @keydown.enter="resolve()">
+            <option value="asciidoc">AsciiDoc</option>
+            <option value="context">ConTeXt</option>
+            <option value="epub">EPUB</option>
+            <option value="epub3">EPUB v3</option>
+            <option value="latex">LaTeX</option>
+            <option value="odt">OpenOffice</option>
+            <option value="pdf">PDF</option>
+            <option value="rst">reStructuredText</option>
+            <option value="rtf">Rich Text Format</option>
+            <option value="textile">Textile</option>
+            <option value="docx">Word</option>
+          </select>
+        </template>
       </form-entry>
     </div>
     <div class="modal__button-bar">

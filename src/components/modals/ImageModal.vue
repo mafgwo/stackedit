@@ -3,7 +3,7 @@
     <div class="modal__content">
       <p>请为您的图像提供<b> url </b>。<span v-if="uploading">(图片上传中...)</span></p>
       <form-entry label="URL" error="url">
-        <input slot="field" class="textfield" type="text" v-model.trim="url" @keydown.enter="resolve">
+        <template v-slot:field><input class="textfield" type="text" v-model.trim="url" @keydown.enter="resolve"></template>
       </form-entry>
     </div>
     <div class="modal__button-bar">
@@ -17,10 +17,12 @@
       <p>添加并选择图床后可在编辑区中粘贴/拖拽图片自动上传</p>
 
       <menu-entry @click.native="checkedImgDest(path)" v-for="path in workspaceImgPath" :key="path">
-        <icon-check-circle v-if="checkedStorage.sub === path" slot="icon"></icon-check-circle>
-        <icon-check-circle-un v-if="checkedStorage.sub !== path" slot="icon"></icon-check-circle-un>
+        <template v-slot:icon>
+          <icon-check-circle v-if="checkedStorage.sub === path"></icon-check-circle>
+          <icon-check-circle-un v-if="checkedStorage.sub !== path"></icon-check-circle-un>
+        </template>
         <menu-item>
-          <icon-provider slot="icon" :provider-id="currentWorkspace.providerId"></icon-provider>
+          <template v-slot:icon><icon-provider :provider-id="currentWorkspace.providerId"></icon-provider></template>
           <div>
             当前文档空间图片路径
             <button class="menu-item__button button" @click.stop="removeByPath(path)" v-title="'删除'">
@@ -31,10 +33,12 @@
         </menu-item>
       </menu-entry>
       <menu-entry @click.native="checkedImgDest(token.sub, token.providerId)" v-for="token in imageTokens" :key="token.sub">
-        <icon-check-circle v-if="checkedStorage.sub === token.sub" slot="icon"></icon-check-circle>
-        <icon-check-circle-un v-if="checkedStorage.sub !== token.sub" slot="icon"></icon-check-circle-un>
+        <template v-slot:icon>
+          <icon-check-circle v-if="checkedStorage.sub === token.sub"></icon-check-circle>
+          <icon-check-circle-un v-if="checkedStorage.sub !== token.sub"></icon-check-circle-un>
+        </template>
         <menu-item>
-          <icon-provider slot="icon" :provider-id="token.providerId"></icon-provider>
+          <template v-slot:icon><icon-provider :provider-id="token.providerId"></icon-provider></template>
           <div>
             {{ token.remark }}
             <button class="menu-item__button button" @click.stop="remove(token.providerId, token)" v-title="'删除'">
@@ -48,10 +52,12 @@
         </menu-item>
       </menu-entry>
       <menu-entry @click.native="checkedImgDest(tokenStorage.token.sub, tokenStorage.providerId, tokenStorage.sid)" v-for="tokenStorage in tokensImgStorages" :key="tokenStorage.sid">
-        <icon-check-circle v-if="checkedStorage.sid === tokenStorage.sid" slot="icon"></icon-check-circle>
-        <icon-check-circle-un v-if="checkedStorage.sid !== tokenStorage.sid" slot="icon"></icon-check-circle-un>
+        <template v-slot:icon>
+          <icon-check-circle v-if="checkedStorage.sid === tokenStorage.sid"></icon-check-circle>
+          <icon-check-circle-un v-if="checkedStorage.sid !== tokenStorage.sid"></icon-check-circle-un>
+        </template>
         <menu-item>
-          <icon-provider slot="icon" :provider-id="tokenStorage.providerId"></icon-provider>
+          <template v-slot:icon><icon-provider :provider-id="tokenStorage.providerId"></icon-provider></template>
           <div>{{tokenStorage.providerName}}
             <button class="menu-item__button button" @click.stop="remove(tokenStorage.providerId, tokenStorage)" v-title="'删除'">
               <icon-delete></icon-delete>
@@ -61,23 +67,23 @@
         </menu-item>
       </menu-entry>
       <menu-entry @click.native="addWorkspaceImgPath">
-        <icon-provider slot="icon" :provider-id="currentWorkspace.providerId"></icon-provider>
+        <template v-slot:icon><icon-provider :provider-id="currentWorkspace.providerId"></icon-provider></template>
         <span>添加当前文档空间图片路径</span>
       </menu-entry>
       <menu-entry @click.native="addSmmsAccount">
-        <icon-provider slot="icon" provider-id="smms"></icon-provider>
+        <template v-slot:icon><icon-provider provider-id="smms"></icon-provider></template>
         <span>添加SM.MS图床账号</span>
       </menu-entry>
       <menu-entry @click.native="addCustomAccount">
-        <icon-provider slot="icon" provider-id="custom"></icon-provider>
+        <template v-slot:icon><icon-provider provider-id="custom"></icon-provider></template>
         <span>添加自定义图床账号</span>
       </menu-entry>
       <menu-entry @click.native="addGiteaImgStorage">
-        <icon-provider slot="icon" provider-id="gitea"></icon-provider>
+        <template v-slot:icon><icon-provider provider-id="gitea"></icon-provider></template>
         <span>添加Gitea图床仓库</span>
       </menu-entry>
       <menu-entry @click.native="addGithubImgStorage">
-        <icon-provider slot="icon" provider-id="github"></icon-provider>
+        <template v-slot:icon><icon-provider provider-id="github"></icon-provider></template>
         <span>添加GitHub图床仓库</span>
       </menu-entry>
     </div>

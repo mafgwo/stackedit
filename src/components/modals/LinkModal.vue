@@ -3,7 +3,7 @@
     <div class="modal__content">
       <p>请为您的链接提供<b> url </b>。</p>
       <form-entry label="URL" error="url">
-        <input slot="field" class="textfield" type="text" v-model.trim="url" @keydown.enter="resolve">
+        <template v-slot:field><input class="textfield" type="text" v-model.trim="url" @keydown.enter="resolve"></template>
       </form-entry>
     </div>
     <div class="modal__button-bar">

@@ -13,40 +13,42 @@
         <div class="modal__title">扩展</div>
         <div class="modal__sub-title">配置Markdown引擎。</div>
         <form-entry label="Preset">
-          <select slot="field" class="textfield" v-model="preset" @keydown.enter="resolve()">
-            <option v-for="(preset, id) in presets" :key="id" :value="preset">
-              {{ preset }}
-            </option>
-          </select>
+          <template v-slot:field>
+            <select class="textfield" v-model="preset" @keydown.enter="resolve()">
+              <option v-for="(preset, id) in presets" :key="id" :value="preset">
+                {{ preset }}
+              </option>
+            </select>
+          </template>
         </form-entry>
         <div class="modal__title">元数据</div>
         <div class="modal__sub-title">将信息添加到您的发布（WordPress，Blogger ...）。</div>
         <form-entry label="Title">
-          <input slot="field" class="textfield" type="text" v-model.trim="title" @keydown.enter="resolve()">
+          <template v-slot:field><input class="textfield" type="text" v-model.trim="title" @keydown.enter="resolve()"></template>
         </form-entry>
         <form-entry label="Author">
-          <input slot="field" class="textfield" type="text" v-model.trim="author" @keydown.enter="resolve()">
+          <template v-slot:field><input class="textfield" type="text" v-model.trim="author" @keydown.enter="resolve()"></template>
         </form-entry>
         <form-entry label="Tags" info="comma-separated">
-          <input slot="field" class="textfield" type="text" v-model.trim="tags" @keydown.enter="resolve()">
+          <template v-slot:field><input class="textfield" type="text" v-model.trim="tags" @keydown.enter="resolve()"></template>
         </form-entry>
         <form-entry label="Categories" info="comma-separated">
-          <input slot="field" class="textfield" type="text" v-model.trim="categories" @keydown.enter="resolve()">
+          <template v-slot:field><input class="textfield" type="text" v-model.trim="categories" @keydown.enter="resolve()"></template>
         </form-entry>
         <form-entry label="Excerpt">
-          <input slot="field" class="textfield" type="text" v-model.trim="excerpt" @keydown.enter="resolve()">
+          <template v-slot:field><input class="textfield" type="text" v-model.trim="excerpt" @keydown.enter="resolve()"></template>
         </form-entry>
         <form-entry label="Featured image">
-          <input slot="field" class="textfield" type="text" v-model.trim="featuredImage" @keydown.enter="resolve()">
+          <template v-slot:field><input class="textfield" type="text" v-model.trim="featuredImage" @keydown.enter="resolve()"></template>
         </form-entry>
         <form-entry label="Status">
-          <input slot="field" class="textfield" type="text" v-model.trim="status" @keydown.enter="resolve()">
+          <template v-slot:field><input class="textfield" type="text" v-model.trim="status" @keydown.enter="resolve()"></template>
           <div class="form-entry__info">
             <b>示例：</b>草稿
           </div>
         </form-entry>
         <form-entry label="Date" info="YYYY-MM-DD">
-          <input slot="field" class="textfield" type="text" v-model.trim="date" @keydown.enter="resolve()">
+          <template v-slot:field><input class="textfield" type="text" v-model.trim="date" @keydown.enter="resolve()"></template>
         </form-entry>
       </div>
       <div v-if="tab === 'yaml'">
@@ -202,7 +204,7 @@ export default {
     setYamlProperties(value) {
       this.yamlProperties = value;
       try {
-        this.properties = yaml.safeLoad(value);
+        this.properties = yaml.load(value);
         this.error = null;
       } catch (e) {
         this.error = e.message;

@@ -6,7 +6,7 @@
       </div>
       <p>将<b> {{CurrentFileName}} </b>保存到您的<b>Dropbox</b>并保持同步。</p>
       <form-entry label="File path" error="path">
-        <input slot="field" class="textfield" type="text" v-model.trim="path" @keydown.enter="resolve()">
+        <template v-slot:field><input class="textfield" type="text" v-model.trim="path" @keydown.enter="resolve()"></template>
         <div class="form-entry__info">
           <b>例如:</b> {{config.token.fullAccess ? '' : '/Applications/StackEdit (restricted)'}}/path/to/My Document.md<br>
           如果文件存在，将被覆盖。

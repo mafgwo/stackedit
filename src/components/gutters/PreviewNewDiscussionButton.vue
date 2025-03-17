@@ -44,7 +44,7 @@ export default {
   },
   mounted() {
     this.$nextTick(() => {
-      editorSvc.$on('previewSelectionRange', () => this.checkSelection());
+      editorSvc.on('previewSelectionRange', () => this.checkSelection());
       this.$watch(
         () => store.getters['layout/styles'].previewWidth,
         () => this.checkSelection(),

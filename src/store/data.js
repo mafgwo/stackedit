@@ -1,16 +1,16 @@
-import Vue from 'vue';
+import { reactive } from 'vue';
 import yaml from 'js-yaml';
 import utils from '../services/utils';
 import defaultWorkspaces from '../data/defaults/defaultWorkspaces';
-import defaultSettings from '../data/defaults/defaultSettings.yml';
+import defaultSettings from '../data/defaults/defaultSettings.yml?raw';
 import defaultLocalSettings from '../data/defaults/defaultLocalSettings';
 import defaultLayoutSettings from '../data/defaults/defaultLayoutSettings';
-import plainHtmlTemplate from '../data/templates/plainHtmlTemplate.html';
-import styledHtmlTemplate from '../data/templates/styledHtmlTemplate.html';
-import styledHtmlWithTocTemplate from '../data/templates/styledHtmlWithTocTemplate.html';
-import styledHtmlWithThemeTemplate from '../data/templates/styledHtmlWithThemeTemplate.html';
-import styledHtmlWithThemeAndTocTemplate from '../data/templates/styledHtmlWithThemeAndTocTemplate.html';
-import jekyllSiteTemplate from '../data/templates/jekyllSiteTemplate.html';
+import plainHtmlTemplate from '../data/templates/plainHtmlTemplate.html?raw';
+import styledHtmlTemplate from '../data/templates/styledHtmlTemplate.html?raw';
+import styledHtmlWithTocTemplate from '../data/templates/styledHtmlWithTocTemplate.html?raw';
+import styledHtmlWithThemeTemplate from '../data/templates/styledHtmlWithThemeTemplate.html?raw';
+import styledHtmlWithThemeAndTocTemplate from '../data/templates/styledHtmlWithThemeAndTocTemplate.html?raw';
+import jekyllSiteTemplate from '../data/templates/jekyllSiteTemplate.html?raw';
 import constants from '../data/constants';
 import features from '../data/features';
 import badgeSvc from '../services/badgeSvc';
@@ -114,14 +114,16 @@ const tokenAdder = providerId => ({ getters, dispatch }, token) => {
   });
 };
 
-export default {
-  namespaced: true,
-  state: {
+const state = reactive({
     // Data items stored in the DB
     itemsById: {},
     // Data items stored in the localStorage
     lsItemsById: {},
-  },
+});
+
+export default {
+  namespaced: true,
+  state,
   mutations: {
     setItem: ({ itemsById, lsItemsById }, value) => {
       // Create an empty item and override its data field
@@ -137,11 +139,15 @@ export default {
       });
 
       // Store item in itemsById or lsItemsById if its stored in the localStorage
-      Vue.set(localStorageIdSet.has(item.id) ? lsItemsById : itemsById, item.id, item);
+      if (localStorageIdSet.has(item.id)) {
+        lsItemsById[item.id] = item;
+      } else {
+        itemsById[item.id] = item;
+      }
     },
     deleteItem({ itemsById }, id) {
       // Only used by localDbSvc to clean itemsById from object moved to localStorage
-      Vue.delete(itemsById, id);
+      delete itemsById[item.id];
     },
   },
   getters: {
@@ -149,8 +155,8 @@ export default {
     workspaces: getter('workspaces'), // Not to be used, prefer workspace/workspacesById
     settings: getter('settings'),
     computedSettings: (state, { settings }) => {
-      const customSettings = yaml.safeLoad(settings);
-      const parsedSettings = yaml.safeLoad(defaultSettings);
+      const customSettings = yaml.load(settings);
+      const parsedSettings = yaml.load(defaultSettings);
       const override = (obj, opt) => {
         const objType = Object.prototype.toString.call(obj);
         const optType = Object.prototype.toString.call(opt);

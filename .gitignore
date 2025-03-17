@@ -1,6 +1,7 @@
 .DS_Store
 node_modules/
 dist/
+diststyle/
 .history
 .idea
 npm-debug.log*
@@ -8,3 +9,13 @@ npm-debug.log*
 stackedit_v4
 chrome-app/*.zip
 /test/unit/coverage/
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?

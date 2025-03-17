@@ -1,7 +1,7 @@
 import editorSvc from '../editorSvc';
 import store from '../../store';
 
-editorSvc.$on('inited', () => {
+editorSvc.on('inited', () => {
   const getPreviewOffset = (elt) => {
     let offset = 0;
     if (!elt || elt === editorSvc.previewElt) {

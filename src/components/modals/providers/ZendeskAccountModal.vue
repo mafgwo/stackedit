@@ -6,13 +6,13 @@
       </div>
       <p>将您的<b>Zendesk</b>链接到<b>StackEdit中文版</b>。</p>
       <form-entry label="Site URL" error="siteUrl">
-        <input slot="field" class="textfield" type="text" v-model.trim="siteUrl" @keydown.enter="resolve()">
+        <template v-slot:field><input class="textfield" type="text" v-model.trim="siteUrl" @keydown.enter="resolve()"></template>
         <div class="form-entry__info">
           <b>例如:</b> https://example.zendesk.com/
         </div>
       </form-entry>
       <form-entry label="Client Unique Identifier" error="clientId">
-        <input slot="field" class="textfield" type="text" v-model.trim="clientId" @keydown.enter="resolve()">
+        <template v-slot:field><input class="textfield" type="text" v-model.trim="clientId" @keydown.enter="resolve()"></template>
         <div class="form-entry__info">
           您必须使用重定向url <b>{{redirectUrl}}</b>配置OAuth客户端
         </div>
