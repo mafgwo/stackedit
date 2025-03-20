@@ -86,9 +86,6 @@ StackEdit中文版
 - 不支持国内常用Gitee
 - 强依赖GoogleDrive，而Google Drive在国内不能正常访问
 
-## 待办
-- PDF的导出功能暂不支持mermaid生成的svg，由于wkhtmltopdf已经很久未更新了，无法兼容最新的mermaid生成的svg，待考虑其他方案生成或提供纯前端生成。
-
 ## 部署说明
 > 建议docker-compose方式部署，其他部署方式如遇到问题欢迎提issue。
 
