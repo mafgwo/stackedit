@@ -81,7 +81,7 @@ export default {
       themeStyleContent = themeStyleEle.innerText;
     }
     containerElt.innerHTML = html;
-    extensionSvc.sectionPreview(containerElt, options);
+    await extensionSvc.sectionPreview(containerElt, options);
 
     // Unwrap tables
     containerElt.querySelectorAll('.table-wrapper').cl_each((wrapperElt) => {

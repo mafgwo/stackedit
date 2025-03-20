@@ -29,9 +29,13 @@ export default {
     });
   },
 
-  sectionPreview(elt, options, isEditor) {
-    sectionPreviewListeners.forEach((listener) => {
-      listener(elt, options, isEditor);
-    });
+  async sectionPreview(elt, options, isEditor) {
+    // 过滤出所有返回 Promise 的 listener 结果
+    const promises = sectionPreviewListeners
+      .map(listener => listener(elt, options, isEditor))
+      .filter(result => result instanceof Promise);
+    
+    // 等待所有 Promise 完成
+    await Promise.all(promises);
   },
 };

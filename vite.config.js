@@ -11,11 +11,23 @@ import vitePluginFaviconsInject from 'vite-plugin-favicons-inject';
 export default defineConfig({
   server: {
     proxy: {
-      // 匹配所有路径
-      '**': {
-        target: 'http://localhost:5000', // 后端接口地址
-        changeOrigin: true, // 修改请求头中的 Origin 为目标地址
-        rewrite: (path) => path // 保留原始路径
+      // 匹配 OAuth2 请求
+      '/oauth2': {
+        target: 'http://localhost:5000',
+        changeOrigin: true
+      },
+      // 匹配其他后端请求
+      '/conf': {
+        target: 'http://localhost:5000',
+        changeOrigin: true
+      },
+      '/pdfExport': {
+        target: 'http://localhost:5000', 
+        changeOrigin: true
+      },
+      '/pandocExport': {
+        target: 'http://localhost:5000',
+        changeOrigin: true
       }
     }
   },

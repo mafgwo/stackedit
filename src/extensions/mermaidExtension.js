@@ -44,15 +44,16 @@ let init = () => {
   init = () => {};
 };
 
-const render = (elt) => {
+const render = async (elt) => {
   try {
     init();
     const svgId = `mermaid-svg-${utils.uid()}`;
-    mermaid.render(svgId, elt.textContent).then(({svg}) => {
-      elt.innerHTML = svg;
-    });
+    const {svg} = await mermaid.render(svgId, elt.textContent);
+    elt.innerHTML = svg;
   } catch (e) {
-    console.error(e); // eslint-disable-line no-console
+    console.error('Mermaid rendering error:', e);
+    // 可以选择添加错误提示
+    elt.innerHTML = `<div class="error">Diagram rendering failed</div>`;
   }
 };
 
@@ -61,6 +62,9 @@ extensionSvc.onGetOptions((options, properties) => {
 });
 
 extensionSvc.onSectionPreview((elt) => {
-  elt.querySelectorAll('.prism.language-mermaid')
-    .cl_each(diagramElt => render(diagramElt.parentNode));
+  const diagrams = Array.from(elt.querySelectorAll('.prism.language-mermaid'));
+  // 返回 Promise.all 以等待所有图表渲染完成
+  return Promise.all(
+    diagrams.map(diagramElt => render(diagramElt.parentNode))
+  );
 });

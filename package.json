@@ -37,7 +37,7 @@
     "markdown-it-pandoc-renderer": "^1.2.0",
     "markdown-it-sub": "^2.0.0",
     "markdown-it-sup": "^2.0.0",
-    "mermaid": "^11.5.0",
+    "mermaid": "^10.9.3",
     "mitt": "^3.0.0",
     "mousetrap": "^1.6.5",
     "normalize-scss": "^8.0.0",

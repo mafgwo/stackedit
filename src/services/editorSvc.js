@@ -161,7 +161,7 @@ const editorSvc = Object.assign(mitt() , editorSvcDiscussions, editorSvcUtils, {
     let insertBeforeTocElt = this.tocElt.firstChild;
     let previewHtml = '';
     let loadingImages = [];
-    this.conversionCtx.htmlSectionDiff.forEach((item) => {
+    for (const item of this.conversionCtx.htmlSectionDiff) {
       for (let i = 0; i < item[1].length; i += 1) {
         const section = this.conversionCtx.sectionList[sectionIdx];
         if (item[0] === 0) {
@@ -202,7 +202,7 @@ const editorSvc = Object.assign(mitt() , editorSvcDiscussions, editorSvcUtils, {
           } else {
             this.previewElt.appendChild(sectionPreviewElt);
           }
-          extensionSvc.sectionPreview(sectionPreviewElt, this.options, true);
+          await extensionSvc.sectionPreview(sectionPreviewElt, this.options, true);
           const imgs = Array.prototype.slice.call(sectionPreviewElt.getElementsByTagName('img')).map((imgElt) => {
             if (imgElt.src.indexOf(constants.origin) >= 0) {
               const uri = decodeURIComponent(imgElt.attributes.src.nodeValue);
@@ -259,7 +259,7 @@ const editorSvc = Object.assign(mitt() , editorSvcDiscussions, editorSvcUtils, {
           sectionDescList.push(new SectionDesc(section, sectionPreviewElt, sectionTocElt, html));
         }
       }
-    });
+    };
 
     this.tocElt.classList[
       this.tocElt.querySelector('.cl-toc-section *') ? 'remove' : 'add'
