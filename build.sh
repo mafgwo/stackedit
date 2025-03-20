@@ -10,6 +10,10 @@ fi
 VERSION="$1"
 IMAGE_NAME="mafgwo/stackedit"
 
+build_fe() {
+  npm run build
+}
+
 # 构建 Docker 镜像
 build_image() {
   docker build -t "$IMAGE_NAME" .

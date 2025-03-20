@@ -1,6 +1,0 @@
-Flask==3.0.3
-Flask-Cors==4.0.2
-Flask-Compress==1.17
-requests==2.32.3
-cairosvg==2.7.1
-bs4==0.0.2

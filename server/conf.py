@@ -1,4 +1,8 @@
 import os
+from dotenv import load_dotenv
+
+env = os.getenv('STACKEDIT_ENV', 'dev')
+load_dotenv(f'server/.env.{env}')
 
 class Config:
     # 类变量，用于存储环境变量的值

@@ -1,0 +1,9 @@
+FROM python:3.11-slim
+
+COPY fonts/NotoSansCJKsc-hinted /root/.fonts/NotoSansCJKsc-hinted
+
+# 安装 wkhtmltopdf
+RUN apt-get update && \
+   apt-get install xvfb libxrender1 libfontconfig1 libssl-dev git wget xfonts-75dpi -y  --allow-unauthenticated && \
+   apt-get install -y wkhtmltopdf && \
+   apt-get autoclean && apt-get clean && rm -rf /var/lib/apt/lists/*

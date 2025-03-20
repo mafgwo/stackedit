@@ -10,7 +10,7 @@ def github_token(args):
 
     try:
         token = _fetch_github_token(client_id, code)
-        return jsonify({"access_token": token})
+        return token
     except Exception as e:
         return jsonify({"error": str(e)}), 400
 

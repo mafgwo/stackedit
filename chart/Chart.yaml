@@ -1,5 +1,0 @@
-apiVersion: v1
-appVersion: vSTACKEDIT_VERSION
-description: In-browser Markdown editor
-name: stackedit
-version: STACKEDIT_VERSION

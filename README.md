@@ -79,12 +79,15 @@ StackEdit中文版
 - 支持ChatGPT生成内容（2023-04-10）
 - GitLab授权接口调整（2023-08-26）
 - 主文档空间支持GitHub登录（2023-10-19）
-- 前端改成vite、后端改成python实现（2025-03-17）
+- 前后端分离，前端改成vite构建并升级相关组件、后端改成python实现（2025-03-20）
 
 ## 国外开源版本弊端：
 - 作者已经不维护了或很少维护了
 - 不支持国内常用Gitee
 - 强依赖GoogleDrive，而Google Drive在国内不能正常访问
+
+## 待办
+- PDF的导出功能暂不支持mermaid生成的svg，由于wkhtmltopdf已经很久未更新了，无法兼容最新的mermaid生成的svg，待考虑其他方案生成或提供纯前端生成。
 
 ## 部署说明
 > 建议docker-compose方式部署，其他部署方式如遇到问题欢迎提issue。
@@ -101,8 +104,6 @@ services:
     container_name: stackedit
     environment:
       - LISTENING_PORT=8080
-      - ROOT_URL=/
-      - USER_BUCKET_NAME=root
       - DROPBOX_APP_KEY=【不需要支持则删掉】
       - DROPBOX_APP_KEY_FULL=【不需要支持则删掉】
       - GITHUB_CLIENT_ID=【不需要支持则删掉】
@@ -138,8 +139,6 @@ docker-compose down
 docker run -itd --name stackedit \
   -p 8080:8080 \
   -e LISTENING_PORT=8080 \
-  -e ROOT_URL=/ \
-  -e USER_BUCKET_NAME=root \
   -e DROPBOX_APP_KEY=【不需要支持则删掉】 \
   -e DROPBOX_APP_KEY_FULL=【不需要支持则删掉】 \
   -e GITHUB_CLIENT_ID=【不需要支持则删掉】 \
@@ -172,20 +171,23 @@ docker run -itd --name stackedit \
 （特别说明：自建的Gitea、Gitlab要能接入stackedit必须支持跨域）
 
 ## 编译与运行
-> 编译运行的nodejs版本选择11.15.0版本
+> 编译运行的后端python版本建议使用3.11.x以上，前端nodejs版本建议20.x
 
 ```bash
-# 安装依赖
+# 后端 -- 加载依赖
+pip install -r server/requirements.txt
+# 后端 -- 启动
+python server/app.py
+
+# 前端-安装依赖
 npm install
 
-# serve with hot reload at localhost:8080
-npm start
+# serve with hot reload at http://localhost:5173/
+npm run dev
 
 # build for production with minification
 npm run build
 
-# build for production and view the bundle analyzer report
-npm run build --report
 ```
 
 ## 欢迎加群交流

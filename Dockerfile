@@ -1,16 +1,13 @@
-FROM mafgwo/wkhtmltopdf-nodejs:11.15.0
+FROM registry.cn-hangzhou.aliyuncs.com/mafgwo/python311-wkhtmltopdf:1.0
 
-WORKDIR /opt/stackedit
+WORKDIR /app
 
-COPY package*json /opt/stackedit/
-COPY gulpfile.js /opt/stackedit/
+COPY dist /app/dist
+COPY static /app/static
+COPY server /app/server
 
-RUN npm install --unsafe-perm \
-  && npm cache clean --force
-COPY . /opt/stackedit
-ENV NODE_ENV production
-RUN npm run build
+RUN pip install -r /app/server/requirements.txt
 
 EXPOSE 8080
 
-CMD [ "node", "." ]
+CMD [ "python", "server/app.py" ]

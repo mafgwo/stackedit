@@ -36,11 +36,11 @@
       <div>导出为 HTML PDF</div>
       <span>从HTML模板生成PDF。</span>
     </menu-entry>
-    <menu-entry @click.native="exportPandoc">
+    <!-- <menu-entry @click.native="exportPandoc">
       <template v-slot:icon><icon-download></icon-download></template>
       <div>导出为 HTML Pandoc</div>
       <span>转换为PDF、Word、EPUB...</span>
-    </menu-entry>
+    </menu-entry> -->
   </div>
 </template>
 

@@ -19,3 +19,4 @@ chrome-app/*.zip
 *.njsproj
 *.sln
 *.sw?
+*/__pycache__/

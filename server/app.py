@@ -14,8 +14,9 @@ config = Config()
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 STATIC_DIR = os.path.join(BASE_DIR, 'static')
 DIST_DIR = os.path.join(BASE_DIR, 'dist')
-print(STATIC_DIR)
-print(DIST_DIR)
+
+LISTENING_PORT = int(os.getenv('LISTENING_PORT', '8080'))
+DEBUG_FLAG =bool(os.getenv('DEBUG_FLAG', 'true'))
 
 # OAuth2 令牌路由
 @app.route('/oauth2/githubToken', methods=['GET'])
@@ -122,4 +123,4 @@ def dist_files(fallback):
     return send_from_directory(DIST_DIR, fallback)
 
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', debug=True)
+    app.run(host='0.0.0.0', port=LISTENING_PORT, debug=DEBUG_FLAG)

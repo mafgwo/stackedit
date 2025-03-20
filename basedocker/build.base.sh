@@ -1,0 +1,1 @@
+docker build -t registry.cn-hangzhou.aliyuncs.com/mafgwo/python311-wkhtmltopdf:1.0 -f Dockerfile.base .
