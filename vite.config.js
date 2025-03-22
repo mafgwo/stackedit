@@ -13,20 +13,20 @@ export default defineConfig({
     proxy: {
       // 匹配 OAuth2 请求
       '/oauth2': {
-        target: 'http://localhost:5000',
+        target: 'http://localhost:8080',
         changeOrigin: true
       },
       // 匹配其他后端请求
       '/conf': {
-        target: 'http://localhost:5000',
+        target: 'http://localhost:8080',
         changeOrigin: true
       },
       '/pdfExport': {
-        target: 'http://localhost:5000', 
+        target: 'http://localhost:8080', 
         changeOrigin: true
       },
       '/pandocExport': {
-        target: 'http://localhost:5000',
+        target: 'http://localhost:8080',
         changeOrigin: true
       },
     }
@@ -62,6 +62,7 @@ export default defineConfig({
         ]
       },
       workbox: {
+        navigateFallback: null,
         maximumFileSizeToCacheInBytes: 3 * 1024 * 1024 // 设置为 3 MiB
       }
     }),

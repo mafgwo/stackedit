@@ -14,15 +14,33 @@ if (!indexedDB) {
 }
 
 registerSW({
+  onRegistered: (registration) => {
+    if (registration) {
+      // 监听 fetch 事件，动态判断路径
+      registration.addEventListener('fetch', (event) => {
+        const url = new URL(event.request.url);
+
+        // 如果路径不是 /app，直接跳过缓存
+        if (!url.pathname.startsWith('/app')) {
+          return;
+        }
+
+        // 否则，返回缓存的 /app 内容
+        event.respondWith(
+          caches.match(event.request).then((response) => {
+            return response || fetch(event.request);
+          })
+        );
+      });
+    }
+  },
   onOfflineReady: () => {
-    // Tells to new SW to take control immediately
-    // Not needed in Vite as default behavior is to take control immediately
+    // 离线就绪时的逻辑
   },
   onNeedRefresh: async () => {
     if (!store.state.light) {
       await localDbSvc.sync();
       localStorage.updated = true;
-      // Reload the webpage to load into the new version
       window.location.reload();
     }
   },

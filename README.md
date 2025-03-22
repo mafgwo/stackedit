@@ -89,7 +89,7 @@ StackEdit中文版
 ## 部署说明
 > 建议docker-compose方式部署，其他部署方式如遇到问题欢迎提issue。
 
-docker官方仓库下载太慢可以使用阿里云的镜像仓库，镜像仓库地址：registry.cn-hangzhou.aliyuncs.com/mafgwo/stackedit:【版本号】
+docker官方仓库下载太慢可以使用阿里云的镜像仓库，镜像仓库地址：registry.cn-hangzhou.aliyuncs.com/mafgwo/stackedit
 
 `docker-compose.yml`如下：
 
@@ -97,10 +97,11 @@ docker官方仓库下载太慢可以使用阿里云的镜像仓库，镜像仓�
 version: "3.7"
 services:
   stackedit:
-    image: mafgwo/stackedit:【docker中央仓库找到最新版本】
+    image: mafgwo/stackedit
     container_name: stackedit
     environment:
       - LISTENING_PORT=8080
+      - DEBUG_FLAG=false
       - DROPBOX_APP_KEY=【不需要支持则删掉】
       - DROPBOX_APP_KEY_FULL=【不需要支持则删掉】
       - GITHUB_CLIENT_ID=【不需要支持则删掉】
@@ -136,6 +137,7 @@ docker-compose down
 docker run -itd --name stackedit \
   -p 8080:8080 \
   -e LISTENING_PORT=8080 \
+  -e DEBUG_FLAG=false \
   -e DROPBOX_APP_KEY=【不需要支持则删掉】 \
   -e DROPBOX_APP_KEY_FULL=【不需要支持则删掉】 \
   -e GITHUB_CLIENT_ID=【不需要支持则删掉】 \
