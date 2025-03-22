@@ -32,6 +32,7 @@ registerSW({
           })
         );
       });
+      console.log('Service Worker 注册成功:', r);
     }
   },
   onOfflineReady: () => {
@@ -43,6 +44,7 @@ registerSW({
       localStorage.updated = true;
       window.location.reload();
     }
+    console.log('需要刷新页面以更新 Service Worker');
   },
 });
 

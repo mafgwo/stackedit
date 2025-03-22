@@ -189,7 +189,7 @@ export default {
       list-style: none;
       cursor: pointer;
       font-size: 14px;
-      margin-right: 10px;
+      margin-right: 14px;
 
       .icon {
         color: #fff;

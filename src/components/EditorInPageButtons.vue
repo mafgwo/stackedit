@@ -164,7 +164,7 @@ export default {
 
   ul {
     padding: 0;
-    margin-left: 10px;
+    margin-left: 20px;
     line-height: 20px;
 
     li {
