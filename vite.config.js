@@ -29,6 +29,10 @@ export default defineConfig({
         target: 'http://localhost:8080',
         changeOrigin: true
       },
+      '/themes': {
+        target: 'http://localhost:8080',
+        changeOrigin: true
+      },
     }
   },
   plugins: [
@@ -61,10 +65,11 @@ export default defineConfig({
           }
         ]
       },
+      registerType: 'autoUpdate', // 自动更新 Service Worker
       workbox: {
         navigateFallback: null,
         maximumFileSizeToCacheInBytes: 3 * 1024 * 1024 // 设置为 3 MiB
-      }
+      },
     }),
   ],
   resolve: {

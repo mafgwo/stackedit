@@ -1,6 +1,8 @@
 <template>
   <div class="comment-list" :class="stickyComment && 'comment-list--' + stickyComment" :style="{width: constants.gutterWidth + 'px'}">
-    <comment v-for="(comment, discussionId) in currentFileDiscussionLastComments" :key="discussionId" v-if="comment.discussionId !== currentDiscussionId" :comment="comment" class="comment--last" :class="'comment--discussion-' + discussionId" :style="{top: tops[discussionId] + 'px'}" @click.native="setCurrentDiscussionId(discussionId)"></comment>
+    <template v-for="(comment, discussionId) in currentFileDiscussionLastComments" :key="discussionId">
+      <comment v-if="comment.discussionId !== currentDiscussionId" :comment="comment" class="comment--last" :class="'comment--discussion-' + discussionId" :style="{top: tops[discussionId] + 'px'}" @click.native="setCurrentDiscussionId(discussionId)"></comment>
+    </template>
     <div class="comment-list__current-discussion" :style="{top: tops.current + 'px'}">
       <comment v-for="(comment, id) in currentDiscussionComments" :key="id" :comment="comment" :class="'comment--' + id"></comment>
       <new-comment v-if="isCommenting"></new-comment>

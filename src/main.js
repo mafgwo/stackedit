@@ -42,6 +42,7 @@ registerSW({
     if (!store.state.light) {
       await localDbSvc.sync();
       localStorage.updated = true;
+      console.log('需要刷新页面以更新 Service Worker');
       window.location.reload();
     }
     console.log('需要刷新页面以更新 Service Worker');

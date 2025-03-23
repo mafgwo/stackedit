@@ -16,9 +16,10 @@
           默认主题无额外样式，请选择其他主题。
         </template>
         <template v-else>
-          <code-editor v-for="(value, index) in styleEles" :key="index"
-            v-if="value.id === `preview-theme-${currPreviewTheme}`" lang="css" :value="value.innerHTML"
-            :disabled="value.id!=='preview-theme-custom'" @changed="changeText" scrollClass="side-bar__inner"></code-editor>
+          <div v-for="(value, index) in styleEles" :key="index">
+            <code-editor v-if="value.id === `preview-theme-${currPreviewTheme}`" lang="css" :value="value.innerHTML"
+              :disabled="value.id!=='preview-theme-custom'" @changed="changeText" scrollClass="side-bar__inner"></code-editor>
+          </div>
         </template>
       </div>
       <div class="flex flex--row flex--end" v-if="currPreviewTheme==='custom'">

@@ -28,8 +28,10 @@
       </div>
       <div class="form-entry">
         <label class="form-entry__label">值</label>
-        <div class="form-entry__field" v-for="(template, id) in templates" :key="id" v-if="id === selectedId">
-          <code-editor lang="handlebars" :value="template.value" :disabled="isReadOnly" @changed="template.value = $event"></code-editor>
+        <div class="form-entry__field">
+          <template v-for="(template, id) in templates" :key="id">
+            <code-editor v-if="id === selectedId" lang="handlebars" :value="template.value" :disabled="isReadOnly" @changed="template.value = $event"></code-editor>
+          </template>
         </div>
       </div>
       <div v-if="!isReadOnly">
@@ -37,8 +39,10 @@
         <div class="form-entry" v-else>
           <br>
           <label class="form-entry__label">帮助</label>
-          <div class="form-entry__field" v-for="(template, id) in templates" :key="id" v-if="id === selectedId">
-            <code-editor lang="javascript" :value="template.helpers" @changed="template.helpers = $event"></code-editor>
+          <div class="form-entry__field">
+            <template v-for="(template, id) in templates" :key="id">
+              <code-editor v-if="id === selectedId" lang="javascript" :value="template.helpers" @changed="template.helpers = $event"></code-editor>
+            </template>
           </div>
         </div>
       </div>

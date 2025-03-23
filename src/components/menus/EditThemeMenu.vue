@@ -16,9 +16,10 @@
           默认主题无额外样式，请选择其他主题。
         </template>
         <template v-else>
-          <code-editor v-for="(value, index) in styleEles" :key="index"
-            v-if="value.id === `edit-theme-${currEditTheme}`" lang="css" :value="value.innerHTML"
-            :disabled="value.id!=='edit-theme-custom'" @changed="changeText" scrollClass="side-bar__inner"></code-editor>
+          <div v-for="(value, index) in styleEles" :key="index">
+            <code-editor v-if="value.id === `edit-theme-${currEditTheme}`" lang="css" :value="value.innerHTML"
+              :disabled="value.id!=='edit-theme-custom'" @changed="changeText" scrollClass="side-bar__inner"></code-editor>
+          </div>
         </template>
       </div>
       <div class="flex flex--row flex--end" v-if="currEditTheme==='custom'">
@@ -81,6 +82,7 @@
           setTimeout(() => this.initStyle(value), 1000);
           return;
         }
+        console.log(`------${styleId}-------${styleEle.id}`)
         this.styleEles.push(styleEle);
       },
     },
