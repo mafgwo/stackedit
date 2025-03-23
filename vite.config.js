@@ -105,7 +105,7 @@ export default defineConfig({
           const hash = createHash('md5').update(assetInfo.source).digest('hex').toLowerCase();
           const ext = assetInfo.names[0].split('.').pop();
           if (assetInfo.names[0] === 'index.css') {
-            return `static/css/app.css`;
+            return `static/css/app.${hash.slice(0,7)}.css`;
           } if (ext === 'png') {
             return `[name].${hash}.[ext]`;
           } else if (ext === 'js') {
