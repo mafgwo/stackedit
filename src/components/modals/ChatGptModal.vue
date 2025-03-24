@@ -4,11 +4,16 @@
       <div class="modal__image">
         <icon-chat-gpt></icon-chat-gpt>
       </div>
-      <p><b>ChatGPT内容生成</b><br>生成时长受ChatGPT服务响应与网络响应时长影响，时间可能较长</p>
+      <p><b>ChatGPT内容生成</b><br>使用Kimi大模型生成</p>
       <form-entry label="生成内容要求详细描述" error="content">
-        <template v-slot:field><textarea class="text-input" type="text" placeholder="输入内容(支持换行)" v-model.trim="content" :disabled="generating || !chatGptConfig.apiKey"></textarea></template>
+        <template v-slot:field><textarea class="text-input" type="text" placeholder="输入内容(支持换行)" v-model.trim="content" :disabled="generating || !apiKey"></textarea></template>
         <div class="form-entry__info">
-          使用 <a href="https://api35.pxj123.cn/" target="_blank">api35.pxj123.cn</a> 的免费接口生成内容，AI模型是：GPT-3.5 Turbo。
+          <span v-if="!apiKey" class="config-warning">
+            未配置apiKey，请点击 <a href="javascript:void(0)" @click="openConfig">配置</a> apiKey。
+          </span>
+          <span v-else>
+            <a href="javascript:void(0)" @click="openConfig">修改apiKey配置</a>
+          </span>
         </div>
       </form-entry>
       <div class="modal__result">
@@ -36,6 +41,9 @@ export default modalTemplate({
     result: '',
     xhr: null,
   }),
+  computedLocalSettings: {
+    apiKey: 'chatgptApiKey',
+  },
   methods: {
     resolve(evt) {
       evt.preventDefault();
@@ -60,12 +68,19 @@ export default modalTemplate({
       this.result = '';
       try {
         this.xhr = chatGptSvc.chat({
-          content: `${this.content}\n(使用Markdown方式输出结果)`,
+          apiKey: this.apiKey,
+          content: this.content,
         }, this.process);
       } catch (err) {
         this.generating = false;
         store.dispatch('notification/error', err);
       }
+    },
+    async openConfig() {
+      try {
+        const config = await store.dispatch('modal/open', { type: 'chatGptConfig', apiKey: this.apiKey });
+        store.dispatch('chatgpt/setCurrConfig', config);
+      } catch (e) { /* Cancel */ }
     },
     reject() {
       if (this.generating) {
@@ -80,14 +95,10 @@ export default modalTemplate({
       callback(null);
     },
   },
-  mounted() {
-    const script = document.createElement('script');
-    script.src = `https://api35.pxj123.cn/js/chat.js?t=${new Date().getTime()}`;
-    script.onload = () => {
-      /* eslint-disable */
-      console.log('加载外部chatgpt的js成功!');
-    };
-    this.$el.appendChild(script);
+  async created() {
+    // store chatgpt配置
+    const config = localStorage.getItem('chatgpt/config');
+    store.dispatch('chatgpt/setCurrConfig', JSON.parse(config || '{}'));
   },
 });
 </script>

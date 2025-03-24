@@ -19,6 +19,7 @@ import workspace from './workspace';
 import img from './img';
 import theme from './theme';
 import locationTemplate from './locationTemplate';
+import chatgpt from './chatgpt';
 import emptyPublishLocation from '../data/empties/emptyPublishLocation';
 import emptySyncLocation from '../data/empties/emptySyncLocation';
 import constants from '../data/constants';
@@ -47,6 +48,7 @@ const store = createStore({
     workspace,
     img,
     theme,
+    chatgpt,
   },
   state: {
     light: false,
