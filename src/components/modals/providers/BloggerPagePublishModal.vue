@@ -27,7 +27,7 @@
         </div>
       </form-entry>
       <div class="modal__info">
-        <b>提示:</b> 您可以在<a href="javascript:void(0)" @click="openFileProperties">文件属性</a>中提供<code>title</code>的值
+        <b>提示:</b> 您可以在<a href="javascript:void(0)" @click="openFileProperties">文件属性</a>中提供<code>title</code>的值.
       </div>
     </div>
     <div class="modal__button-bar">
