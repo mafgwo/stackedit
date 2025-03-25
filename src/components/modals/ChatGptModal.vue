@@ -6,9 +6,9 @@
       </div>
       <p><b>ChatGPT内容生成</b><br>使用Kimi大模型生成</p>
       <form-entry label="生成内容要求详细描述" error="content">
-        <template v-slot:field><textarea class="text-input" type="text" placeholder="输入内容(支持换行)" v-model.trim="content" :disabled="generating || !apiKey"></textarea></template>
+        <template v-slot:field><textarea class="text-input" type="text" placeholder="输入内容(支持换行)" v-model.trim="content" :disabled="generating || !chatGptConfig.apiKey"></textarea></template>
         <div class="form-entry__info">
-          <span v-if="!apiKey" class="config-warning">
+          <span v-if="!chatGptConfig.apiKey" class="config-warning">
             未配置apiKey，请点击 <a href="javascript:void(0)" @click="openConfig">配置</a> apiKey。
           </span>
           <span v-else>
@@ -30,6 +30,7 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex';
 import modalTemplate from './common/modalTemplate';
 import chatGptSvc from '../../services/chatGptSvc';
 import store from '../../store';
@@ -41,8 +42,10 @@ export default modalTemplate({
     result: '',
     xhr: null,
   }),
-  computedLocalSettings: {
-    apiKey: 'chatgptApiKey',
+  computed: {
+    ...mapGetters('chatgpt', [
+      'chatGptConfig',
+    ]),
   },
   methods: {
     resolve(evt) {
@@ -68,7 +71,7 @@ export default modalTemplate({
       this.result = '';
       try {
         this.xhr = chatGptSvc.chat({
-          apiKey: this.apiKey,
+          apiKey: this.chatGptConfig.apiKey,
           content: this.content,
         }, this.process);
       } catch (err) {
@@ -78,7 +81,7 @@ export default modalTemplate({
     },
     async openConfig() {
       try {
-        const config = await store.dispatch('modal/open', { type: 'chatGptConfig', apiKey: this.apiKey });
+        const config = await store.dispatch('modal/open', { type: 'chatGptConfig', apiKey: this.chatGptConfig.apiKey });
         store.dispatch('chatgpt/setCurrConfig', config);
       } catch (e) { /* Cancel */ }
     },
