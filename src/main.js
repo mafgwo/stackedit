@@ -22,6 +22,8 @@ registerSW({
 
         // 如果路径不是 /app，直接跳过缓存
         if (!url.pathname.startsWith('/app')) {
+          // 其他路径直接请求网络
+          event.respondWith(fetch(event.request));
           return;
         }
 

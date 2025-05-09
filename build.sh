@@ -6,8 +6,15 @@ if [ -z "$1" ]; then
   exit 1
 fi
 
+# 检查参数是否提供版本号
+if [ -z "$2" ]; then
+  echo "请提供构建或推送参数"
+  exit 1
+fi
+
 # 定义版本号变量
 VERSION="$1"
+STAGE="$2"
 IMAGE_NAME="mafgwo/stackedit"
 
 build_fe() {
@@ -34,8 +41,13 @@ push_image() {
 }
 
 # 执行构建、标记和推送
-build_image
-tag_image
-push_image
+if [ $STAGE == "build" ]; then
+  build_image
+  tag_image
+fi
+
+if [ $STAGE == "push" ]; then
+  push_image
+fi
 
 echo "操作完成"

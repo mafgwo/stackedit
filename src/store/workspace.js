@@ -61,6 +61,13 @@ export default {
     mainWorkspaceToken: (state, getters, rootState, rootGetters) =>
       utils.someResult([...Object.values(rootGetters['data/giteeTokensBySub']), ...Object.values(rootGetters['data/githubTokensBySub'])], (token) => {
         if (token.isLogin) {
+          // 区分主文档空间类型
+          if (rootGetters['data/giteeTokensBySub'][token.sub]) {
+            token.providerId = 'giteeAppData'
+          }
+          else if (rootGetters['data/githubTokensBySub'][token.sub]) {
+            token.providerId = 'githubAppData'
+          }
           return token;
         }
         return null;
