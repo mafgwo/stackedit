@@ -5,6 +5,7 @@ diststyle/
 .history
 .idea
 npm-debug.log*
+.npm-cache/
 .vscode
 stackedit_v4
 chrome-app/*.zip
@@ -20,3 +21,4 @@ chrome-app/*.zip
 *.sln
 *.sw?
 */__pycache__/
+/server/.venv/

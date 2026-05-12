@@ -672,9 +672,16 @@ const editorSvc = Object.assign(mitt() , editorSvcDiscussions, editorSvcUtils, {
       },
     );
 
+    let layoutMeasurementFrameId;
     store.watch(
       () => utils.serializeObject(store.getters['layout/styles']),
-      () => this.measureSectionDimensions(false, true, true),
+      () => {
+        // Wait for the layout DOM update before measuring section offsets.
+        window.cancelAnimationFrame(layoutMeasurementFrameId);
+        layoutMeasurementFrameId = window.requestAnimationFrame(() => {
+          this.measureSectionDimensions(false, true, true);
+        });
+      },
     );
 
     this.initHighlighters();

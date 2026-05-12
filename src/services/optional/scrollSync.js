@@ -15,6 +15,7 @@ let sectionDescList = [];
 
 let throttleTimeoutId;
 let throttleLastTime = 0;
+let showSidePreviewTimeoutId;
 
 function throttle(func, wait) {
   clearTimeout(throttleTimeoutId);
@@ -161,7 +162,26 @@ store.watch(
   (showEditor) => {
     isScrollEditor = showEditor;
     isScrollPreview = !showEditor;
+    isEditorMoving = false;
+    isPreviewMoving = false;
     skipAnimation = true;
+  },
+);
+
+store.watch(
+  () => store.getters['layout/styles'].showSidePreview,
+  (showSidePreview) => {
+    clearTimeout(showSidePreviewTimeoutId);
+    isEditorMoving = false;
+    isPreviewMoving = false;
+    isScrollEditor = true;
+    isScrollPreview = false;
+    skipAnimation = true;
+    if (showSidePreview) {
+      showSidePreviewTimeoutId = setTimeout(() => {
+        editorSvc.measureSectionDimensions(false, true);
+      }, 0);
+    }
   },
 );
 

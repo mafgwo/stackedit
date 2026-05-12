@@ -1,5 +1,4 @@
 import { createApp } from 'vue';
-import 'indexeddbshim/dist/indexeddbshim';
 import { registerSW } from "virtual:pwa-register";
 import './extensions';
 import './services/optional';
