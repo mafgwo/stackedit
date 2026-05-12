@@ -61,6 +61,10 @@
         <template v-slot:icon><icon-provider provider-id="gitee"></icon-provider></template>
         <span>添加Gitee账号</span>
       </menu-entry>
+      <menu-entry @click.native="addGitcodeAccount">
+        <template v-slot:icon><icon-provider provider-id="gitcode"></icon-provider></template>
+        <span>添加GitCode账号</span>
+      </menu-entry>
       <menu-entry @click.native="addGitlabAccount">
         <template v-slot:icon><icon-provider provider-id="gitlab"></icon-provider></template>
         <span>添加GitLab账号</span>
@@ -110,6 +114,7 @@ import googleHelper from '../../services/providers/helpers/googleHelper';
 import dropboxHelper from '../../services/providers/helpers/dropboxHelper';
 import githubHelper from '../../services/providers/helpers/githubHelper';
 import giteeHelper from '../../services/providers/helpers/giteeHelper';
+import gitcodeHelper from '../../services/providers/helpers/gitcodeHelper';
 import gitlabHelper from '../../services/providers/helpers/gitlabHelper';
 import giteaHelper from '../../services/providers/helpers/giteaHelper';
 import wordpressHelper from '../../services/providers/helpers/wordpressHelper';
@@ -162,6 +167,13 @@ export default {
           userId: token.sub,
           name: token.name,
           scopes: ['projects', 'pull_requests'],
+        })),
+        ...Object.values(store.getters['data/gitcodeTokensBySub']).map(token => ({
+          token,
+          providerId: 'gitcode',
+          userId: token.sub,
+          name: token.name,
+          scopes: token.scopes || ['all_user', 'all_repository'],
         })),
         ...Object.values(store.getters['data/gitlabTokensBySub']).map(token => ({
           token,
@@ -244,6 +256,12 @@ export default {
       try {
         await store.dispatch('modal/open', { type: 'giteeAccount' });
         await giteeHelper.addAccount();
+      } catch (e) { /* cancel */ }
+    },
+    async addGitcodeAccount() {
+      try {
+        await store.dispatch('modal/open', { type: 'gitcodeAccount' });
+        await gitcodeHelper.addAccount();
       } catch (e) { /* cancel */ }
     },
     async addGitlabAccount() {

@@ -29,6 +29,9 @@
         <span v-else-if="currentWorkspace.providerId === 'giteeWorkspace'">
           <b>{{currentWorkspace.name}}</b> 与 <a :href="workspaceLocationUrl" target="_blank">Gitee 仓库</a> 同步。
         </span>
+        <span v-else-if="currentWorkspace.providerId === 'gitcodeWorkspace'">
+          <b>{{currentWorkspace.name}}</b> 与 <a :href="workspaceLocationUrl" target="_blank">GitCode 仓库</a> 同步。
+        </span>
         <span v-else-if="currentWorkspace.providerId === 'gitlabWorkspace'">
           <b>{{currentWorkspace.name}}</b> 与 <a :href="workspaceLocationUrl" target="_blank">GitLab 项目</a>同步。
         </span>

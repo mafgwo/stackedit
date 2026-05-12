@@ -1,7 +1,7 @@
 import os
 import random
-from flask import Flask, request, send_from_directory, jsonify, redirect, url_for
-from flask_cors import CORS
+import logging
+from flask import Flask, request, send_from_directory, jsonify, redirect
 from flask_compress import Compress
 
 app = Flask(__name__, static_folder='dist')
@@ -16,7 +16,14 @@ STATIC_DIR = os.path.join(BASE_DIR, 'static')
 DIST_DIR = os.path.join(BASE_DIR, 'dist')
 
 LISTENING_PORT = int(os.getenv('LISTENING_PORT', '8080'))
-DEBUG_FLAG =bool(os.getenv('DEBUG_FLAG', 'true'))
+DEBUG_FLAG = os.getenv('DEBUG_FLAG', 'true').lower() == 'true'
+LOG_LEVEL = os.getenv('LOG_LEVEL', 'INFO' if DEBUG_FLAG else 'WARNING').upper()
+HTTP_ACCESS_LOG = os.getenv('HTTP_ACCESS_LOG', 'true' if DEBUG_FLAG else 'false').lower() == 'true'
+
+logging.basicConfig(level=getattr(logging, LOG_LEVEL, logging.WARNING))
+app.logger.setLevel(getattr(logging, LOG_LEVEL, logging.WARNING))
+if not HTTP_ACCESS_LOG:
+    logging.getLogger('werkzeug').setLevel(logging.WARNING)
 
 # OAuth2 令牌路由
 @app.route('/oauth2/githubToken', methods=['GET'])
@@ -28,6 +35,11 @@ def github_token():
 def gitee_token():
     from gitee import gitee_token
     return gitee_token(request.args)
+
+@app.route('/oauth2/gitcodeToken', methods=['GET'])
+def gitcode_token():
+    from gitcode import gitcode_token
+    return gitcode_token(request.args)
 
 @app.route('/oauth2/giteaToken', methods=['GET'])
 def gitea_token():
@@ -109,18 +121,20 @@ def app_index():
 
 @app.route('/static/landing/<path:fallback>')
 def static_landing_files(fallback):
-    print(fallback)
     return send_from_directory(os.path.join(STATIC_DIR, 'landing'), fallback, max_age=86400)
 
 @app.route('/static/<path:fallback>')
 def static_files(fallback):
-    print(fallback)
     return send_from_directory(os.path.join(DIST_DIR, 'static'), fallback, max_age=31536000)
 
 @app.route('/<path:fallback>')
 def dist_files(fallback):
-    print(fallback)
     return send_from_directory(DIST_DIR, fallback)
 
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', port=LISTENING_PORT, debug=DEBUG_FLAG)
+    app.run(
+        host='0.0.0.0',
+        port=LISTENING_PORT,
+        debug=DEBUG_FLAG,
+        use_reloader=DEBUG_FLAG,
+    )

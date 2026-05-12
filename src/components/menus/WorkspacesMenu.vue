@@ -22,6 +22,10 @@
       <template v-slot:icon><icon-provider provider-id="giteeWorkspace"></icon-provider></template>
       <span>新增 <b>Gitee</b> 文档空间</span>
     </menu-entry>
+    <menu-entry @click.native="addGitcodeWorkspace">
+      <template v-slot:icon><icon-provider provider-id="gitcodeWorkspace"></icon-provider></template>
+      <span>新增 <b>GitCode</b> 文档空间</span>
+    </menu-entry>
     <menu-entry @click.native="addGitlabWorkspace">
       <template v-slot:icon><icon-provider provider-id="gitlabWorkspace"></icon-provider></template>
       <span>新增 <b>GitLab</b> 文档空间</span>
@@ -81,6 +85,13 @@ export default {
       try {
         store.dispatch('modal/open', {
           type: 'giteeWorkspace',
+        });
+      } catch (e) { /* Cancel */ }
+    },
+    async addGitcodeWorkspace() {
+      try {
+        store.dispatch('modal/open', {
+          type: 'gitcodeWorkspace',
         });
       } catch (e) { /* Cancel */ }
     },

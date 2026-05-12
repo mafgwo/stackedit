@@ -10,6 +10,7 @@ import githubAppDataProvider from './providers/githubAppDataProvider';
 import './providers/couchdbWorkspaceProvider';
 import './providers/githubWorkspaceProvider';
 import './providers/giteeWorkspaceProvider';
+import './providers/gitcodeWorkspaceProvider';
 import './providers/gitlabWorkspaceProvider';
 import './providers/giteaWorkspaceProvider';
 import './providers/googleDriveWorkspaceProvider';
@@ -831,7 +832,11 @@ const syncWorkspace = async (skipContents = false) => {
     }
 
     if (workspace.id === 'main') {
-      badgeSvc.addBadge(workspace.providerId === 'giteeAppData' ? 'syncMainWorkspace' : 'githubSyncMainWorkspace');
+      const badgeByProviderId = {
+        giteeAppData: 'syncMainWorkspace',
+        githubAppData: 'githubSyncMainWorkspace',
+      };
+      badgeSvc.addBadge(badgeByProviderId[workspace.providerId] || 'syncMainWorkspace');
     }
   } catch (err) {
     if (err && err.message === 'TOO_LATE') {
@@ -974,7 +979,9 @@ const afterSignIn = async () => {
   if (store.getters['workspace/currentWorkspace'].id === 'main' && workspaceProvider) {
     const mainToken = store.getters['workspace/mainWorkspaceToken'];
     // Try to find a suitable workspace sync provider
-    workspaceProvider = mainToken.providerId === 'githubAppData' ? githubAppDataProvider : giteeAppDataProvider;
+    workspaceProvider = mainToken.providerId === 'githubAppData'
+      ? githubAppDataProvider
+      : giteeAppDataProvider;
     await workspaceProvider.initWorkspace();
   }
 };
@@ -994,7 +1001,9 @@ export default {
     // Try to find a suitable workspace sync provider
     workspaceProvider = providerRegistry.providersById[utils.queryParams.providerId];
     if (!workspaceProvider || !workspaceProvider.initWorkspace) {
-      workspaceProvider = mainToken && mainToken.providerId === 'githubAppData' ? githubAppDataProvider : giteeAppDataProvider;
+      workspaceProvider = mainToken && mainToken.providerId === 'githubAppData'
+        ? githubAppDataProvider
+        : giteeAppDataProvider;
     }
     const workspace = await workspaceProvider.initWorkspace();
     // Fix the URL hash

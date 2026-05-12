@@ -69,6 +69,11 @@ import GiteeWorkspaceModal from './modals/providers/GiteeWorkspaceModal';
 import GiteePublishModal from './modals/providers/GiteePublishModal';
 import GiteeGistSyncModal from './modals/providers/GiteeGistSyncModal';
 import GiteeGistPublishModal from './modals/providers/GiteeGistPublishModal';
+import GitcodeAccountModal from './modals/providers/GitcodeAccountModal';
+import GitcodeOpenModal from './modals/providers/GitcodeOpenModal';
+import GitcodeSaveModal from './modals/providers/GitcodeSaveModal';
+import GitcodeWorkspaceModal from './modals/providers/GitcodeWorkspaceModal';
+import GitcodePublishModal from './modals/providers/GitcodePublishModal';
 import GitlabAccountModal from './modals/providers/GitlabAccountModal';
 import GitlabOpenModal from './modals/providers/GitlabOpenModal';
 import GitlabPublishModal from './modals/providers/GitlabPublishModal';
@@ -140,6 +145,11 @@ export default {
     GiteePublishModal,
     GiteeGistSyncModal,
     GiteeGistPublishModal,
+    GitcodeAccountModal,
+    GitcodeOpenModal,
+    GitcodeSaveModal,
+    GitcodeWorkspaceModal,
+    GitcodePublishModal,
     GitlabAccountModal,
     GitlabOpenModal,
     GitlabPublishModal,

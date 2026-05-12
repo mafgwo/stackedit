@@ -165,7 +165,7 @@ export default [
   new Feature(
     'githubSignIn',
     '登录',
-    '使用 Gitee 登录，同步您的主文档空间并解锁功能。',
+    '使用 GitHub 登录，同步您的主文档空间并解锁功能。',
     [
       new Feature(
         'githubSyncMainWorkspace',
@@ -193,6 +193,11 @@ export default [
         'addGiteeWorkspace',
         '创建Gitee文档空间',
         '使用文档空间菜单创建Gitee文档空间。',
+      ),
+      new Feature(
+        'addGitCodeWorkspace',
+        '创建GitCode文档空间',
+        '使用文档空间菜单创建GitCode文档空间。',
       ),
       new Feature(
         'addGitlabWorkspace',
@@ -255,6 +260,11 @@ export default [
         'addGiteeAccount',
         'Gitee账号',
         '将您的Gitee账号链接到StackEdit中文版。',
+      ),
+      new Feature(
+        'addGitCodeAccount',
+        'GitCode账号',
+        '将您的GitCode账号链接到StackEdit中文版。',
       ),
       new Feature(
         'addGitLabAccount',
@@ -349,6 +359,16 @@ export default [
         '使用“同步”菜单将文件保存在GiteeGist中。',
       ),
       new Feature(
+        'openFromGitCode',
+        'GitCode阅读器',
+        '使用“同步”菜单从GitCode仓库打开文件。',
+      ),
+      new Feature(
+        'saveOnGitCode',
+        'GitCode保存',
+        '使用“同步”菜单将文件保存在GitCode仓库中。',
+      ),
+      new Feature(
         'openFromGitlab',
         'GitLab阅读器',
         '使用“同步”菜单从GitLab仓库打开文件。',
@@ -434,6 +454,11 @@ export default [
         'publishToGiteeGist',
         'GiteeGist发布',
         '使用“发布”菜单将文件发布到GiteeGist。',
+      ),
+      new Feature(
+        'publishToGitCode',
+        'GitCode发布',
+        '使用“发布”菜单将文件发布到GitCode仓库。',
       ),
       new Feature(
         'publishToGitlab',

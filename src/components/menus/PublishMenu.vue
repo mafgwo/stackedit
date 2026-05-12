@@ -64,6 +64,13 @@
           <span>{{token.name}}</span>
         </menu-entry>
       </div>
+      <div v-for="token in gitcodeTokens" :key="token.sub">
+        <menu-entry @click.native="publishGitcode(token)">
+          <template v-slot:icon><icon-provider provider-id="gitcode"></icon-provider></template>
+          <div>发布到 GitCode</div>
+          <span>{{token.name}}</span>
+        </menu-entry>
+      </div>
       <div v-for="token in gitlabTokens" :key="token.sub">
         <menu-entry @click.native="publishGitlab(token)">
           <template v-slot:icon><icon-provider provider-id="gitlab"></icon-provider></template>
@@ -116,6 +123,10 @@
         <template v-slot:icon><icon-provider provider-id="gitee"></icon-provider></template>
         <span>添加 Gitee 账号</span>
       </menu-entry>
+      <menu-entry @click.native="addGitcodeAccount">
+        <template v-slot:icon><icon-provider provider-id="gitcode"></icon-provider></template>
+        <span>添加 GitCode 账号</span>
+      </menu-entry>
       <menu-entry @click.native="addGitlabAccount">
         <template v-slot:icon><icon-provider provider-id="gitlab"></icon-provider></template>
         <span>添加 GitLab 账号</span>
@@ -147,6 +158,7 @@ import googleHelper from '../../services/providers/helpers/googleHelper';
 import dropboxHelper from '../../services/providers/helpers/dropboxHelper';
 import githubHelper from '../../services/providers/helpers/githubHelper';
 import giteeHelper from '../../services/providers/helpers/giteeHelper';
+import gitcodeHelper from '../../services/providers/helpers/gitcodeHelper';
 import gitlabHelper from '../../services/providers/helpers/gitlabHelper';
 import giteaHelper from '../../services/providers/helpers/giteaHelper';
 import wordpressHelper from '../../services/providers/helpers/wordpressHelper';
@@ -200,6 +212,9 @@ export default {
     giteeTokens() {
       return tokensToArray(store.getters['data/giteeTokensBySub']);
     },
+    gitcodeTokens() {
+      return tokensToArray(store.getters['data/gitcodeTokensBySub']);
+    },
     gitlabTokens() {
       return tokensToArray(store.getters['data/gitlabTokensBySub']);
     },
@@ -220,6 +235,7 @@ export default {
         && !this.dropboxTokens.length
         && !this.githubTokens.length
         && !this.giteeTokens.length
+        && !this.gitcodeTokens.length
         && !this.gitlabTokens.length
         && !this.giteaTokens.length
         && !this.googleDriveTokens.length
@@ -261,6 +277,12 @@ export default {
         await giteeHelper.addAccount();
       } catch (e) { /* cancel */ }
     },
+    async addGitcodeAccount() {
+      try {
+        await store.dispatch('modal/open', { type: 'gitcodeAccount' });
+        await gitcodeHelper.addAccount();
+      } catch (e) { /* cancel */ }
+    },
     async addGitlabAccount() {
       try {
         const { serverUrl, applicationId, applicationSecret } = await store.dispatch('modal/open', { type: 'gitlabAccount' });
@@ -297,6 +319,7 @@ export default {
     publishGist: publishModalOpener('gistPublish', 'publishToGist'),
     publishGitee: publishModalOpener('giteePublish', 'publishToGitee'),
     publishGiteeGist: publishModalOpener('giteeGistPublish', 'publishGiteeGist'),
+    publishGitcode: publishModalOpener('gitcodePublish', 'publishToGitCode'),
     publishGitlab: publishModalOpener('gitlabPublish', 'publishToGitlab'),
     publishGitea: publishModalOpener('giteaPublish', 'publishToGitea'),
     publishGoogleDrive: publishModalOpener('googleDrivePublish', 'publishToGoogleDrive'),

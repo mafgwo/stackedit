@@ -67,6 +67,18 @@
           <span>{{token.name}}</span>
         </menu-entry>
       </div>
+      <div v-for="token in gitcodeTokens" :key="token.sub">
+        <menu-entry @click.native="openGitcode(token)">
+          <template v-slot:icon><icon-provider provider-id="gitcode"></icon-provider></template>
+          <div>从 GitCode 打开</div>
+          <span>{{token.name}}</span>
+        </menu-entry>
+        <menu-entry @click.native="saveGitcode(token)">
+          <template v-slot:icon><icon-provider provider-id="gitcode"></icon-provider></template>
+          <div>在GitCode上保存</div>
+          <span>{{token.name}}</span>
+        </menu-entry>
+      </div>
       <div v-for="token in gitlabTokens" :key="token.sub">
         <menu-entry @click.native="openGitlab(token)">
           <template v-slot:icon><icon-provider provider-id="gitlab"></icon-provider></template>
@@ -116,6 +128,10 @@
         <template v-slot:icon><icon-provider provider-id="gitee"></icon-provider></template>
         <span>添加 Gitee 账号</span>
       </menu-entry>
+      <menu-entry @click.native="addGitcodeAccount">
+        <template v-slot:icon><icon-provider provider-id="gitcode"></icon-provider></template>
+        <span>添加 GitCode 账号</span>
+      </menu-entry>
       <menu-entry @click.native="addGitlabAccount">
         <template v-slot:icon><icon-provider provider-id="gitlab"></icon-provider></template>
         <span>添加 GitLab 账号</span>
@@ -139,12 +155,14 @@ import googleHelper from '../../services/providers/helpers/googleHelper';
 import dropboxHelper from '../../services/providers/helpers/dropboxHelper';
 import githubHelper from '../../services/providers/helpers/githubHelper';
 import giteeHelper from '../../services/providers/helpers/giteeHelper';
+import gitcodeHelper from '../../services/providers/helpers/gitcodeHelper';
 import gitlabHelper from '../../services/providers/helpers/gitlabHelper';
 import giteaHelper from '../../services/providers/helpers/giteaHelper';
 import googleDriveProvider from '../../services/providers/googleDriveProvider';
 import dropboxProvider from '../../services/providers/dropboxProvider';
 import githubProvider from '../../services/providers/githubProvider';
 import giteeProvider from '../../services/providers/giteeProvider';
+import gitcodeProvider from '../../services/providers/gitcodeProvider';
 import gitlabProvider from '../../services/providers/gitlabProvider';
 import giteaProvider from '../../services/providers/giteaProvider';
 import syncSvc from '../../services/syncSvc';
@@ -192,6 +210,9 @@ export default {
     giteeTokens() {
       return tokensToArray(store.getters['data/giteeTokensBySub']);
     },
+    gitcodeTokens() {
+      return tokensToArray(store.getters['data/gitcodeTokensBySub']);
+    },
     gitlabTokens() {
       return tokensToArray(store.getters['data/gitlabTokensBySub']);
     },
@@ -205,7 +226,8 @@ export default {
       return !this.googleDriveTokens.length
         && !this.dropboxTokens.length
         && !this.githubTokens.length
-        && !this.giteeTokens.length;
+        && !this.giteeTokens.length
+        && !this.gitcodeTokens.length;
     },
   },
   methods: {
@@ -235,6 +257,12 @@ export default {
       try {
         await store.dispatch('modal/open', { type: 'giteeAccount' });
         await giteeHelper.addAccount();
+      } catch (e) { /* cancel */ }
+    },
+    async addGitcodeAccount() {
+      try {
+        await store.dispatch('modal/open', { type: 'gitcodeAccount' });
+        await gitcodeHelper.addAccount();
       } catch (e) { /* cancel */ }
     },
     async addGitlabAccount() {
@@ -327,6 +355,27 @@ export default {
       try {
         await openSyncModal(token, 'giteeSave');
         badgeSvc.addBadge('saveOnGitee');
+      } catch (e) { /* cancel */ }
+    },
+    async openGitcode(token) {
+      try {
+        const syncLocation = await store.dispatch('modal/open', {
+          type: 'gitcodeOpen',
+          token,
+        });
+        store.dispatch(
+          'queue/enqueue',
+          async () => {
+            await gitcodeProvider.openFile(token, syncLocation);
+            badgeSvc.addBadge('openFromGitCode');
+          },
+        );
+      } catch (e) { /* cancel */ }
+    },
+    async saveGitcode(token) {
+      try {
+        await openSyncModal(token, 'gitcodeSave');
+        badgeSvc.addBadge('saveOnGitCode');
       } catch (e) { /* cancel */ }
     },
     async saveGist(token) {

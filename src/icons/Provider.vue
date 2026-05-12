@@ -32,6 +32,8 @@ export default {
         case 'giteeWorkspace':
         case 'giteegist':
           return 'gitee';
+        case 'gitcodeWorkspace':
+          return 'gitcode';
         case 'stackedit':
           return 'stackedit';
         default:
@@ -105,6 +107,10 @@ export default {
 
 .icon-provider--gitee {
   background-image: url(../assets/iconGitee.svg);
+}
+
+.icon-provider--gitcode {
+  background-image: url(../assets/iconGitcode.svg);
 }
 
 .icon-provider--smms {

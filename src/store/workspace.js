@@ -45,6 +45,7 @@ export default {
     currentWorkspaceIsGit: (state, { currentWorkspace }) =>
       currentWorkspace.providerId === 'githubWorkspace'
       || currentWorkspace.providerId === 'giteeWorkspace'
+      || currentWorkspace.providerId === 'gitcodeWorkspace'
       || currentWorkspace.providerId === 'gitlabWorkspace'
       || currentWorkspace.providerId === 'giteaWorkspace'
       || currentWorkspace.providerId === 'giteeAppData'
@@ -52,6 +53,7 @@ export default {
     currentWorkspaceHasUniquePaths: (state, { currentWorkspace }) =>
       currentWorkspace.providerId === 'githubWorkspace'
       || currentWorkspace.providerId === 'giteeWorkspace'
+      || currentWorkspace.providerId === 'gitcodeWorkspace'
       || currentWorkspace.providerId === 'gitlabWorkspace'
       || currentWorkspace.providerId === 'giteaWorkspace'
       || currentWorkspace.providerId === 'giteeAppData'
@@ -59,7 +61,10 @@ export default {
     lastSyncActivityKey: (state, { currentWorkspace }) => `${currentWorkspace.id}/lastSyncActivity`,
     lastFocusKey: (state, { currentWorkspace }) => `${currentWorkspace.id}/lastWindowFocus`,
     mainWorkspaceToken: (state, getters, rootState, rootGetters) =>
-      utils.someResult([...Object.values(rootGetters['data/giteeTokensBySub']), ...Object.values(rootGetters['data/githubTokensBySub'])], (token) => {
+      utils.someResult([
+        ...Object.values(rootGetters['data/giteeTokensBySub']),
+        ...Object.values(rootGetters['data/githubTokensBySub']),
+      ], (token) => {
         if (token.isLogin) {
           // 区分主文档空间类型
           if (rootGetters['data/giteeTokensBySub'][token.sub]) {
@@ -80,6 +85,8 @@ export default {
           return rootGetters['data/githubTokensBySub'][currentWorkspace.sub];
         case 'giteeWorkspace':
           return rootGetters['data/giteeTokensBySub'][currentWorkspace.sub];
+        case 'gitcodeWorkspace':
+          return rootGetters['data/gitcodeTokensBySub'][currentWorkspace.sub];
         case 'gitlabWorkspace':
           return rootGetters['data/gitlabTokensBySub'][currentWorkspace.sub];
         case 'giteaWorkspace':
@@ -97,6 +104,8 @@ export default {
         case 'githubAppData':
         case 'githubWorkspace':
           return 'github';
+        case 'gitcodeWorkspace':
+          return 'gitcode';
         case 'giteeAppData':
         case 'giteeWorkspace':
         default:

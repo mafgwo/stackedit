@@ -18,7 +18,9 @@
               <button class="workspace-entry__button button" @click="edit(id)" v-title="'编辑名称'">
                 <icon-pen></icon-pen>
               </button>
-              <template v-if="workspace.providerId === 'giteeAppData' || workspace.providerId === 'githubAppData' || workspace.providerId === 'githubWorkspace'
+              <template v-if="workspace.providerId === 'giteeAppData'
+                || workspace.providerId === 'githubAppData' || workspace.providerId === 'githubWorkspace'
+                || workspace.providerId === 'gitcodeWorkspace'
                 || workspace.providerId === 'giteeWorkspace' || workspace.providerId === 'gitlabWorkspace' || workspace.providerId === 'giteaWorkspace'">
                 <button class="workspace-entry__button button" @click="stopAutoSync(id)" v-if="workspace.autoSync == undefined || workspace.autoSync" v-title="'关闭自动同步'">
                   <icon-sync-auto></icon-sync-auto>

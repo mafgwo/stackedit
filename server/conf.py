@@ -16,6 +16,8 @@ class Config:
     GITHUB_CLIENT_SECRET = os.getenv("GITHUB_CLIENT_SECRET")
     GITEE_CLIENT_ID = os.getenv("GITEE_CLIENT_ID")
     GITEE_CLIENT_SECRET = os.getenv("GITEE_CLIENT_SECRET")
+    GITCODE_CLIENT_ID = os.getenv("GITCODE_CLIENT_ID")
+    GITCODE_CLIENT_SECRET = os.getenv("GITCODE_CLIENT_SECRET")
     GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID")
     GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
     WORDPRESS_CLIENT_ID = os.getenv("WORDPRESS_CLIENT_ID")
@@ -38,6 +40,8 @@ class Config:
             "githubClientSecret": cls.GITHUB_CLIENT_SECRET,
             "giteeClientId": cls.GITEE_CLIENT_ID,
             "giteeClientSecret": cls.GITEE_CLIENT_SECRET,
+            "gitcodeClientId": cls.GITCODE_CLIENT_ID,
+            "gitcodeClientSecret": cls.GITCODE_CLIENT_SECRET,
             "googleClientId": cls.GOOGLE_CLIENT_ID,
             "googleApiKey": cls.GOOGLE_API_KEY,
             "wordpressClientId": cls.WORDPRESS_CLIENT_ID,
@@ -55,6 +59,7 @@ class Config:
             "dropboxAppKey": cls.DROPBOX_APP_KEY,
             "dropboxAppKeyFull": cls.DROPBOX_APP_KEY_FULL,
             "githubClientId": cls.GITHUB_CLIENT_ID,
+            "gitcodeClientId": cls.GITCODE_CLIENT_ID,
             "googleClientId": cls.GOOGLE_CLIENT_ID,
             "googleApiKey": cls.GOOGLE_API_KEY,
             "wordpressClientId": cls.WORDPRESS_CLIENT_ID,
