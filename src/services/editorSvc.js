@@ -351,15 +351,49 @@ const editorSvc = Object.assign(mitt() , editorSvcDiscussions, editorSvcUtils, {
   /**
    * Save editor selection/scroll state into the store.
    */
-  saveContentState: allowDebounce(() => {
-    const scrollPosition = editorSvc.getScrollPosition() ||
-      store.getters['contentState/current'].scrollPosition;
-    store.dispatch('contentState/patchCurrent', {
-      selectionStart: editorSvc.clEditor.selectionMgr.selectionStart,
-      selectionEnd: editorSvc.clEditor.selectionMgr.selectionEnd,
-      scrollPosition,
-    });
-  }, 100),
+  saveContentState: (() => {
+    const timeoutIdsByFileId = Object.create(null);
+    const saveSnapshot = (snapshot) => {
+      if (!snapshot.fileId) {
+        return;
+      }
+      const id = `${snapshot.fileId}/contentState`;
+      const patch = {
+        id,
+        selectionStart: snapshot.selectionStart,
+        selectionEnd: snapshot.selectionEnd,
+        scrollPosition: snapshot.scrollPosition,
+      };
+      if (store.state.contentState.itemsById[id]) {
+        store.commit('contentState/patchItem', patch);
+      }
+    };
+    const makeSnapshot = () => {
+      const fileId = store.getters['file/current'].id;
+      const id = `${fileId}/contentState`;
+      const currentState = store.state.contentState.itemsById[id] ||
+        store.getters['contentState/current'];
+      return {
+        fileId,
+        selectionStart: editorSvc.clEditor.selectionMgr.selectionStart,
+        selectionEnd: editorSvc.clEditor.selectionMgr.selectionEnd,
+        scrollPosition: editorSvc.getScrollPosition() || currentState.scrollPosition,
+      };
+    };
+    return (doDebounce = false) => {
+      const snapshot = makeSnapshot();
+      const { fileId } = snapshot;
+      clearTimeout(timeoutIdsByFileId[fileId]);
+      if (doDebounce) {
+        timeoutIdsByFileId[fileId] = setTimeout(() => {
+          delete timeoutIdsByFileId[fileId];
+          saveSnapshot(snapshot);
+        }, 100);
+      } else {
+        saveSnapshot(snapshot);
+      }
+    };
+  })(),
 
   /**
    * Report selection from the preview to the editor.
@@ -467,11 +501,11 @@ const editorSvc = Object.assign(mitt() , editorSvcDiscussions, editorSvcUtils, {
     this.editorElt.parentNode.addEventListener('scroll', () => this.saveContentState(true));
     this.previewElt.parentNode.addEventListener('scroll', () => this.saveContentState(true));
 
-    const refreshPreview = allowDebounce(() => {
+    const refreshPreview = allowDebounce(async () => {
       this.convert();
       if (instantPreview) {
-        this.refreshPreview();
-        this.measureSectionDimensions(false, true);
+        await this.refreshPreview();
+        this.measureSectionDimensions(false, true, true);
       } else {
         setTimeout(() => this.refreshPreview(), 10);
       }
@@ -574,7 +608,7 @@ const editorSvc = Object.assign(mitt() , editorSvcDiscussions, editorSvcUtils, {
                 }
               }
               imgEltsToCache.push(imgElt);
-              if (imgElt.src.indexOf(origin) >= 0) {
+              if (imgElt.src.indexOf(constants.origin) >= 0) {
                 imgElt.removeAttribute('src');
                 loadImgs.push({ imgElt, uri: decodeURIComponent(uri) });
               }
