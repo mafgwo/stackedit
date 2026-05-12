@@ -121,7 +121,6 @@ export default {
     };
 
     if (isMain) {
-      token.providerId = 'githubAppData';
       // check stackedit-app-data repo exist?
       await this.checkAndCreateRepo(token);
     }

@@ -23,9 +23,9 @@
 import modalTemplate from './common/modalTemplate';
 
 export default modalTemplate({
-  computedLocalSettings: {
-    apiKey: 'chatgptApiKey',
-  },
+  data: () => ({
+    apiKey: '',
+  }),
   methods: {
     resolve() {
       if (!this.apiKey) {
@@ -33,6 +33,9 @@ export default modalTemplate({
       }
       this.config.resolve({ apiKey: this.apiKey });
     },
+  },
+  async created() {
+    this.apiKey = this.config.apiKey;
   },
 });
 </script>
