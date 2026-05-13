@@ -4,10 +4,22 @@
 
 <script>
 import Prism from 'prismjs';
+import 'prismjs/components/prism-yaml';
+import 'prismjs/components/prism-handlebars';
+import 'prismjs/components/prism-css';
+import 'prismjs/components/prism-javascript';
 import cledit from '../services/editor/cledit';
+
+const escapeHtml = (value = '') => value
+  .replace(/&/g, '&amp;')
+  .replace(/</g, '&lt;')
+  .replace(/>/g, '&gt;');
 
 export default {
   props: ['value', 'lang', 'disabled', 'scrollClass'],
+  data: () => ({
+    clEditor: null,
+  }),
   mounted() {
     const preElt = this.$refs.codeEditorRoot;
     let scrollElt = preElt;
@@ -15,15 +27,42 @@ export default {
     while (scrollElt && !scrollElt.classList.contains(scrollCls)) {
       scrollElt = scrollElt.parentNode;
     }
-    if (scrollElt) {
-      const clEditor = cledit(preElt, scrollElt);
-      clEditor.on('contentChanged', value => this.$emit('changed', value));
-      clEditor.init({
-        content: this.value,
-        sectionHighlighter: section => Prism.highlight(section.text, Prism.languages[this.lang], this.lang),
-      });
-      clEditor.toggleEditable(!this.disabled);
+    if (!scrollElt) {
+      preElt.textContent = this.value || '';
+      return;
     }
+    const clEditor = cledit(preElt, scrollElt);
+    clEditor.on('contentChanged', value => this.$emit('changed', value));
+    clEditor.init({
+      content: this.value,
+      sectionHighlighter: (section) => {
+        const grammar = Prism.languages[this.lang];
+        if (!grammar) {
+          return escapeHtml(section.text);
+        }
+        return Prism.highlight(section.text, grammar, this.lang);
+      },
+    });
+    clEditor.toggleEditable(!this.disabled);
+    this.clEditor = clEditor;
+  },
+  watch: {
+    value(value) {
+      if (!this.clEditor) {
+        this.$refs.codeEditorRoot.textContent = value || '';
+        return;
+      }
+      const nextValue = value || '';
+      const currentValue = this.clEditor.getContent();
+      if (currentValue !== nextValue) {
+        this.clEditor.setContent(nextValue, true);
+      }
+    },
+    disabled(value) {
+      if (this.clEditor) {
+        this.clEditor.toggleEditable(!value);
+      }
+    },
   },
 };
 </script>
