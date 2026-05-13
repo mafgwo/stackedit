@@ -13,6 +13,7 @@
         <icon-pen></icon-pen>
       </button>
     </div>
+    <image-lightbox :image="zoomedImage" @close="closeZoomedImage"></image-lightbox>
   </div>
 </template>
 
@@ -21,6 +22,7 @@
 import { mapGetters, mapActions } from 'vuex';
 import CommentList from './gutters/CommentList';
 import PreviewNewDiscussionButton from './gutters/PreviewNewDiscussionButton';
+import ImageLightbox from './ImageLightbox';
 import store from '../store';
 import { rerenderMermaidDiagrams } from '../extensions/mermaidExtension';
 
@@ -30,9 +32,11 @@ export default {
   components: {
     CommentList,
     PreviewNewDiscussionButton,
+    ImageLightbox,
   },
   data: () => ({
     previewTop: true,
+    zoomedImage: null,
   }),
   computed: {
     ...mapGetters('file', [
@@ -55,9 +59,27 @@ export default {
     ...mapActions('data', [
       'toggleEditor',
     ]),
+    closeZoomedImage() {
+      this.zoomedImage = null;
+    },
+    openZoomedImage(imgElt) {
+      const src = imgElt.currentSrc || imgElt.src;
+      if (!src) {
+        return;
+      }
+      this.zoomedImage = {
+        src,
+        alt: imgElt.alt || '',
+      };
+    },
     onClick(evt) {
       let elt = evt.target;
       while (elt !== this.$el) {
+        if (elt.tagName === 'IMG' && this.$el.querySelector('.preview__inner-2')?.contains(elt)) {
+          evt.preventDefault();
+          this.openZoomedImage(elt);
+          return;
+        }
         if (elt.href && elt.href.match(/^https?:\/\//)
           && (!elt.hash || elt.href.slice(0, appUri.length) !== appUri)) {
           evt.preventDefault();
@@ -190,5 +212,9 @@ $corner-size: 110px;
       color: rgba(255, 255, 255, 0.33);
     }
   }
+}
+
+.preview__inner-2 img {
+  cursor: zoom-in;
 }
 </style>
