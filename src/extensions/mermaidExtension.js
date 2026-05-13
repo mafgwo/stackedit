@@ -47,7 +47,7 @@ const getTheme = (elt) => {
   if (elt.closest('.app--dark')) {
     return 'dark';
   }
-  return 'base';
+  return 'default';
 };
 
 const ensureConfig = (theme) => {
