@@ -2,7 +2,7 @@ FROM registry.cn-hangzhou.aliyuncs.com/mafgwo/python311-wkhtmltopdf:1.0
 
 WORKDIR /app
 COPY server /app/server
-RUN pip install -r /app/server/requirements.txt
+RUN pip install -r /app/server/requirements.txt --index-url https://pypi.tuna.tsinghua.edu.cn/simple
 
 COPY dist /app/dist
 COPY static /app/static
