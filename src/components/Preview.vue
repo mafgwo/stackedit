@@ -22,6 +22,7 @@ import { mapGetters, mapActions } from 'vuex';
 import CommentList from './gutters/CommentList';
 import PreviewNewDiscussionButton from './gutters/PreviewNewDiscussionButton';
 import store from '../store';
+import editorSvc from '../services/editorSvc';
 
 const appUri = `${window.location.protocol}//${window.location.host}`;
 
@@ -39,6 +40,9 @@ export default {
     ]),
     ...mapGetters('theme', [
       'currPreviewTheme',
+    ]),
+    ...mapGetters('data', [
+      'computedSettings',
     ]),
     ...mapGetters('layout', [
       'styles',
@@ -104,6 +108,24 @@ export default {
         if (discussionId) {
           previewElt.querySelectorAll(`.discussion-preview-highlighting--${discussionId}`)
             .cl_each(elt => elt.classList.add('discussion-preview-highlighting--selected'));
+        }
+      },
+    );
+
+    this.$watch(
+      () => this.computedSettings.colorTheme,
+      async () => {
+        if (editorSvc.previewCtx && editorSvc.previewCtx.sectionDescList.length) {
+          editorSvc.previewElt.innerHTML = '';
+          editorSvc.tocElt.innerHTML = '';
+          editorSvc.previewCtx = {
+            sectionDescList: [],
+          };
+          editorSvc.previewCtxMeasured = null;
+          editorSvc.previewCtxWithDiffs = null;
+          editorSvc.conversionCtx = null;
+          editorSvc.convert();
+          await editorSvc.refreshPreview();
         }
       },
     );

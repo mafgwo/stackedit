@@ -2,13 +2,15 @@ import mermaid from 'mermaid';
 import extensionSvc from '../services/extensionSvc';
 import utils from '../services/utils';
 
-const config = {
-  logLevel: 5,
+const baseConfig = {
   startOnLoad: false,
-  arrowMarkerAbsolute: false,
-  theme: 'neutral',
+  look: 'classic',
+  securityLevel: 'strict',
+  deterministicIds: false,
+  suppressErrorRendering: true,
+  fontFamily: '"Helvetica Neue", Helvetica, Arial, sans-serif',
   flowchart: {
-    htmlLabels: true,
+    htmlLabels: false,
     curve: 'linear',
   },
   sequence: {
@@ -39,21 +41,53 @@ const config = {
   },
 };
 
-let init = () => {
-  mermaid.initialize(config);
-  init = () => {};
+let currentTheme;
+
+const getTheme = (elt) => {
+  if (elt.closest('.app--dark')) {
+    return 'dark';
+  }
+  return 'default';
 };
 
+const ensureConfig = (theme) => {
+  if (currentTheme === theme) {
+    return;
+  }
+  mermaid.initialize({
+    ...baseConfig,
+    theme,
+  });
+  currentTheme = theme;
+};
+
+const escapeHtml = (value = '') => value
+  .replace(/&/g, '&amp;')
+  .replace(/</g, '&lt;')
+  .replace(/>/g, '&gt;')
+  .replace(/"/g, '&quot;')
+  .replace(/'/g, '&#39;');
+
 const render = async (elt) => {
+  const source = elt.textContent.trim();
+  if (!source) {
+    return;
+  }
   try {
-    init();
+    ensureConfig(getTheme(elt));
     const svgId = `mermaid-svg-${utils.uid()}`;
-    const {svg} = await mermaid.render(svgId, elt.textContent);
+    const { svg } = await mermaid.render(svgId, source);
     elt.innerHTML = svg;
+    elt.classList.add('mermaid-diagram');
+    elt.classList.remove('mermaid-error');
   } catch (e) {
     console.error('Mermaid rendering error:', e);
-    // 可以选择添加错误提示
-    elt.innerHTML = `<div class="error">Diagram rendering failed</div>`;
+    elt.classList.remove('mermaid-diagram');
+    elt.classList.add('mermaid-error');
+    elt.innerHTML = `
+      <div class="mermaid-error__title">Mermaid 渲染失败</div>
+      <pre class="mermaid-error__message">${escapeHtml(e && e.message ? e.message : 'Unknown Mermaid error')}</pre>
+    `;
   }
 };
 
