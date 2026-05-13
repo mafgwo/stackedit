@@ -27,8 +27,8 @@ StackEdit中文版
 	<img src="https://img.shields.io/badge/QQ交流群-703187410-orange"/></a>
 </p>
 <hr />
-1 笔记支持Gitee、GitHub、Gitea等Git仓库存储。<br>
-2 支持直接上传图片，也支持多种外部图床（GitHub、Gitea、SM.MS、自定义图床）粘贴或拖拽上传。<br>
+1 笔记支持Gitee、GitHub、AtomGit|GitCode、Gitea等Git仓库存储。<br>
+2 支持直接上传图片到文档所在空间，也支持多种外部图床（GitHub、Gitea、SM.MS、自定义图床）粘贴或拖拽上传。<br>
 3 编辑区域支持选择主题或自定义，总有你喜欢的主题。<br>
 4 支持历史版本管理，不用担心编辑覆盖后无法回滚。<br>
 5 支持ChatGPT辅助写作。<br>
@@ -84,7 +84,7 @@ StackEdit中文版
 
 ## 国外开源版本弊端：
 - 作者已经不维护了或很少维护了
-- 不支持国内常用Gitee
+- 不支持国内常用Gitee、AtomGit|GitCode
 - 强依赖GoogleDrive，而Google Drive在国内不能正常访问
 
 ## 部署说明

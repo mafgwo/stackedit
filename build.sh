@@ -29,6 +29,7 @@ build_image() {
 # 标记 Docker 镜像
 tag_image() {
   docker tag "$IMAGE_NAME" "$IMAGE_NAME:$VERSION"
+  docker tag "$IMAGE_NAME" "registry.cn-hangzhou.aliyuncs.com/$IMAGE_NAME"
   docker tag "$IMAGE_NAME" "registry.cn-hangzhou.aliyuncs.com/$IMAGE_NAME:$VERSION"
 }
 
@@ -43,10 +44,10 @@ push_image() {
 # 执行构建、标记和推送
 if [ $STAGE == "build" ]; then
   build_image
-  tag_image
 fi
 
 if [ $STAGE == "push" ]; then
+  tag_image
   push_image
 fi
 
