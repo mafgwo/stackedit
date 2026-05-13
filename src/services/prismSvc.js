@@ -1,4 +1,6 @@
 import Prism from 'prismjs';
+import prismComponents from 'prismjs/components.js';
+import getLoader from 'prismjs/dependencies.js';
 import 'prismjs/components/prism-markup-templating';
 import 'prismjs/components/prism-yaml';
 import 'prismjs/components/prism-handlebars';
@@ -18,32 +20,26 @@ const prismComponentBase = '/prism-components';
 const listeners = new Set();
 const loadingMap = new Map();
 const fencedCodeLinePattern = /^(```+|~~~+)([^\n]*)$/gm;
+const prismLanguageEntries = prismComponents.languages;
+const prismLanguageIds = Object.keys(prismLanguageEntries).filter(id => id !== 'meta');
+const prismLanguageIdSet = new Set(prismLanguageIds);
 
 if (typeof window !== 'undefined') {
   window.Prism = Prism;
 }
 
-const prismLanguageAliases = {
+const extraLanguageAliases = {
   'c#': 'csharp',
   'c++': 'cpp',
   conf: 'ini',
   config: 'ini',
   console: 'shell-session',
-  dockerfile: 'docker',
   env: 'ini',
   'f#': 'fsharp',
   golang: 'go',
   gql: 'graphql',
-  hbs: 'handlebars',
   htm: 'markup',
-  html: 'markup',
-  js: 'javascript',
   json: 'json',
-  kt: 'kotlin',
-  kts: 'kotlin',
-  md: 'markdown',
-  mustache: 'handlebars',
-  objc: 'objectivec',
   'objective-c': 'objectivec',
   'objective-cpp': 'objectivec',
   'objective-c++': 'objectivec',
@@ -52,60 +48,31 @@ const prismLanguageAliases = {
   ps: 'powershell',
   ps1: 'powershell',
   psm1: 'powershell',
-  py: 'python',
-  rb: 'ruby',
   rs: 'rust',
-  shell: 'bash',
   'shell-session': 'shell-session',
   shellscript: 'bash',
-  shellsession: 'shell-session',
-  sh: 'bash',
-  'sh-session': 'shell-session',
-  svg: 'markup',
   text: 'plain',
-  ts: 'typescript',
-  xml: 'markup',
-  yml: 'yaml',
   zsh: 'bash',
 };
 
-const prismLanguageDeps = {
-  c: [],
-  cpp: ['c'],
-  csharp: [],
-  dart: [],
-  diff: [],
-  docker: [],
-  fsharp: [],
-  git: [],
-  go: [],
-  graphql: [],
-  ini: [],
-  java: [],
-  jsx: ['javascript'],
-  kotlin: [],
-  less: ['css'],
-  lua: [],
-  markdown: ['markup', 'yaml'],
-  nginx: [],
-  objectivec: ['c'],
-  perl: [],
-  php: ['markup-templating'],
-  powershell: [],
-  python: [],
-  r: [],
-  ruby: [],
-  rust: [],
-  scala: ['java'],
-  scss: ['css'],
-  'shell-session': ['bash'],
-  sql: [],
-  swift: [],
-  toml: [],
-  typescript: ['javascript'],
-  tsx: ['jsx', 'typescript'],
-  zig: [],
-};
+const prismLanguageAliases = (() => {
+  const aliasMap = Object.create(null);
+  prismLanguageIds.forEach((id) => {
+    const entry = prismLanguageEntries[id];
+    const aliases = Array.isArray(entry.alias)
+      ? entry.alias
+      : entry.alias
+        ? [entry.alias]
+        : [];
+    aliases.forEach((alias) => {
+      aliasMap[alias.toLowerCase()] = id;
+    });
+  });
+  Object.entries(extraLanguageAliases).forEach(([alias, id]) => {
+    aliasMap[alias] = id;
+  });
+  return aliasMap;
+})();
 
 const normalizeLanguage = (language = '') => language
   .trim()
@@ -114,6 +81,12 @@ const normalizeLanguage = (language = '') => language
 
 const resolveLanguage = (language = '') => {
   const normalizedLanguage = normalizeLanguage(language);
+  if (!normalizedLanguage) {
+    return '';
+  }
+  if (prismLanguageIdSet.has(normalizedLanguage)) {
+    return normalizedLanguage;
+  }
   return prismLanguageAliases[normalizedLanguage] || normalizedLanguage;
 };
 
@@ -179,19 +152,27 @@ export const ensurePrismLanguage = async (language) => {
     return loadingMap.get(resolvedLanguage);
   }
   const task = (async () => {
-    const dependencies = prismLanguageDeps[resolvedLanguage];
-    if (dependencies === undefined) {
+    if (!prismLanguageIdSet.has(resolvedLanguage)) {
       return false;
     }
-    for (const dependency of dependencies) {
-      await ensurePrismLanguage(dependency);
+    const loadOrder = [];
+    getLoader(
+      prismComponents,
+      [resolvedLanguage],
+      Object.keys(Prism.languages),
+    ).load(id => loadOrder.push(id));
+    for (const languageId of loadOrder) {
+      if (Prism.languages[languageId]) {
+        continue;
+      }
+      const loaded = await loadScript(languageId);
+      if (loaded && Prism.languages[languageId]) {
+        emitLoaded(languageId);
+        continue;
+      }
+      return false;
     }
-    const loaded = await loadScript(resolvedLanguage);
-    if (loaded && Prism.languages[resolvedLanguage]) {
-      emitLoaded(resolvedLanguage);
-      return true;
-    }
-    return false;
+    return !!Prism.languages[resolvedLanguage];
   })();
   loadingMap.set(resolvedLanguage, task);
   try {
@@ -230,6 +211,7 @@ export const safeHighlight = (text = '', grammar, language) => {
 export const safeHighlightElement = (element) => {
   try {
     const language = extractElementLanguage(element);
+    const resolvedLanguage = resolveLanguage(language);
     const grammar = getPrismGrammar(language);
     if (!grammar) {
       ensurePrismLanguage(language).then((loaded) => {
@@ -238,6 +220,15 @@ export const safeHighlightElement = (element) => {
         }
       });
       return;
+    }
+    if (resolvedLanguage && resolvedLanguage !== language) {
+      element.classList.remove(`language-${language}`);
+      element.classList.add(`language-${resolvedLanguage}`);
+      const parent = element.parentElement;
+      if (parent?.classList.contains(`language-${language}`)) {
+        parent.classList.remove(`language-${language}`);
+        parent.classList.add(`language-${resolvedLanguage}`);
+      }
     }
     Prism.highlightElement(element);
   } catch (error) {
