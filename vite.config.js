@@ -34,6 +34,10 @@ export default defineConfig({
         target: 'http://localhost:8080',
         changeOrigin: true
       },
+      '/prism-components': {
+        target: 'http://localhost:8080',
+        changeOrigin: true
+      },
     }
   },
   plugins: [

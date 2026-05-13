@@ -22,11 +22,15 @@
 
 <script>
 import { mapGetters, mapMutations, mapActions } from 'vuex';
-import Prism from 'prismjs';
 import UserImage from '../UserImage';
 import cledit from '../../services/editor/cledit';
 import editorSvc from '../../services/editorSvc';
 import markdownConversionSvc from '../../services/markdownConversionSvc';
+import {
+  ensurePrismLanguagesInMarkdown,
+  onPrismLanguageLoaded,
+  safeHighlight,
+} from '../../services/prismSvc';
 import utils from '../../services/utils';
 import userSvc from '../../services/userSvc';
 import store from '../../store';
@@ -36,6 +40,9 @@ export default {
   components: {
     UserImage,
   },
+  data: () => ({
+    removeLanguageListener: null,
+  }),
   computed: {
     ...mapGetters('workspace', [
       'loginToken',
@@ -93,10 +100,13 @@ export default {
     const scrollerElt = this.$el.querySelector('.comment__text-inner');
     const clEditor = cledit(preElt, scrollerElt, true);
     clEditor.init({
-      sectionHighlighter: section => Prism.highlight(
-        section.text,
-        editorSvc.prismGrammars[section.data],
-      ),
+      sectionHighlighter: (section) => {
+        ensurePrismLanguagesInMarkdown(section.text);
+        return safeHighlight(
+          section.text,
+          editorSvc.prismGrammars[section.data],
+        );
+      },
       sectionParser: text => markdownConversionSvc
         .parseSections(editorSvc.converter, text).sections,
       content: store.state.discussion.newCommentText,
@@ -162,6 +172,20 @@ export default {
         () => store.state.discussion.newCommentText,
         newCommentText => clEditor.setContent(newCommentText),
       );
+    }
+
+    this.removeLanguageListener = onPrismLanguageLoaded(() => {
+      markdownConversionSvc.refreshPrismSupport();
+      editorSvc.initPrism();
+      if (clEditor.refreshHighlighter) {
+        clEditor.refreshHighlighter();
+      }
+    });
+  },
+  beforeUnmount() {
+    if (this.removeLanguageListener) {
+      this.removeLanguageListener();
+      this.removeLanguageListener = null;
     }
   },
 };

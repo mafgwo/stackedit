@@ -22,3 +22,4 @@ chrome-app/*.zip
 *.sw?
 */__pycache__/
 /server/.venv/
+stats.html

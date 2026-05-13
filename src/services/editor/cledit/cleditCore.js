@@ -201,6 +201,12 @@ function cledit(contentElt, scrollEltOpt, isMarkdown = false) {
     selectionMgr.updateCursorCoordinates();
   }
 
+  function refreshHighlighter() {
+    const content = getTextContent();
+    const sectionList = editor.highlighter.parseSections(content, true);
+    editor.$trigger('contentChanged', content, [0, content], sectionList);
+  }
+
   function keydownHandler(handler) {
     return (evt) => {
       if (
@@ -402,6 +408,7 @@ function cledit(contentElt, scrollEltOpt, isMarkdown = false) {
   editor.getContent = getTextContent;
   editor.focus = focus;
   editor.setSelection = setSelection;
+  editor.refreshHighlighter = refreshHighlighter;
   editor.addKeystroke = addKeystroke;
   editor.addMarker = addMarker;
   editor.removeMarker = removeMarker;

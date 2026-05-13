@@ -1,43 +1,28 @@
 import DiffMatchPatch from 'diff-match-patch';
-import Prism from 'prismjs';
 import MarkdownIt from 'markdown-it';
 import markdownGrammarSvc from './markdownGrammarSvc';
 import extensionSvc from './extensionSvc';
+import Prism, { safeHighlight } from './prismSvc';
 import utils from './utils';
 
 const htmlSectionMarker = '\uF111\uF222\uF333\uF444';
 const diffMatchPatch = new DiffMatchPatch();
 
-// Create aliases for syntax highlighting
-const languageAliases = ({
-  js: 'javascript',
-  json: 'javascript',
-  html: 'markup',
-  svg: 'markup',
-  xml: 'markup',
-  py: 'python',
-  rb: 'ruby',
-  yml: 'yaml',
-  ps1: 'powershell',
-  psm1: 'powershell',
-});
-Object.entries(languageAliases).forEach(([alias, language]) => {
-  Prism.languages[alias] = Prism.languages[language];
-});
-
-// Add programming language parsing capability to markdown fences
-const insideFences = {};
-Object.entries(Prism.languages).forEach(([name, language]) => {
-  if (Prism.util.type(language) === 'Object') {
-    insideFences[`language-${name}`] = {
-      pattern: new RegExp(`(\`\`\`|~~~)${name}\\W[\\s\\S]*`),
-      inside: {
-        'cl cl-pre': /(```|~~~).*/,
-        rest: language,
-      },
-    };
-  }
-});
+export const createInsideFences = () => {
+  const insideFences = {};
+  Object.entries(Prism.languages).forEach(([name, language]) => {
+    if (Prism.util.type(language) === 'Object') {
+      insideFences[`language-${name}`] = {
+        pattern: new RegExp(`(\`\`\`|~~~)${name}\\W[\\s\\S]*`),
+        inside: {
+          'cl cl-pre': /(```|~~~).*/,
+          rest: language,
+        },
+      };
+    }
+  });
+  return insideFences;
+};
 
 // Disable spell checking in specific tokens
 const noSpellcheckTokens = Object.create(null);
@@ -115,10 +100,21 @@ export default {
     // Default options for the markdown converter and the grammar
     this.defaultOptions = {
       ...extensionSvc.getOptions(defaultProperties),
-      insideFences,
+      insideFences: createInsideFences(),
     };
 
     this.defaultConverter = this.createConverter(this.defaultOptions);
+    this.defaultPrismGrammars = markdownGrammarSvc.makeGrammars(this.defaultOptions);
+  },
+
+  refreshPrismSupport() {
+    if (!this.defaultOptions) {
+      return;
+    }
+    this.defaultOptions = {
+      ...this.defaultOptions,
+      insideFences: createInsideFences(),
+    };
     this.defaultPrismGrammars = markdownGrammarSvc.makeGrammars(this.defaultOptions);
   },
 
@@ -268,6 +264,6 @@ export default {
   highlight(markdown, converter = this.defaultConverter, grammars = this.defaultPrismGrammars) {
     const parsingCtx = this.parseSections(converter, markdown);
     return parsingCtx.sections
-      .map(section => Prism.highlight(section.text, grammars[section.data])).join('');
+      .map(section => safeHighlight(section.text, grammars[section.data])).join('');
   },
 };

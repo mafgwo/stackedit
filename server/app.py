@@ -14,6 +14,7 @@ config = Config()
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 STATIC_DIR = os.path.join(BASE_DIR, 'static')
 DIST_DIR = os.path.join(BASE_DIR, 'dist')
+PRISM_COMPONENTS_DIR = os.path.join(BASE_DIR, 'node_modules', 'prismjs', 'components')
 
 LISTENING_PORT = int(os.getenv('LISTENING_PORT', '8080'))
 DEBUG_FLAG = os.getenv('DEBUG_FLAG', 'true').lower() == 'true'
@@ -101,6 +102,10 @@ def google_drive_action():
 @app.route('/themes/<path:filename>')
 def themes(filename):
     return send_from_directory(os.path.join(STATIC_DIR, 'themes'), filename)
+
+@app.route('/prism-components/<path:filename>')
+def prism_components(filename):
+    return send_from_directory(PRISM_COMPONENTS_DIR, filename, max_age=31536000)
 
 @app.route('/style.css')
 def style_css():

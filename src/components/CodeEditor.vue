@@ -3,22 +3,19 @@
 </template>
 
 <script>
-import Prism from 'prismjs';
-import 'prismjs/components/prism-yaml';
-import 'prismjs/components/prism-handlebars';
-import 'prismjs/components/prism-css';
-import 'prismjs/components/prism-javascript';
 import cledit from '../services/editor/cledit';
-
-const escapeHtml = (value = '') => value
-  .replace(/&/g, '&amp;')
-  .replace(/</g, '&lt;')
-  .replace(/>/g, '&gt;');
+import {
+  ensurePrismLanguage,
+  getPrismGrammar,
+  onPrismLanguageLoaded,
+  safeHighlight,
+} from '../services/prismSvc';
 
 export default {
   props: ['value', 'lang', 'disabled', 'scrollClass'],
   data: () => ({
     clEditor: null,
+    removeLanguageListener: null,
   }),
   mounted() {
     const preElt = this.$refs.codeEditorRoot;
@@ -33,18 +30,27 @@ export default {
     }
     const clEditor = cledit(preElt, scrollElt);
     clEditor.on('contentChanged', value => this.$emit('changed', value));
+    this.clEditor = clEditor;
+    this.removeLanguageListener = onPrismLanguageLoaded((language) => {
+      if (language === this.lang && this.clEditor?.refreshHighlighter) {
+        this.clEditor.refreshHighlighter();
+      }
+    });
     clEditor.init({
       content: this.value,
       sectionHighlighter: (section) => {
-        const grammar = Prism.languages[this.lang];
-        if (!grammar) {
-          return escapeHtml(section.text);
-        }
-        return Prism.highlight(section.text, grammar, this.lang);
+        ensurePrismLanguage(this.lang);
+        const grammar = getPrismGrammar(this.lang);
+        return safeHighlight(section.text, grammar, this.lang);
       },
     });
     clEditor.toggleEditable(!this.disabled);
-    this.clEditor = clEditor;
+  },
+  unmounted() {
+    if (this.removeLanguageListener) {
+      this.removeLanguageListener();
+      this.removeLanguageListener = null;
+    }
   },
   watch: {
     value(value) {

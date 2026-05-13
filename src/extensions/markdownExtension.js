@@ -1,4 +1,4 @@
-import Prism from 'prismjs';
+import { safeHighlightElement } from '../services/prismSvc';
 // https://mdit-plugins.github.io/ 使用最新的md插件
 import markdownitAbbr from 'markdown-it-abbr';
 import markdownitDeflist from 'markdown-it-deflist';
@@ -143,7 +143,7 @@ extensionSvc.onSectionPreview((elt, options, isEditor) => {
   // Highlight with Prism
   elt.querySelectorAll('.prism').cl_each((prismElt) => {
     if (!prismElt.$highlightedWithPrism) {
-      Prism.highlightElement(prismElt);
+      safeHighlightElement(prismElt);
       prismElt.$highlightedWithPrism = true;
     }
   });

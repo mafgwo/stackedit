@@ -6,6 +6,7 @@ RUN pip install -r /app/server/requirements.txt
 
 COPY dist /app/dist
 COPY static /app/static
+COPY node_modules/prismjs/components /app/node_modules/prismjs/components
 
 ENV DEBUG_FLAG=false
 

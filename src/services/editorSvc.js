@@ -1,17 +1,21 @@
 import mitt from 'mitt';
 import DiffMatchPatch from 'diff-match-patch';
-import Prism from 'prismjs';
 import markdownItPandocRenderer from 'markdown-it-pandoc-renderer';
 import CryptoJS from 'crypto-js';
 import cledit from './editor/cledit';
 import pagedown from '../libs/pagedown';
 import htmlSanitizer from '../libs/htmlSanitizer';
-import markdownConversionSvc from './markdownConversionSvc';
+import markdownConversionSvc, { createInsideFences } from './markdownConversionSvc';
 import markdownGrammarSvc from './markdownGrammarSvc';
 import sectionUtils from './editor/sectionUtils';
 import extensionSvc from './extensionSvc';
 import editorSvcDiscussions from './editor/editorSvcDiscussions';
 import editorSvcUtils from './editor/editorSvcUtils';
+import {
+  ensurePrismLanguagesInMarkdown,
+  onPrismLanguageLoaded,
+  safeHighlight,
+} from './prismSvc';
 import utils from './utils';
 import store from '../store';
 import syncSvc from './syncSvc';
@@ -169,7 +173,7 @@ const editorSvc = Object.assign(mitt() , editorSvcDiscussions, editorSvcUtils, {
   initPrism() {
     const options = {
       ...this.options,
-      insideFences: markdownConversionSvc.defaultOptions.insideFences,
+      insideFences: createInsideFences(),
     };
     this.prismGrammars = markdownGrammarSvc.makeGrammars(options);
   },
@@ -190,8 +194,13 @@ const editorSvc = Object.assign(mitt() , editorSvcDiscussions, editorSvcUtils, {
     this.previewCtxWithDiffs = null;
     editorSvc.emit('previewCtxWithDiffs', null);
     const options = {
-      sectionHighlighter: section => Prism
-        .highlight(section.text, this.prismGrammars[section.data]),
+      sectionHighlighter: (section) => {
+        ensurePrismLanguagesInMarkdown(section.text);
+        return safeHighlight(
+          section.text,
+          this.prismGrammars[section.data],
+        );
+      },
       sectionParser: (text) => {
         this.parsingCtx = markdownConversionSvc.parseSections(this.converter, text);
         return this.parsingCtx.sections;
@@ -531,6 +540,16 @@ const editorSvc = Object.assign(mitt() , editorSvcDiscussions, editorSvcUtils, {
     this.tocElt = tocElt;
 
     this.createClEditor(editorElt);
+    onPrismLanguageLoaded(() => {
+      if (!this.options) {
+        return;
+      }
+      markdownConversionSvc.refreshPrismSupport();
+      this.initPrism();
+      if (this.clEditor?.refreshHighlighter) {
+        this.clEditor.refreshHighlighter();
+      }
+    });
 
     this.clEditor.on('contentChanged', (content, diffs, sectionList) => {
       this.parsingCtx = {
