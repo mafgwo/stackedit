@@ -47,7 +47,7 @@ const getTheme = (elt) => {
   if (elt.closest('.app--dark')) {
     return 'dark';
   }
-  return 'default';
+  return 'base';
 };
 
 const ensureConfig = (theme) => {
@@ -69,7 +69,7 @@ const escapeHtml = (value = '') => value
   .replace(/'/g, '&#39;');
 
 const render = async (elt) => {
-  const source = elt.textContent.trim();
+  const source = (elt.dataset.mermaidSource || elt.textContent).trim();
   if (!source) {
     return;
   }
@@ -77,6 +77,7 @@ const render = async (elt) => {
     ensureConfig(getTheme(elt));
     const svgId = `mermaid-svg-${utils.uid()}`;
     const { svg } = await mermaid.render(svgId, source);
+    elt.dataset.mermaidSource = source;
     elt.innerHTML = svg;
     elt.classList.add('mermaid-diagram');
     elt.classList.remove('mermaid-error');
@@ -102,3 +103,8 @@ extensionSvc.onSectionPreview((elt) => {
     diagrams.map(diagramElt => render(diagramElt.parentNode))
   );
 });
+
+export const rerenderMermaidDiagrams = elt => Promise.all(
+  Array.from(elt.querySelectorAll('.mermaid-diagram[data-mermaid-source]'))
+    .map(diagramElt => render(diagramElt))
+);

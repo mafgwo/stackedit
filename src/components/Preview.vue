@@ -22,7 +22,7 @@ import { mapGetters, mapActions } from 'vuex';
 import CommentList from './gutters/CommentList';
 import PreviewNewDiscussionButton from './gutters/PreviewNewDiscussionButton';
 import store from '../store';
-import editorSvc from '../services/editorSvc';
+import { rerenderMermaidDiagrams } from '../extensions/mermaidExtension';
 
 const appUri = `${window.location.protocol}//${window.location.host}`;
 
@@ -115,17 +115,8 @@ export default {
     this.$watch(
       () => this.computedSettings.colorTheme,
       async () => {
-        if (editorSvc.previewCtx && editorSvc.previewCtx.sectionDescList.length) {
-          editorSvc.previewElt.innerHTML = '';
-          editorSvc.tocElt.innerHTML = '';
-          editorSvc.previewCtx = {
-            sectionDescList: [],
-          };
-          editorSvc.previewCtxMeasured = null;
-          editorSvc.previewCtxWithDiffs = null;
-          editorSvc.conversionCtx = null;
-          editorSvc.convert();
-          await editorSvc.refreshPreview();
+        if (previewElt.querySelector('.mermaid-diagram[data-mermaid-source]')) {
+          await rerenderMermaidDiagrams(previewElt);
         }
       },
     );
