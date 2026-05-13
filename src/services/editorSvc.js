@@ -45,13 +45,80 @@ class SectionDesc {
 }
 
 const pathUrlMap = Object.create(null);
+const pathUrlRefCountMap = Object.create(null);
+const localImageSrcAttr = 'data-ws-src';
+const localImageSrcMatcher = /(<img\b[^>]*?)\ssrc=(['"])([^'"]+)\2/ig;
+
+const isWorkspaceLocalUri = uri => !!uri && !/^([a-z][a-z0-9+.-]*:|\/\/)/i.test(uri);
+
+const replaceLocalImageSrc = html => html.replace(localImageSrcMatcher, (match, before, quote, uri) => {
+  if (!isWorkspaceLocalUri(uri)) {
+    return match;
+  }
+  return `${before} ${localImageSrcAttr}=${quote}${uri}${quote}`;
+});
+
+const getAbsoluteWorkspaceImgPath = uri => utils.getAbsoluteFilePath(
+  store.getters['explorer/selectedNodeFolder'],
+  uri,
+);
+
+const retainImgUrl = (absoluteImgPath) => {
+  if (pathUrlMap[absoluteImgPath]) {
+    pathUrlRefCountMap[absoluteImgPath] = (pathUrlRefCountMap[absoluteImgPath] || 0) + 1;
+    return pathUrlMap[absoluteImgPath];
+  }
+  return null;
+};
+
+const cacheImgUrl = (absoluteImgPath, url) => {
+  pathUrlMap[absoluteImgPath] = url;
+  pathUrlRefCountMap[absoluteImgPath] = (pathUrlRefCountMap[absoluteImgPath] || 0) + 1;
+  return url;
+};
+
+const releaseImgUrl = (absoluteImgPath) => {
+  if (!pathUrlMap[absoluteImgPath]) {
+    return;
+  }
+  const nextRefCount = (pathUrlRefCountMap[absoluteImgPath] || 0) - 1;
+  if (nextRefCount > 0) {
+    pathUrlRefCountMap[absoluteImgPath] = nextRefCount;
+    return;
+  }
+  URL.revokeObjectURL(pathUrlMap[absoluteImgPath]);
+  delete pathUrlMap[absoluteImgPath];
+  delete pathUrlRefCountMap[absoluteImgPath];
+};
+
+const releaseAllImgUrls = () => {
+  Object.keys(pathUrlMap).forEach((absoluteImgPath) => {
+    URL.revokeObjectURL(pathUrlMap[absoluteImgPath]);
+    delete pathUrlMap[absoluteImgPath];
+    delete pathUrlRefCountMap[absoluteImgPath];
+  });
+};
+
+const increaseImgPathCount = (counterMap, absoluteImgPath) => {
+  counterMap[absoluteImgPath] = (counterMap[absoluteImgPath] || 0) + 1;
+};
+
+const syncActiveImgPathCounts = (activeCountMap, nextCountMap) => {
+  Object.keys(activeCountMap).forEach((absoluteImgPath) => {
+    const releaseCount = (activeCountMap[absoluteImgPath] || 0) - (nextCountMap[absoluteImgPath] || 0);
+    for (let i = 0; i < releaseCount; i += 1) {
+      releaseImgUrl(absoluteImgPath);
+    }
+  });
+  return nextCountMap;
+};
 
 const getImgUrl = async (uri) => {
   if (uri.indexOf('http://') !== 0 && uri.indexOf('https://') !== 0) {
-    const currDirNode = store.getters['explorer/selectedNodeFolder'];
-    const absoluteImgPath = utils.getAbsoluteFilePath(currDirNode, uri);
-    if (pathUrlMap[absoluteImgPath]) {
-      return pathUrlMap[absoluteImgPath];
+    const absoluteImgPath = getAbsoluteWorkspaceImgPath(uri);
+    const cachedUrl = retainImgUrl(absoluteImgPath);
+    if (cachedUrl) {
+      return cachedUrl;
     }
     const md5Id = CryptoJS.MD5(absoluteImgPath).toString();
     let imgItem = await localDbSvc.getImgItem(md5Id);
@@ -63,8 +130,7 @@ const getImgUrl = async (uri) => {
       // imgItem 如果不存在 则加载 TODO
       const imgFile = utils.base64ToBlob(imgItem.content, uri);
       const url = URL.createObjectURL(imgFile);
-      pathUrlMap[absoluteImgPath] = url;
-      return url;
+      return cacheImgUrl(absoluteImgPath, url);
     }
     return '';
   }
@@ -94,6 +160,8 @@ const editorSvc = Object.assign(mitt() , editorSvcDiscussions, editorSvcUtils, {
   selectionRange: null,
   previewSelectionRange: null,
   previewSelectionStartOffset: null,
+  activePreviewImgPathCounts: Object.create(null),
+  activeEditorImgPathCounts: Object.create(null),
 
   /**
    * Initialize the Prism grammar with the options
@@ -152,6 +220,7 @@ const editorSvc = Object.assign(mitt() , editorSvcDiscussions, editorSvcUtils, {
    * Refresh the preview with the result of `convert()`
    */
   async refreshPreview() {
+    const nextPreviewImgPathCounts = Object.create(null);
     const sectionDescList = [];
     let sectionPreviewElt;
     let sectionTocElt;
@@ -190,7 +259,9 @@ const editorSvc = Object.assign(mitt() , editorSvcDiscussions, editorSvcUtils, {
           insertBeforeTocElt = insertBeforeTocElt.nextSibling;
           this.tocElt.removeChild(sectionTocElt);
         } else if (item[0] === 1) {
-          const html = htmlSanitizer.sanitizeHtml(this.conversionCtx.htmlSectionList[sectionIdx]);
+          const html = replaceLocalImageSrc(
+            htmlSanitizer.sanitizeHtml(this.conversionCtx.htmlSectionList[sectionIdx]),
+          );
           sectionIdx += 1;
 
           // Create preview section element
@@ -204,9 +275,10 @@ const editorSvc = Object.assign(mitt() , editorSvcDiscussions, editorSvcUtils, {
           }
           await extensionSvc.sectionPreview(sectionPreviewElt, this.options, true);
           const imgs = Array.prototype.slice.call(sectionPreviewElt.getElementsByTagName('img')).map((imgElt) => {
-            if (imgElt.src.indexOf(constants.origin) >= 0) {
-              const uri = decodeURIComponent(imgElt.attributes.src.nodeValue);
-              imgElt.removeAttribute('src');
+            const workspaceSrcAttr = imgElt.attributes[localImageSrcAttr];
+            if (workspaceSrcAttr) {
+              const uri = decodeURIComponent(workspaceSrcAttr.nodeValue);
+              imgElt.removeAttribute(localImageSrcAttr);
               return { imgElt, uri };
             }
             return { imgElt };
@@ -279,6 +351,9 @@ const editorSvc = Object.assign(mitt() , editorSvcDiscussions, editorSvcUtils, {
       if (!it.imgElt.src && it.uri) {
         getImgUrl(it.uri).then((newUrl) => {
           it.imgElt.src = newUrl;
+          if (newUrl) {
+            increaseImgPathCount(nextPreviewImgPathCounts, getAbsoluteWorkspaceImgPath(it.uri));
+          }
           resolve();
         }, () => reject(new Error('加载当前空间图片出错')));
         return;
@@ -293,6 +368,10 @@ const editorSvc = Object.assign(mitt() , editorSvcDiscussions, editorSvcUtils, {
       img.src = it.imgElt.src;
     }));
     await Promise.all(loadedPromises);
+    this.activePreviewImgPathCounts = syncActiveImgPathCounts(
+      this.activePreviewImgPathCounts,
+      nextPreviewImgPathCounts,
+    );
 
     // Debounce if sections have already been measured
     this.measureSectionDimensions(!!this.previewCtxMeasured);
@@ -537,6 +616,12 @@ const editorSvc = Object.assign(mitt() , editorSvcDiscussions, editorSvcUtils, {
      */
 
     const imgCache = Object.create(null);
+    const updateActiveEditorImgPaths = (nextEditorImgPathCounts) => {
+      this.activeEditorImgPathCounts = syncActiveImgPathCounts(
+        this.activeEditorImgPathCounts,
+        nextEditorImgPathCounts,
+      );
+    };
 
     const hashImgElt = imgElt => `${imgElt.src}:${imgElt.width || -1}:${imgElt.height || -1}`;
 
@@ -595,7 +680,11 @@ const editorSvc = Object.assign(mitt() , editorSvcDiscussions, editorSvcUtils, {
               imgElt.onload = () => {
                 imgElt.style.display = '';
               };
-              imgElt.src = uri;
+              if (isWorkspaceLocalUri(uri)) {
+                loadImgs.push({ imgElt, uri: decodeURIComponent(uri) });
+              } else {
+                imgElt.src = uri;
+              }
               // Take img size into account
               const sizeElt = imgTokenElt.querySelector('.token.cl-size');
               if (sizeElt) {
@@ -608,10 +697,6 @@ const editorSvc = Object.assign(mitt() , editorSvcDiscussions, editorSvcUtils, {
                 }
               }
               imgEltsToCache.push(imgElt);
-              if (imgElt.src.indexOf(constants.origin) >= 0) {
-                imgElt.removeAttribute('src');
-                loadImgs.push({ imgElt, uri: decodeURIComponent(uri) });
-              }
             }
             const imgTokenWrapper = document.createElement('span');
             imgTokenWrapper.className = 'token img-wrapper';
@@ -622,13 +707,21 @@ const editorSvc = Object.assign(mitt() , editorSvcDiscussions, editorSvcUtils, {
         });
         if (loadImgs.length) {
           // Wait for images to load
+          const nextEditorImgPathCounts = Object.create(null);
           const loadWorkspaceImg = loadImgs.map(it => new Promise((resolve, reject) => {
             getImgUrl(it.uri).then((newUrl) => {
               it.imgElt.src = newUrl;
+              if (newUrl) {
+                increaseImgPathCount(nextEditorImgPathCounts, getAbsoluteWorkspaceImgPath(it.uri));
+              }
               resolve();
             }, () => reject(new Error(`加载当前空间图片出错,uri:${it.uri}`)));
           }));
-          Promise.all(loadWorkspaceImg).then();
+          Promise.all(loadWorkspaceImg)
+            .then(() => updateActiveEditorImgPaths(nextEditorImgPathCounts))
+            .catch(() => updateActiveEditorImgPaths(nextEditorImgPathCounts));
+        } else {
+          updateActiveEditorImgPaths(Object.create(null));
         }
       });
     }
@@ -719,6 +812,7 @@ const editorSvc = Object.assign(mitt() , editorSvcDiscussions, editorSvcUtils, {
     );
 
     this.initHighlighters();
+    window.addEventListener('beforeunload', releaseAllImgUrls, { once: true });
     this.emit('inited');
   },
 });

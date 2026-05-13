@@ -196,11 +196,14 @@ const localDbSvc = {
     await this.writeImgItem(imgItem);
     const waitUploadIdsItem = (await this.getImgItem(imgWaitUploadIdsKey))
        || { id: imgWaitUploadIdsKey, ids: [] };
-    const waitUplodIds = waitUploadIdsItem.ids || [];
+    const waitUplodIds = Array.isArray(waitUploadIdsItem.ids) ? waitUploadIdsItem.ids.slice() : [];
     // 如果已上传
     if (imgItem.uploaded) {
-      waitUplodIds.splice(waitUplodIds.indexOf(imgItem.id), 1);
-    } else {
+      const index = waitUplodIds.indexOf(imgItem.id);
+      if (index >= 0) {
+        waitUplodIds.splice(index, 1);
+      }
+    } else if (waitUplodIds.indexOf(imgItem.id) < 0) {
       waitUplodIds.push(imgItem.id);
     }
     waitUploadIdsItem.ids = waitUplodIds;
