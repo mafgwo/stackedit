@@ -34,10 +34,10 @@ tag_image() {
 
 # 推送 Docker 镜像
 push_image() {
-  docker push "$IMAGE_NAME"
-  docker push "registry.cn-hangzhou.aliyuncs.com/$IMAGE_NAME"
   docker push "$IMAGE_NAME:$VERSION"
   docker push "registry.cn-hangzhou.aliyuncs.com/$IMAGE_NAME:$VERSION"
+  docker push "$IMAGE_NAME"
+  docker push "registry.cn-hangzhou.aliyuncs.com/$IMAGE_NAME"
 }
 
 # 执行构建、标记和推送

@@ -7,6 +7,8 @@ RUN pip install -r /app/server/requirements.txt
 COPY dist /app/dist
 COPY static /app/static
 
+ENV DEBUG_FLAG=false
+
 EXPOSE 8080
 
 CMD [ "python", "server/app.py" ]

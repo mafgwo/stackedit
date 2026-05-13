@@ -80,6 +80,7 @@ StackEdit中文版
 - GitLab授权接口调整（2023-08-26）
 - 主文档空间支持GitHub登录（2023-10-19）
 - 前后端分离，前端改成vite构建并升级相关组件、后端改成python实现（2025-03-20）
+- 支持了AtomGit | GitCode仓库（2026-05-13）
 
 ## 国外开源版本弊端：
 - 作者已经不维护了或很少维护了
@@ -108,6 +109,8 @@ services:
       - GITHUB_CLIENT_SECRET=【不需要支持则删掉】
       - GITEE_CLIENT_ID=【不需要支持则删掉】
       - GITEE_CLIENT_SECRET=【不需要支持则删掉】
+      - GITCODE_CLIENT_ID=【不需要支持则删掉】
+      - GITCODE_CLIENT_SECRET=【不需要支持则删掉】
       - GOOGLE_CLIENT_ID=【不需要支持则删掉】
       - GOOGLE_API_KEY=【不需要支持则删掉】
       - GITEA_CLIENT_ID=【不需要支持则删掉】
@@ -144,6 +147,8 @@ docker run -itd --name stackedit \
   -e GITHUB_CLIENT_SECRET=【不需要支持则删掉】 \
   -e GITEE_CLIENT_ID=【不需要支持则删掉】 \
   -e GITEE_CLIENT_SECRET=【不需要支持则删掉】 \
+  -e GITCODE_CLIENT_ID=【不需要支持则删掉】 \
+  -e GITCODE_CLIENT_SECRET=【不需要支持则删掉】 \
   -e GOOGLE_CLIENT_ID=【不需要支持则删掉】 \
   -e GOOGLE_API_KEY=【不需要支持则删掉】 \
   -e GITEA_CLIENT_ID=【不需要支持则删掉】 \
