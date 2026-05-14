@@ -129,7 +129,11 @@ const getImgUrl = async (uri) => {
     const md5Id = CryptoJS.MD5(absoluteImgPath).toString();
     let imgItem = await localDbSvc.getImgItem(md5Id);
     if (!imgItem) {
-      await syncSvc.syncImg(absoluteImgPath);
+      try {
+        await syncSvc.syncImg(absoluteImgPath);
+      } catch (err) {
+        return '';
+      }
       imgItem = await localDbSvc.getImgItem(md5Id);
     }
     if (imgItem) {
@@ -358,15 +362,15 @@ const editorSvc = Object.assign(mitt() , editorSvcDiscussions, editorSvcUtils, {
     this.makeTextToPreviewDiffs();
 
     // Wait for images to load
-    const loadedPromises = loadingImages.map(it => new Promise((resolve, reject) => {
+    const loadedPromises = loadingImages.map(it => new Promise((resolve) => {
       if (!it.imgElt.src && it.uri) {
         getImgUrl(it.uri).then((newUrl) => {
-          it.imgElt.src = newUrl;
           if (newUrl) {
+            it.imgElt.src = newUrl;
             increaseImgPathCount(nextPreviewImgPathCounts, getAbsoluteWorkspaceImgPath(it.uri));
           }
           resolve();
-        }, () => reject(new Error('加载当前空间图片出错')));
+        }, () => resolve());
         return;
       }
       if (!it.imgElt.src) {
@@ -736,14 +740,14 @@ const editorSvc = Object.assign(mitt() , editorSvcDiscussions, editorSvcUtils, {
         if (loadImgs.length) {
           // Wait for images to load
           const nextEditorImgPathCounts = Object.create(null);
-          const loadWorkspaceImg = loadImgs.map(it => new Promise((resolve, reject) => {
+          const loadWorkspaceImg = loadImgs.map(it => new Promise((resolve) => {
             getImgUrl(it.uri).then((newUrl) => {
-              it.imgElt.src = newUrl;
               if (newUrl) {
+                it.imgElt.src = newUrl;
                 increaseImgPathCount(nextEditorImgPathCounts, getAbsoluteWorkspaceImgPath(it.uri));
               }
               resolve();
-            }, () => reject(new Error(`加载当前空间图片出错,uri:${it.uri}`)));
+            }, () => resolve());
           }));
           Promise.all(loadWorkspaceImg)
             .then(() => updateActiveEditorImgPaths(nextEditorImgPathCounts))
