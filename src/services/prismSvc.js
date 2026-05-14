@@ -1,6 +1,5 @@
 import Prism from 'prismjs';
 import prismComponents from 'prismjs/components.js';
-import getLoader from 'prismjs/dependencies.js';
 import 'prismjs/components/prism-markup-templating';
 import 'prismjs/components/prism-yaml';
 import 'prismjs/components/prism-handlebars';
@@ -16,10 +15,6 @@ const escapeHtml = (value = '') => value
   .replace(/</g, '&lt;')
   .replace(/>/g, '&gt;');
 
-const prismComponentBase = '/prism-components';
-const listeners = new Set();
-const loadingMap = new Map();
-const fencedCodeLinePattern = /^(```+|~~~+)([^\n]*)$/gm;
 const prismLanguageEntries = prismComponents.languages;
 const prismLanguageIds = Object.keys(prismLanguageEntries).filter(id => id !== 'meta');
 const prismLanguageIdSet = new Set(prismLanguageIds);
@@ -90,47 +85,9 @@ const resolveLanguage = (language = '') => {
   return prismLanguageAliases[normalizedLanguage] || normalizedLanguage;
 };
 
-const parseFenceLanguage = (infoString = '') => {
-  const trimmedInfoString = infoString.trim();
-  if (!trimmedInfoString) {
-    return '';
-  }
-  if (trimmedInfoString[0] !== '{') {
-    return trimmedInfoString
-      .split(/\s+/, 1)[0]
-      .replace(/^language-/, '')
-      .replace(/^[.]/, '');
-  }
-  const classMatch = trimmedInfoString.match(/(?:^|\s)\.([^\s}.]+)/);
-  return classMatch ? classMatch[1] : '';
-};
-
-const loadScript = (language) => {
-  if (typeof document === 'undefined') {
-    return Promise.resolve(false);
-  }
-  return new Promise((resolve) => {
-    const script = document.createElement('script');
-    script.async = true;
-    script.src = `${prismComponentBase}/prism-${language}.min.js`;
-    script.onload = () => resolve(true);
-    script.onerror = () => {
-      script.remove();
-      resolve(false);
-    };
-    document.head.appendChild(script);
-  });
-};
-
-const emitLoaded = (language) => {
-  listeners.forEach((listener) => {
-    try {
-      listener(language);
-    } catch (error) {
-      // Ignore listener errors so language loading does not break highlighting.
-    }
-  });
-};
+const getMarkupGrammar = () => Prism.languages.markup
+  || Prism.languages.html
+  || Prism.languages.xml;
 
 const extractElementLanguage = (element) => {
   const className = Array.from(element.classList || [])
@@ -138,71 +95,28 @@ const extractElementLanguage = (element) => {
   return className ? className.slice('language-'.length) : '';
 };
 
-export const onPrismLanguageLoaded = (listener) => {
-  listeners.add(listener);
-  return () => listeners.delete(listener);
-};
-
-export const ensurePrismLanguage = async (language) => {
+export const getPrismGrammar = (language) => {
   const resolvedLanguage = resolveLanguage(language);
-  if (!resolvedLanguage || Prism.languages[resolvedLanguage]) {
-    return !!resolvedLanguage;
+  const grammar = Prism.languages[resolvedLanguage];
+  if (grammar) {
+    return grammar;
   }
-  if (loadingMap.has(resolvedLanguage)) {
-    return loadingMap.get(resolvedLanguage);
+  if (resolvedLanguage && prismLanguageIdSet.has(resolvedLanguage)) {
+    return getMarkupGrammar();
   }
-  const task = (async () => {
-    if (!prismLanguageIdSet.has(resolvedLanguage)) {
-      return false;
-    }
-    const loadOrder = [];
-    getLoader(
-      prismComponents,
-      [resolvedLanguage],
-      Object.keys(Prism.languages),
-    ).load(id => loadOrder.push(id));
-    for (const languageId of loadOrder) {
-      if (Prism.languages[languageId]) {
-        continue;
-      }
-      const loaded = await loadScript(languageId);
-      if (loaded && Prism.languages[languageId]) {
-        emitLoaded(languageId);
-        continue;
-      }
-      return false;
-    }
-    return !!Prism.languages[resolvedLanguage];
-  })();
-  loadingMap.set(resolvedLanguage, task);
-  try {
-    return await task;
-  } finally {
-    loadingMap.delete(resolvedLanguage);
-  }
+  return undefined;
 };
-
-export const ensurePrismLanguagesInMarkdown = (text = '') => {
-  const languages = new Set();
-  text.replace(fencedCodeLinePattern, (match, fence, infoString) => {
-    const language = parseFenceLanguage(infoString);
-    if (language) {
-      languages.add(language);
-    }
-    return match;
-  });
-  languages.forEach(language => ensurePrismLanguage(language));
-};
-
-export const getPrismGrammar = language => Prism.languages[resolveLanguage(language)];
 
 export const safeHighlight = (text = '', grammar, language) => {
-  if (!grammar) {
-    ensurePrismLanguage(language);
+  const effectiveGrammar = grammar || getPrismGrammar(language);
+  if (!effectiveGrammar) {
     return escapeHtml(text);
   }
   try {
-    return Prism.highlight(text, grammar, resolveLanguage(language));
+    const grammarLanguage = effectiveGrammar === getMarkupGrammar()
+      ? 'markup'
+      : resolveLanguage(language) || 'markup';
+    return Prism.highlight(text, effectiveGrammar, grammarLanguage);
   } catch (error) {
     return escapeHtml(text);
   }
@@ -214,23 +128,21 @@ export const safeHighlightElement = (element) => {
     const resolvedLanguage = resolveLanguage(language);
     const grammar = getPrismGrammar(language);
     if (!grammar) {
-      ensurePrismLanguage(language).then((loaded) => {
-        if (loaded && element.isConnected) {
-          safeHighlightElement(element);
-        }
-      });
       return;
     }
-    if (resolvedLanguage && resolvedLanguage !== language) {
+    const highlightLanguage = grammar === getMarkupGrammar()
+      ? 'markup'
+      : resolvedLanguage;
+    if (highlightLanguage && highlightLanguage !== language) {
       element.classList.remove(`language-${language}`);
-      element.classList.add(`language-${resolvedLanguage}`);
+      element.classList.add(`language-${highlightLanguage}`);
       const parent = element.parentElement;
       if (parent?.classList.contains(`language-${language}`)) {
         parent.classList.remove(`language-${language}`);
-        parent.classList.add(`language-${resolvedLanguage}`);
+        parent.classList.add(`language-${highlightLanguage}`);
       }
     }
-    Prism.highlightElement(element);
+    element.innerHTML = safeHighlight(element.textContent || '', grammar, highlightLanguage);
   } catch (error) {
     element.textContent = element.textContent || '';
   }

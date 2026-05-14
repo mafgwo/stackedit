@@ -5,9 +5,7 @@
 <script>
 import cledit from '../services/editor/cledit';
 import {
-  ensurePrismLanguage,
   getPrismGrammar,
-  onPrismLanguageLoaded,
   safeHighlight,
 } from '../services/prismSvc';
 
@@ -15,7 +13,6 @@ export default {
   props: ['value', 'lang', 'disabled', 'scrollClass'],
   data: () => ({
     clEditor: null,
-    removeLanguageListener: null,
   }),
   mounted() {
     const preElt = this.$refs.codeEditorRoot;
@@ -31,26 +28,14 @@ export default {
     const clEditor = cledit(preElt, scrollElt);
     clEditor.on('contentChanged', value => this.$emit('changed', value));
     this.clEditor = clEditor;
-    this.removeLanguageListener = onPrismLanguageLoaded((language) => {
-      if (language === this.lang && this.clEditor?.refreshHighlighter) {
-        this.clEditor.refreshHighlighter();
-      }
-    });
     clEditor.init({
       content: this.value,
       sectionHighlighter: (section) => {
-        ensurePrismLanguage(this.lang);
         const grammar = getPrismGrammar(this.lang);
         return safeHighlight(section.text, grammar, this.lang);
       },
     });
     clEditor.toggleEditable(!this.disabled);
-  },
-  unmounted() {
-    if (this.removeLanguageListener) {
-      this.removeLanguageListener();
-      this.removeLanguageListener = null;
-    }
   },
   watch: {
     value(value) {

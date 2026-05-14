@@ -12,8 +12,6 @@ import extensionSvc from './extensionSvc';
 import editorSvcDiscussions from './editor/editorSvcDiscussions';
 import editorSvcUtils from './editor/editorSvcUtils';
 import {
-  ensurePrismLanguagesInMarkdown,
-  onPrismLanguageLoaded,
   safeHighlight,
 } from './prismSvc';
 import utils from './utils';
@@ -195,10 +193,10 @@ const editorSvc = Object.assign(mitt() , editorSvcDiscussions, editorSvcUtils, {
     editorSvc.emit('previewCtxWithDiffs', null);
     const options = {
       sectionHighlighter: (section) => {
-        ensurePrismLanguagesInMarkdown(section.text);
         return safeHighlight(
           section.text,
           this.prismGrammars[section.data],
+          section.data,
         );
       },
       sectionParser: (text) => {
@@ -540,16 +538,6 @@ const editorSvc = Object.assign(mitt() , editorSvcDiscussions, editorSvcUtils, {
     this.tocElt = tocElt;
 
     this.createClEditor(editorElt);
-    onPrismLanguageLoaded(() => {
-      if (!this.options) {
-        return;
-      }
-      markdownConversionSvc.refreshPrismSupport();
-      this.initPrism();
-      if (this.clEditor?.refreshHighlighter) {
-        this.clEditor.refreshHighlighter();
-      }
-    });
 
     this.clEditor.on('contentChanged', (content, diffs, sectionList) => {
       this.parsingCtx = {

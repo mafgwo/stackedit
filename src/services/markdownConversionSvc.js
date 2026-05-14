@@ -264,6 +264,6 @@ export default {
   highlight(markdown, converter = this.defaultConverter, grammars = this.defaultPrismGrammars) {
     const parsingCtx = this.parseSections(converter, markdown);
     return parsingCtx.sections
-      .map(section => safeHighlight(section.text, grammars[section.data])).join('');
+      .map(section => safeHighlight(section.text, grammars[section.data], section.data)).join('');
   },
 };

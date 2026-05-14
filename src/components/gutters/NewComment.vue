@@ -27,8 +27,6 @@ import cledit from '../../services/editor/cledit';
 import editorSvc from '../../services/editorSvc';
 import markdownConversionSvc from '../../services/markdownConversionSvc';
 import {
-  ensurePrismLanguagesInMarkdown,
-  onPrismLanguageLoaded,
   safeHighlight,
 } from '../../services/prismSvc';
 import utils from '../../services/utils';
@@ -40,9 +38,6 @@ export default {
   components: {
     UserImage,
   },
-  data: () => ({
-    removeLanguageListener: null,
-  }),
   computed: {
     ...mapGetters('workspace', [
       'loginToken',
@@ -101,10 +96,10 @@ export default {
     const clEditor = cledit(preElt, scrollerElt, true);
     clEditor.init({
       sectionHighlighter: (section) => {
-        ensurePrismLanguagesInMarkdown(section.text);
         return safeHighlight(
           section.text,
           editorSvc.prismGrammars[section.data],
+          section.data,
         );
       },
       sectionParser: text => markdownConversionSvc
@@ -172,20 +167,6 @@ export default {
         () => store.state.discussion.newCommentText,
         newCommentText => clEditor.setContent(newCommentText),
       );
-    }
-
-    this.removeLanguageListener = onPrismLanguageLoaded(() => {
-      markdownConversionSvc.refreshPrismSupport();
-      editorSvc.initPrism();
-      if (clEditor.refreshHighlighter) {
-        clEditor.refreshHighlighter();
-      }
-    });
-  },
-  beforeUnmount() {
-    if (this.removeLanguageListener) {
-      this.removeLanguageListener();
-      this.removeLanguageListener = null;
     }
   },
 };
