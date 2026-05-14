@@ -29,6 +29,8 @@ const prismLanguageEntries = prismComponents.languages;
 const prismLanguageIds = Object.keys(prismLanguageEntries).filter(id => id !== 'meta');
 const prismLanguageIdSet = new Set(prismLanguageIds);
 const skipDomHighlightLanguages = new Set(['mermaid']);
+const languageLoadedListeners = [];
+const languageLoadPromises = Object.create(null);
 
 if (typeof window !== 'undefined') {
   window.Prism = Prism;
@@ -86,6 +88,41 @@ export const getPrismLanguageNames = () => {
   return Array.from(names);
 };
 
+export const getPrismLanguageVariants = (language) => {
+  const resolvedLanguage = resolveLanguage(language);
+  if (!resolvedLanguage) {
+    return [];
+  }
+  const names = new Set([resolvedLanguage]);
+  Object.entries(prismLanguageAliases).forEach(([alias, id]) => {
+    if (id === resolvedLanguage) {
+      names.add(alias);
+    }
+  });
+  return Array.from(names);
+};
+
+const notifyLanguageLoaded = (language) => {
+  languageLoadedListeners.forEach((listener) => {
+    try {
+      listener(language);
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error(error.message, error.stack);
+    }
+  });
+};
+
+export const onPrismLanguageLoaded = (listener) => {
+  languageLoadedListeners.push(listener);
+  return () => {
+    const index = languageLoadedListeners.indexOf(listener);
+    if (index !== -1) {
+      languageLoadedListeners.splice(index, 1);
+    }
+  };
+};
+
 export const loadPrismLanguage = language => new Promise((resolve, reject) => {
   const resolvedLanguage = resolveLanguage(language);
   if (!resolvedLanguage || !prismLanguageIdSet.has(resolvedLanguage)) {
@@ -101,11 +138,22 @@ export const loadPrismLanguage = language => new Promise((resolve, reject) => {
     resolve(false);
     return;
   }
-  autoloader.loadLanguages(resolvedLanguage, () => {
-    resolve(Boolean(Prism.languages[resolvedLanguage]));
-  }, () => {
-    reject(new Error(`Unable to load Prism language: ${resolvedLanguage}`));
+  if (languageLoadPromises[resolvedLanguage]) {
+    languageLoadPromises[resolvedLanguage].then(resolve, reject);
+    return;
+  }
+  languageLoadPromises[resolvedLanguage] = new Promise((resolveLoad, rejectLoad) => {
+    autoloader.loadLanguages(resolvedLanguage, () => {
+      const loaded = Boolean(Prism.languages[resolvedLanguage]);
+      if (loaded) {
+        notifyLanguageLoaded(resolvedLanguage);
+      }
+      resolveLoad(loaded);
+    }, () => {
+      rejectLoad(new Error(`Unable to load Prism language: ${resolvedLanguage}`));
+    });
   });
+  languageLoadPromises[resolvedLanguage].then(resolve, reject);
 });
 
 export const getPrismGrammar = (language) => {

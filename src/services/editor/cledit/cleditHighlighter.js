@@ -193,7 +193,17 @@ function Highlighter(editor) {
 
     return sectionList;
   };
+
+  this.highlightSections = (predicate) => {
+    const modifiedSections = sectionList.filter(predicate);
+    if (!modifiedSections.length) {
+      return sectionList;
+    }
+    modifiedSections.forEach((section) => {
+      section.forceHighlighting = true;
+    });
+    return this.parseSections(editor.getContent());
+  };
 }
 
 cledit.Highlighter = Highlighter;
-

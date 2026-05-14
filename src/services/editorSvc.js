@@ -12,6 +12,8 @@ import extensionSvc from './extensionSvc';
 import editorSvcDiscussions from './editor/editorSvcDiscussions';
 import editorSvcUtils from './editor/editorSvcUtils';
 import {
+  getPrismLanguageVariants,
+  onPrismLanguageLoaded,
   safeHighlight,
 } from './prismSvc';
 import utils from './utils';
@@ -35,6 +37,8 @@ const allowDebounce = (action, wait) => {
 const diffMatchPatch = new DiffMatchPatch();
 let instantPreview = true;
 let tokens;
+const regexSpecialChars = /[\\^$.*+?()[\]{}|]/g;
+const escapeRegex = value => value.replace(regexSpecialChars, '\\$&');
 
 class SectionDesc {
   constructor(section, previewElt, tocElt, html) {
@@ -751,6 +755,27 @@ const editorSvc = Object.assign(mitt() , editorSvcDiscussions, editorSvcUtils, {
       newSectionList = sectionList;
       onEditorChanged(!instantPreview);
     });
+
+    const loadedPrismLanguages = new Set();
+    const refreshEditorHighlighterForPrism = cledit.Utils.debounce(() => {
+      this.initPrism();
+      if (this.clEditor) {
+        const fencePattern = new RegExp(
+          `^(?:\`\`\`|~~~)(?:${Array.from(loadedPrismLanguages)
+            .flatMap(getPrismLanguageVariants)
+            .map(escapeRegex)
+            .join('|')})(?:\\W|$)`,
+          'im',
+        );
+        loadedPrismLanguages.clear();
+        this.clEditor.refreshHighlightedSections(section => fencePattern.test(section.text));
+      }
+    }, 25);
+    const offPrismLanguageLoaded = onPrismLanguageLoaded((language) => {
+      loadedPrismLanguages.add(language);
+      refreshEditorHighlighterForPrism();
+    });
+    this.clEditor.on('destroy', offPrismLanguageLoaded);
 
     // clEditorSvc.setPreviewElt(element[0].querySelector('.preview__inner-2'))
     // var previewElt = element[0].querySelector('.preview')
