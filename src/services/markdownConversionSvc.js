@@ -2,25 +2,36 @@ import DiffMatchPatch from 'diff-match-patch';
 import MarkdownIt from 'markdown-it';
 import markdownGrammarSvc from './markdownGrammarSvc';
 import extensionSvc from './extensionSvc';
-import Prism, { safeHighlight } from './prismSvc';
+import Prism, {
+  getPrismGrammar,
+  getPrismLanguageNames,
+  safeHighlight,
+} from './prismSvc';
 import utils from './utils';
 
 const htmlSectionMarker = '\uF111\uF222\uF333\uF444';
 const diffMatchPatch = new DiffMatchPatch();
+const regexSpecialChars = /[\\^$.*+?()[\]{}|]/g;
+const escapeRegex = value => value.replace(regexSpecialChars, '\\$&');
 
 export const createInsideFences = () => {
   const insideFences = {};
-  Object.entries(Prism.languages).forEach(([name, language]) => {
-    if (Prism.util.type(language) === 'Object') {
-      insideFences[`language-${name}`] = {
-        pattern: new RegExp(`(\`\`\`|~~~)${name}\\W[\\s\\S]*`),
-        inside: {
-          'cl cl-pre': /(```|~~~).*/,
-          rest: language,
-        },
-      };
-    }
+  getPrismLanguageNames().forEach((name) => {
+    insideFences[`language-${name}`] = {
+      pattern: new RegExp(`(\`\`\`|~~~)${escapeRegex(name)}\\W[\\s\\S]*`),
+      inside: {
+        'cl cl-pre': /(```|~~~).*/,
+        rest: getPrismGrammar(name),
+      },
+    };
   });
+  insideFences['language-fallback'] = {
+    pattern: /(```|~~~)[\w#+.-]+[^\r\n]*[\s\S]*/,
+    inside: {
+      'cl cl-pre': /(```|~~~).*/,
+      rest: getPrismGrammar('fallback'),
+    },
+  };
   return insideFences;
 };
 

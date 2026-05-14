@@ -1,14 +1,24 @@
 import Prism from 'prismjs';
 import prismComponents from 'prismjs/components.js';
-import 'prismjs/components/prism-markup-templating';
-import 'prismjs/components/prism-yaml';
-import 'prismjs/components/prism-handlebars';
+import 'prismjs/plugins/autoloader/prism-autoloader';
+import 'prismjs/components/prism-markup';
 import 'prismjs/components/prism-css';
+import 'prismjs/components/prism-clike';
 import 'prismjs/components/prism-javascript';
-import 'prismjs/components/prism-json';
 import 'prismjs/components/prism-bash';
+import 'prismjs/components/prism-yaml';
+import 'prismjs/components/prism-markup-templating';
+import 'prismjs/components/prism-handlebars';
+import 'prismjs/components/prism-json';
 import 'prismjs/components/prism-shell-session';
-import 'prismjs/components/prism-typescript';
+
+const configurePrismAutoloader = () => {
+  const autoloader = Prism.plugins?.autoloader;
+  if (autoloader) {
+    autoloader.languages_path = '/prism-components/';
+    autoloader.use_minified = true;
+  }
+};
 
 const escapeHtml = (value = '') => value
   .replace(/&/g, '&amp;')
@@ -18,36 +28,14 @@ const escapeHtml = (value = '') => value
 const prismLanguageEntries = prismComponents.languages;
 const prismLanguageIds = Object.keys(prismLanguageEntries).filter(id => id !== 'meta');
 const prismLanguageIdSet = new Set(prismLanguageIds);
+const skipDomHighlightLanguages = new Set(['mermaid']);
 
 if (typeof window !== 'undefined') {
   window.Prism = Prism;
+  configurePrismAutoloader();
 }
 
 const extraLanguageAliases = {
-  'c#': 'csharp',
-  'c++': 'cpp',
-  conf: 'ini',
-  config: 'ini',
-  console: 'shell-session',
-  env: 'ini',
-  'f#': 'fsharp',
-  golang: 'go',
-  gql: 'graphql',
-  htm: 'markup',
-  json: 'json',
-  'objective-c': 'objectivec',
-  'objective-cpp': 'objectivec',
-  'objective-c++': 'objectivec',
-  'plain-text': 'plain',
-  plaintext: 'plain',
-  ps: 'powershell',
-  ps1: 'powershell',
-  psm1: 'powershell',
-  rs: 'rust',
-  'shell-session': 'shell-session',
-  shellscript: 'bash',
-  text: 'plain',
-  zsh: 'bash',
 };
 
 const prismLanguageAliases = (() => {
@@ -85,26 +73,47 @@ const resolveLanguage = (language = '') => {
   return prismLanguageAliases[normalizedLanguage] || normalizedLanguage;
 };
 
-const getMarkupGrammar = () => Prism.languages.markup
-  || Prism.languages.html
-  || Prism.languages.xml;
-
 const extractElementLanguage = (element) => {
   const className = Array.from(element.classList || [])
     .find(item => item.startsWith('language-'));
   return className ? className.slice('language-'.length) : '';
 };
 
+export const getPrismLanguageNames = () => {
+  const names = new Set();
+  prismLanguageIds.forEach(id => names.add(id));
+  Object.keys(prismLanguageAliases).forEach(alias => names.add(alias));
+  return Array.from(names);
+};
+
+export const loadPrismLanguage = language => new Promise((resolve, reject) => {
+  const resolvedLanguage = resolveLanguage(language);
+  if (!resolvedLanguage || !prismLanguageIdSet.has(resolvedLanguage)) {
+    resolve(false);
+    return;
+  }
+  if (Prism.languages[resolvedLanguage]) {
+    resolve(true);
+    return;
+  }
+  const autoloader = Prism.plugins?.autoloader;
+  if (!autoloader) {
+    resolve(false);
+    return;
+  }
+  autoloader.loadLanguages(resolvedLanguage, () => {
+    resolve(Boolean(Prism.languages[resolvedLanguage]));
+  }, () => {
+    reject(new Error(`Unable to load Prism language: ${resolvedLanguage}`));
+  });
+});
+
 export const getPrismGrammar = (language) => {
   const resolvedLanguage = resolveLanguage(language);
-  const grammar = Prism.languages[resolvedLanguage];
-  if (grammar) {
-    return grammar;
+  if (!resolvedLanguage) {
+    return undefined;
   }
-  if (resolvedLanguage && prismLanguageIdSet.has(resolvedLanguage)) {
-    return getMarkupGrammar();
-  }
-  return undefined;
+  return Prism.languages[resolvedLanguage];
 };
 
 export const safeHighlight = (text = '', grammar, language) => {
@@ -113,9 +122,10 @@ export const safeHighlight = (text = '', grammar, language) => {
     return escapeHtml(text);
   }
   try {
-    const grammarLanguage = effectiveGrammar === getMarkupGrammar()
-      ? 'markup'
-      : resolveLanguage(language) || 'markup';
+    const grammarLanguage = resolveLanguage(language);
+    if (!grammarLanguage) {
+      return escapeHtml(text);
+    }
     return Prism.highlight(text, effectiveGrammar, grammarLanguage);
   } catch (error) {
     return escapeHtml(text);
@@ -126,23 +136,41 @@ export const safeHighlightElement = (element) => {
   try {
     const language = extractElementLanguage(element);
     const resolvedLanguage = resolveLanguage(language);
-    const grammar = getPrismGrammar(language);
-    if (!grammar) {
+    if (!resolvedLanguage) {
       return;
     }
-    const highlightLanguage = grammar === getMarkupGrammar()
-      ? 'markup'
-      : resolvedLanguage;
-    if (highlightLanguage && highlightLanguage !== language) {
+
+    if (skipDomHighlightLanguages.has(resolvedLanguage)) {
+      return;
+    }
+
+    if (resolvedLanguage !== language) {
       element.classList.remove(`language-${language}`);
-      element.classList.add(`language-${highlightLanguage}`);
+      element.classList.add(`language-${resolvedLanguage}`);
       const parent = element.parentElement;
       if (parent?.classList.contains(`language-${language}`)) {
         parent.classList.remove(`language-${language}`);
-        parent.classList.add(`language-${highlightLanguage}`);
+        parent.classList.add(`language-${resolvedLanguage}`);
       }
     }
-    element.innerHTML = safeHighlight(element.textContent || '', grammar, highlightLanguage);
+
+    if (prismLanguageIdSet.has(resolvedLanguage) && !Prism.languages[resolvedLanguage]) {
+      loadPrismLanguage(resolvedLanguage)
+        .then((loaded) => {
+          if (loaded) {
+            Prism.highlightElement(element);
+          }
+        })
+        .catch(() => {});
+      return;
+    }
+
+    const grammar = Prism.languages[resolvedLanguage];
+    if (!grammar) {
+      element.textContent = element.textContent || '';
+      return;
+    }
+    element.innerHTML = safeHighlight(element.textContent || '', grammar, resolvedLanguage);
   } catch (error) {
     element.textContent = element.textContent || '';
   }
