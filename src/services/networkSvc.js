@@ -6,7 +6,6 @@ const scriptLoadingPromises = Object.create(null);
 const authorizeTimeout = 6 * 60 * 1000; // 2 minutes
 const silentAuthorizeTimeout = 15 * 1000; // 15 secondes (which will be reattempted)
 const networkTimeout = 30 * 1000; // 30 sec
-let isConnectionDown = false;
 const userInactiveAfter = 3 * 60 * 1000; // 3 minutes (twice the default sync period)
 let lastActivity = 0;
 let lastFocus = 0;
@@ -55,37 +54,10 @@ export default {
     }
     window.addEventListener('focus', setLastFocus);
 
-    // Check that browser is online periodically
+    // Check the browser online state periodically.
     const checkOffline = async () => {
-      const isBrowserOffline = window.navigator.onLine === false;
-      if (!isBrowserOffline
-        && store.state.lastOfflineCheck + networkTimeout + 5000 < Date.now()
-        && this.isUserActive()
-      ) {
-        store.commit('updateLastOfflineCheck');
-        const script = document.createElement('script');
-        let timeout;
-        try {
-          await new Promise((resolve, reject) => {
-            script.onload = resolve;
-            script.onerror = reject;
-            script.src = `https://res.wx.qq.com/open/js/jweixin-1.2.0.js?${Date.now()}`;
-            try {
-              document.head.appendChild(script); // This can fail with bad network
-              timeout = setTimeout(reject, networkTimeout);
-            } catch (e) {
-              reject(e);
-            }
-          });
-          isConnectionDown = false;
-        } catch (e) {
-          isConnectionDown = true;
-        } finally {
-          clearTimeout(timeout);
-          document.head.removeChild(script);
-        }
-      }
-      const offline = isBrowserOffline || isConnectionDown;
+      const offline = window.navigator.onLine === false;
+      store.commit('updateLastOfflineCheck');
       if (store.state.offline !== offline) {
         store.commit('setOffline', offline);
         if (offline) {
@@ -98,10 +70,7 @@ export default {
     };
 
     utils.setInterval(checkOffline, 1000);
-    window.addEventListener('online', () => {
-      isConnectionDown = false;
-      checkOffline();
-    });
+    window.addEventListener('online', checkOffline);
     window.addEventListener('offline', checkOffline);
     await checkOffline();
     this.getServerConf();
@@ -182,9 +151,12 @@ export default {
               if (!reattempt) {
                 reject(new Error('REATTEMPT'));
               } else {
-                isConnectionDown = true;
-                store.commit('setOffline', true);
                 store.commit('updateLastOfflineCheck');
+                if (window.navigator.onLine === false) {
+                  store.commit('setOffline', true);
+                  reject(new Error('You are offline.'));
+                  return;
+                }
                 reject(new Error('You are offline.'));
               }
             }, silentAuthorizeTimeout);
@@ -268,8 +240,9 @@ export default {
           const timeoutId = setTimeout(() => {
             xhr.abort();
             if (offlineCheck) {
-              isConnectionDown = true;
-              store.commit('setOffline', true);
+              if (window.navigator.onLine === false) {
+                store.commit('setOffline', true);
+              }
               reject(new Error('You are offline.'));
             } else {
               reject(new Error('Network request timeout.'));
@@ -277,9 +250,6 @@ export default {
           }, sanitizedConfig.timeout);
 
           xhr.onload = () => {
-            if (offlineCheck) {
-              isConnectionDown = false;
-            }
             clearTimeout(timeoutId);
             const result = {
               status: xhr.status,
@@ -303,8 +273,9 @@ export default {
           xhr.onerror = () => {
             clearTimeout(timeoutId);
             if (offlineCheck) {
-              isConnectionDown = true;
-              store.commit('setOffline', true);
+              if (window.navigator.onLine === false) {
+                store.commit('setOffline', true);
+              }
               reject(new Error('You are offline.'));
             } else {
               reject(new Error('Network request failed.'));
