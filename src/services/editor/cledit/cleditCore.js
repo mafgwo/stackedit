@@ -208,9 +208,8 @@ function cledit(contentElt, scrollEltOpt, isMarkdown = false) {
   }
 
   function refreshHighlightedSections(predicate) {
-    const content = getTextContent();
     const sectionList = editor.highlighter.highlightSections(predicate);
-    editor.$trigger('contentChanged', content, [0, content], sectionList);
+    editor.$trigger('highlightedSectionsRefreshed', sectionList);
   }
 
   function keydownHandler(handler) {

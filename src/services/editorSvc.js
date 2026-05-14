@@ -549,6 +549,23 @@ const editorSvc = Object.assign(mitt() , editorSvcDiscussions, editorSvcUtils, {
         sectionList,
       };
     });
+    this.clEditor.on('highlightedSectionsRefreshed', (sectionList) => {
+      this.parsingCtx = {
+        ...this.parsingCtx,
+        sectionList,
+      };
+      this.sectionList = sectionList;
+      if (this.previewCtx?.sectionDescList?.length) {
+        this.previewCtx.sectionDescList.forEach((sectionDesc, index) => {
+          const section = sectionList[index];
+          if (section) {
+            sectionDesc.section = section;
+            sectionDesc.editorElt = section.elt;
+          }
+        });
+        this.measureSectionDimensions(false, false, true);
+      }
+    });
     this.clEditor.undoMgr.on('undoStateChange', () => {
       const canUndo = this.clEditor.undoMgr.canUndo();
       if (canUndo !== store.state.layout.canUndo) {
