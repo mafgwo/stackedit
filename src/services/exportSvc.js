@@ -1,4 +1,4 @@
-import CryptoJS from 'crypto-js';
+import MD5 from 'crypto-js/md5';
 import FileSaver from 'file-saver';
 import localDbSvc from './localDbSvc';
 import markdownConversionSvc from './markdownConversionSvc';
@@ -39,7 +39,7 @@ const getImgBase64 = async (uri) => {
   if (uri.indexOf('http://') !== 0 && uri.indexOf('https://') !== 0) {
     const currDirNode = store.getters['explorer/selectedNodeFolder'];
     const absoluteImgPath = utils.getAbsoluteFilePath(currDirNode, uri);
-    const md5Id = CryptoJS.MD5(absoluteImgPath).toString();
+    const md5Id = MD5(absoluteImgPath).toString();
     const imgItem = await localDbSvc.getImgItem(md5Id);
     if (imgItem) {
       const potIdx = uri.lastIndexOf('.');

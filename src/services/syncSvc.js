@@ -1,4 +1,4 @@
-import CryptoJS from 'crypto-js';
+import MD5 from 'crypto-js/md5';
 import localDbSvc from './localDbSvc';
 import store from '../store';
 import utils from './utils';
@@ -859,7 +859,7 @@ const syncImg = async (absolutePath) => {
     return;
   }
   await localDbSvc.saveImg({
-    id: CryptoJS.MD5(absolutePath).toString(),
+    id: MD5(absolutePath).toString(),
     path: absolutePath,
     content,
     uploaded: 1,

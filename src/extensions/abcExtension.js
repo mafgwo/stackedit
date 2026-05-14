@@ -1,8 +1,25 @@
-import renderAbc from 'abcjs/src/api/abc_tunebook_svg';
 import extensionSvc from '../services/extensionSvc';
 
-const render = (elt) => {
+let renderAbcPromise;
+
+const loadRenderAbc = () => {
+  if (!renderAbcPromise) {
+    renderAbcPromise = import('abcjs/src/api/abc_tunebook_svg')
+      .then(module => module.default);
+  }
+  return renderAbcPromise;
+};
+
+const render = async (elt) => {
+  if (elt.$abcRendering) {
+    return;
+  }
+  elt.$abcRendering = true;
   const content = elt.textContent;
+  const renderAbc = await loadRenderAbc();
+  if (!elt.parentNode || !elt.parentNode.parentNode) {
+    return;
+  }
   // Create a div element
   const divElt = document.createElement('div');
   divElt.className = 'abc-notation-block';
@@ -16,6 +33,6 @@ extensionSvc.onGetOptions((options, properties) => {
 });
 
 extensionSvc.onSectionPreview((elt) => {
-  elt.querySelectorAll('.prism.language-abc')
-    .cl_each(notationElt => render(notationElt));
+  const notationElts = Array.from(elt.querySelectorAll('.prism.language-abc'));
+  return Promise.all(notationElts.map(notationElt => render(notationElt)));
 });

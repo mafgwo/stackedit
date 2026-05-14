@@ -1,7 +1,7 @@
 import mitt from 'mitt';
 import DiffMatchPatch from 'diff-match-patch';
 import markdownItPandocRenderer from 'markdown-it-pandoc-renderer';
-import CryptoJS from 'crypto-js';
+import MD5 from 'crypto-js/md5';
 import cledit from './editor/cledit';
 import pagedown from '../libs/pagedown';
 import htmlSanitizer from '../libs/htmlSanitizer';
@@ -126,7 +126,7 @@ const getImgUrl = async (uri) => {
     if (cachedUrl) {
       return cachedUrl;
     }
-    const md5Id = CryptoJS.MD5(absoluteImgPath).toString();
+    const md5Id = MD5(absoluteImgPath).toString();
     let imgItem = await localDbSvc.getImgItem(md5Id);
     if (!imgItem) {
       try {

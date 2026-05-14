@@ -1,4 +1,4 @@
-import CryptoJS from 'crypto-js';
+import MD5 from 'crypto-js/md5';
 import store from '../store';
 import utils from './utils';
 import localDbSvc from './localDbSvc';
@@ -38,7 +38,7 @@ export default {
       const currDirNode = store.getters['explorer/selectedNodeFolder'];
       const absolutePath = utils.getAbsoluteFilePath(currDirNode, path);
       await localDbSvc.saveImg({
-        id: CryptoJS.MD5(absolutePath).toString(),
+        id: MD5(absolutePath).toString(),
         path: absolutePath,
         content: base64,
       });
