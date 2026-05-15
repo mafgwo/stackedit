@@ -455,7 +455,7 @@
                 </a>
             </div>
             <a href="app" title="The app">The app</a> – <a href="https://gitee.com/mafgwo/stackedit/issues" target="_blank" title="The app">Community</a><br>
-            © 2022 <a href="https://gitee.com/mafgwo" target="_blank">豆萁</a> <a href="https://beian.miit.gov.cn/" target="_blank">粤ICP备18096694号</a><br>
+            © <span id="copyright-years">2022</span> <a href="https://gitee.com/mafgwo" target="_blank">豆萁</a> <a href="https://beian.miit.gov.cn/" target="_blank">粤ICP备18096694号</a><br>
             Licensed under an
             <a target="_blank" href="http://www.apache.org/licenses/LICENSE-2.0">Apache License</a> –
             <a href="privacy_policy.html" target="_blank">隐私策略</a>
@@ -465,6 +465,13 @@
 
     <!-- built files will be auto injected -->
     <script>
+        (function() {
+          var startYear = 2022;
+          var currentYear = new Date().getFullYear();
+          document.getElementById('copyright-years').textContent =
+            currentYear > startYear ? startYear + '-' + currentYear : startYear;
+        })();
+
         var _hmt = _hmt || [];
         (function() {
           var hm = document.createElement("script");
