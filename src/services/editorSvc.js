@@ -53,6 +53,7 @@ class SectionDesc {
 const pathUrlMap = Object.create(null);
 const pathUrlRefCountMap = Object.create(null);
 const localImageSrcAttr = 'data-ws-src';
+const localImagePathAttr = 'data-ws-path';
 const localImageSrcMatcher = /(<img\b[^>]*?)\ssrc=(['"])([^'"]+)\2/ig;
 
 const isWorkspaceLocalUri = uri => !!uri && !/^([a-z][a-z0-9+.-]*:|\/\/)/i.test(uri);
@@ -69,17 +70,8 @@ const getAbsoluteWorkspaceImgPath = uri => utils.getAbsoluteFilePath(
   uri,
 );
 
-const retainImgUrl = (absoluteImgPath) => {
-  if (pathUrlMap[absoluteImgPath]) {
-    pathUrlRefCountMap[absoluteImgPath] = (pathUrlRefCountMap[absoluteImgPath] || 0) + 1;
-    return pathUrlMap[absoluteImgPath];
-  }
-  return null;
-};
-
 const cacheImgUrl = (absoluteImgPath, url) => {
   pathUrlMap[absoluteImgPath] = url;
-  pathUrlRefCountMap[absoluteImgPath] = (pathUrlRefCountMap[absoluteImgPath] || 0) + 1;
   return url;
 };
 
@@ -110,19 +102,38 @@ const increaseImgPathCount = (counterMap, absoluteImgPath) => {
 };
 
 const syncActiveImgPathCounts = (activeCountMap, nextCountMap) => {
-  Object.keys(activeCountMap).forEach((absoluteImgPath) => {
-    const releaseCount = (activeCountMap[absoluteImgPath] || 0) - (nextCountMap[absoluteImgPath] || 0);
-    for (let i = 0; i < releaseCount; i += 1) {
+  Object.keys({
+    ...activeCountMap,
+    ...nextCountMap,
+  }).forEach((absoluteImgPath) => {
+    const countDiff = (nextCountMap[absoluteImgPath] || 0) - (activeCountMap[absoluteImgPath] || 0);
+    if (countDiff > 0) {
+      pathUrlRefCountMap[absoluteImgPath] = (pathUrlRefCountMap[absoluteImgPath] || 0) + countDiff;
+      return;
+    }
+    for (let i = 0; i < -countDiff; i += 1) {
       releaseImgUrl(absoluteImgPath);
     }
   });
   return nextCountMap;
 };
 
+const countActiveWorkspaceImages = (rootElt) => {
+  const counts = Object.create(null);
+  if (!rootElt) {
+    return counts;
+  }
+  Array.prototype.slice.call(rootElt.querySelectorAll(`img[${localImagePathAttr}]`))
+    .forEach((imgElt) => {
+      increaseImgPathCount(counts, imgElt.getAttribute(localImagePathAttr));
+    });
+  return counts;
+};
+
 const getImgUrl = async (uri) => {
   if (uri.indexOf('http://') !== 0 && uri.indexOf('https://') !== 0) {
     const absoluteImgPath = getAbsoluteWorkspaceImgPath(uri);
-    const cachedUrl = retainImgUrl(absoluteImgPath);
+    const cachedUrl = pathUrlMap[absoluteImgPath];
     if (cachedUrl) {
       return cachedUrl;
     }
@@ -367,7 +378,7 @@ const editorSvc = Object.assign(mitt() , editorSvcDiscussions, editorSvcUtils, {
         getImgUrl(it.uri).then((newUrl) => {
           if (newUrl) {
             it.imgElt.src = newUrl;
-            increaseImgPathCount(nextPreviewImgPathCounts, getAbsoluteWorkspaceImgPath(it.uri));
+            it.imgElt.setAttribute(localImagePathAttr, getAbsoluteWorkspaceImgPath(it.uri));
           }
           resolve();
         }, () => resolve());
@@ -385,7 +396,7 @@ const editorSvc = Object.assign(mitt() , editorSvcDiscussions, editorSvcUtils, {
     await Promise.all(loadedPromises);
     this.activePreviewImgPathCounts = syncActiveImgPathCounts(
       this.activePreviewImgPathCounts,
-      nextPreviewImgPathCounts,
+      countActiveWorkspaceImages(this.previewElt),
     );
 
     // Debounce if sections have already been measured
@@ -652,7 +663,7 @@ const editorSvc = Object.assign(mitt() , editorSvcDiscussions, editorSvcUtils, {
     const updateActiveEditorImgPaths = (nextEditorImgPathCounts) => {
       this.activeEditorImgPathCounts = syncActiveImgPathCounts(
         this.activeEditorImgPathCounts,
-        nextEditorImgPathCounts,
+        nextEditorImgPathCounts || countActiveWorkspaceImages(this.editorElt),
       );
     };
 
@@ -745,16 +756,16 @@ const editorSvc = Object.assign(mitt() , editorSvcDiscussions, editorSvcUtils, {
             getImgUrl(it.uri).then((newUrl) => {
               if (newUrl) {
                 it.imgElt.src = newUrl;
-                increaseImgPathCount(nextEditorImgPathCounts, getAbsoluteWorkspaceImgPath(it.uri));
+                it.imgElt.setAttribute(localImagePathAttr, getAbsoluteWorkspaceImgPath(it.uri));
               }
               resolve();
             }, () => resolve());
           }));
           Promise.all(loadWorkspaceImg)
-            .then(() => updateActiveEditorImgPaths(nextEditorImgPathCounts))
-            .catch(() => updateActiveEditorImgPaths(nextEditorImgPathCounts));
+            .then(() => updateActiveEditorImgPaths())
+            .catch(() => updateActiveEditorImgPaths());
         } else {
-          updateActiveEditorImgPaths(Object.create(null));
+          updateActiveEditorImgPaths();
         }
       });
     }
@@ -771,6 +782,7 @@ const editorSvc = Object.assign(mitt() , editorSvcDiscussions, editorSvcUtils, {
       imgEltsToCache = [];
       // Eject released images from cache
       triggerImgCacheGc();
+      updateActiveEditorImgPaths();
     });
 
     this.clEditor.on('contentChanged', (content, diffs, sectionList) => {
