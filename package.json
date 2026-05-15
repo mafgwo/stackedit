@@ -1,7 +1,7 @@
 {
   "name": "stackedit",
   "private": true,
-  "version": "6.0.7",
+  "version": "6.0.8",
   "description": "免费, 开源, 功能齐全的 Markdown 编辑器",
   "author": "Benoit Schweblin, 豆萁",
   "license": "Apache-2.0",
