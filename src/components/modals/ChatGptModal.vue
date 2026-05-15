@@ -4,7 +4,7 @@
       <div class="modal__image">
         <icon-chat-gpt></icon-chat-gpt>
       </div>
-      <p><b>AI内容生成</b><br>使用{{ selectedProvider.name }} - {{ chatGptConfig.model }}生成</p>
+      <p><b>AI内容生成</b><br>使用{{ selectedProvider.name }} - {{ chatGptConfig.model }}生成<span v-if="chatGptConfig.search.enabled">，联网搜索已启用</span></p>
       <form-entry label="生成内容要求详细描述" error="content">
         <template v-slot:field><textarea class="text-input" type="text" placeholder="输入内容(支持换行)" v-model.trim="content" :disabled="generating || !isConfigured"></textarea></template>
         <div class="form-entry__info">
@@ -33,6 +33,8 @@
 import { mapGetters } from 'vuex';
 import modalTemplate from './common/modalTemplate';
 import chatGptSvc from '../../services/chatGptSvc';
+import aiSearchSvc from '../../services/aiSearchSvc';
+import { isAiSearchConfigured } from '../../services/aiSearchConfig';
 import { normalizeAiModelConfig } from '../../services/aiModelConfig';
 import store from '../../store';
 
@@ -51,7 +53,8 @@ export default modalTemplate({
       return chatGptSvc.getProvider(this.chatGptConfig.providerId);
     },
     isConfigured() {
-      return !!(this.chatGptConfig.apiKey && this.chatGptConfig.baseUrl && this.chatGptConfig.model);
+      return !!(this.chatGptConfig.apiKey && this.chatGptConfig.baseUrl && this.chatGptConfig.model)
+        && isAiSearchConfigured(this.chatGptConfig.search);
     },
   },
   methods: {
@@ -68,22 +71,71 @@ export default modalTemplate({
       } else if (content) {
         this.result = this.result + content;
         const container = document.querySelector('.result_pre');
-        container.scrollTo(0, container.scrollHeight); // 滚动到最底部
+        if (container) {
+          container.scrollTo(0, container.scrollHeight); // 滚动到最底部
+        }
       } else if (error) {
         this.generating = false;
       }
     },
-    generate() {
+    buildMessages(searchResult) {
+      if (!searchResult || !searchResult.context) {
+        return [{ role: 'user', content: this.content }];
+      }
+      return [{
+        role: 'system',
+        content: '你是写作助手。用户启用了联网搜索。请优先基于搜索结果生成内容；如果搜索结果不足，请明确说明。涉及事实、数据、新闻、政策、版本、价格时，请在正文或末尾标注来源序号。',
+      }, {
+        role: 'user',
+        content: [
+          `用户需求：${this.content}`,
+          '',
+          `搜索查询：${searchResult.query}`,
+          '',
+          '搜索结果：',
+          searchResult.context,
+        ].join('\n'),
+      }];
+    },
+    appendSources(searchResult) {
+      if (!searchResult || !searchResult.results.length) {
+        return;
+      }
+      const sources = searchResult.results
+        .filter(result => result.url)
+        .map((result, index) => `[${index + 1}] ${result.title} ${result.url}`)
+        .join('\n');
+      if (sources) {
+        this.result = `${this.result}\n\n参考来源：\n${sources}`;
+      }
+    },
+    async generate() {
       this.generating = true;
       this.result = '';
       try {
+        let searchResult = null;
+        if (this.chatGptConfig.search.enabled) {
+          this.result = '(联网搜索中...)';
+          searchResult = await aiSearchSvc.search(this.chatGptConfig.search, this.content);
+          this.result = '';
+          if (!searchResult.results.length) {
+            this.result = '(未搜索到可用结果，继续生成中...)\n';
+          }
+        }
         this.xhr = chatGptSvc.chat({
           ...this.chatGptConfig,
           content: this.content,
-        }, this.process);
+          messages: this.buildMessages(searchResult),
+        }, (message) => {
+          this.process(message);
+          if (message.done) {
+            this.appendSources(searchResult);
+          }
+        });
       } catch (err) {
         this.generating = false;
-        store.dispatch('notification/error', err);
+        this.result = '';
+        store.dispatch('notification/error', err.message || err);
       }
     },
     async openConfig() {

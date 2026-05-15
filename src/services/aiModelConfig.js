@@ -1,3 +1,5 @@
+import { normalizeAiSearchConfig } from './aiSearchConfig.js';
+
 export const aiModelProviders = [{
   id: 'kimi',
   name: 'Kimi（月之暗面）',
@@ -116,5 +118,6 @@ export const normalizeAiModelConfig = (config = {}) => {
     model,
     providerModels,
     availableModels: normalizedModels,
+    search: normalizeAiSearchConfig(config.search),
   };
 };

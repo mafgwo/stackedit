@@ -80,7 +80,7 @@ export default {
     xhr.setRequestHeader('Content-Type', 'application/json');
     xhr.send(JSON.stringify({
       model: normalizedConfig.model,
-      messages: [{ role: 'user', content: config.content }],
+      messages: config.messages || [{ role: 'user', content: config.content }],
       temperature: 1,
       stream: true,
     }));

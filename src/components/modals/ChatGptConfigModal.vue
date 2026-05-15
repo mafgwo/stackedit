@@ -35,6 +35,37 @@
           <span v-if="modelFetchError" class="config-warning">{{ modelFetchError }}</span>
         </div>
       </form-entry>
+      <form-entry label="联网搜索" error="search">
+        <label slot="field" class="ai-config-checkbox">
+          <input type="checkbox" v-model="searchEnabled">
+          <span>启用联网搜索</span>
+        </label>
+        <div class="form-entry__info">
+          启用后生成前会先分词并调用搜索 API，再把搜索结果作为参考资料传给模型。
+        </div>
+      </form-entry>
+      <template v-if="searchEnabled">
+        <form-entry label="搜索提供商" error="searchProvider">
+          <select slot="field" class="textfield" v-model="searchProviderId" @change="handleSearchProviderChange">
+            <option v-for="provider in searchProviders" :key="provider.id" :value="provider.id">{{ provider.name }}</option>
+          </select>
+        </form-entry>
+        <form-entry label="搜索接口地址" error="searchBaseUrl" v-if="searchProviderId === 'custom'">
+          <input slot="field" class="textfield" type="text" placeholder="https://example.com/search" v-model.trim="searchBaseUrl" @keydown.enter="resolve()">
+          <div class="form-entry__info">
+            自定义接口需支持 POST JSON：<b>{ query, maxResults }</b>，返回 <b>results</b>、<b>data</b>、<b>items</b> 或数组。
+          </div>
+        </form-entry>
+        <form-entry label="搜索apiKey" error="searchApiKey">
+          <input slot="field" class="textfield" type="text" v-model.trim="searchApiKey" @keydown.enter="resolve()">
+          <div class="form-entry__info">
+            <b>apiKey</b> 请到 <a v-if="selectedSearchProvider.apiKeyUrl" :href="selectedSearchProvider.apiKeyUrl" target="_blank">{{ selectedSearchProvider.name }} API Key 管理</a><span v-else>对应搜索服务后台</span> 中获取。
+          </div>
+        </form-entry>
+        <form-entry label="搜索结果数" error="searchMaxResults">
+          <input slot="field" class="textfield" type="number" min="1" max="10" v-model.number="searchMaxResults" @keydown.enter="resolve()">
+        </form-entry>
+      </template>
     </div>
     <div class="modal__button-bar">
       <button class="button" @click="config.reject()">取消</button>
@@ -47,6 +78,11 @@
 import modalTemplate from './common/modalTemplate';
 import chatGptSvc from '../../services/chatGptSvc';
 import { aiModelProviders, normalizeAiModelConfig } from '../../services/aiModelConfig';
+import {
+  aiSearchProviders,
+  getAiSearchProvider,
+  normalizeAiSearchConfig,
+} from '../../services/aiSearchConfig';
 
 export default modalTemplate({
   data: () => ({
@@ -59,13 +95,22 @@ export default modalTemplate({
     providerModels: {},
     customModel: '',
     modelOptions: [],
+    searchEnabled: false,
+    searchProviderId: 'tavily',
+    searchBaseUrl: '',
+    searchApiKey: '',
+    searchMaxResults: 5,
     loadingModels: false,
     modelFetchError: '',
   }),
   computed: {
     providers: () => aiModelProviders,
+    searchProviders: () => aiSearchProviders,
     selectedProvider() {
       return chatGptSvc.getProvider(this.providerId);
+    },
+    selectedSearchProvider() {
+      return getAiSearchProvider(this.searchProviderId);
     },
     canFetchModels() {
       return !!this.apiKey && !!this.baseUrl;
@@ -119,6 +164,19 @@ export default modalTemplate({
     handleCustomModelInput() {
       this.$nextTick(() => this.rememberProviderConfig());
     },
+    handleSearchProviderChange() {
+      const config = normalizeAiSearchConfig({ providerId: this.searchProviderId });
+      this.searchBaseUrl = config.baseUrl;
+    },
+    getSearchConfig() {
+      return normalizeAiSearchConfig({
+        enabled: this.searchEnabled,
+        providerId: this.searchProviderId,
+        baseUrl: this.searchBaseUrl,
+        apiKey: this.searchApiKey,
+        maxResults: this.searchMaxResults,
+      });
+    },
     async refreshModels() {
       this.loadingModels = true;
       this.modelFetchError = '';
@@ -155,6 +213,15 @@ export default modalTemplate({
         this.setError('model');
         return;
       }
+      const searchConfig = this.getSearchConfig();
+      if (searchConfig.enabled && !searchConfig.baseUrl) {
+        this.setError('searchBaseUrl');
+        return;
+      }
+      if (searchConfig.enabled && !searchConfig.apiKey) {
+        this.setError('searchApiKey');
+        return;
+      }
       this.rememberProviderConfig();
       this.config.resolve(normalizeAiModelConfig({
         providerId: this.providerId,
@@ -164,6 +231,7 @@ export default modalTemplate({
         model: this.resolvedModel,
         providerModels: this.providerModels,
         availableModels: this.modelOptions,
+        search: searchConfig,
       }));
     },
   },
@@ -178,6 +246,11 @@ export default modalTemplate({
     this.providerModels = config.providerModels;
     this.customModel = '';
     this.modelOptions = config.availableModels;
+    this.searchEnabled = config.search.enabled;
+    this.searchProviderId = config.search.providerId;
+    this.searchBaseUrl = config.search.baseUrl;
+    this.searchApiKey = config.search.apiKey;
+    this.searchMaxResults = config.search.maxResults;
   },
 });
 </script>
@@ -190,6 +263,15 @@ export default modalTemplate({
 
   .model-custom-input {
     margin-top: 8px;
+  }
+
+  .ai-config-checkbox {
+    display: flex;
+    align-items: center;
+
+    input {
+      margin-right: 8px;
+    }
   }
 
   .config-warning {
