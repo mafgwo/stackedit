@@ -1,15 +1,15 @@
+import { normalizeAiModelConfig } from '../services/aiModelConfig';
+
 const chatgptConfigKey = 'chatgpt/config';
 
 export default {
   namespaced: true,
   state: {
-    config: {
-      apiKey: null,
-    },
+    config: normalizeAiModelConfig(),
   },
   mutations: {
     setCurrConfig: (state, value) => {
-      state.config = value;
+      state.config = normalizeAiModelConfig(value);
     },
   },
   getters: {
@@ -17,8 +17,9 @@ export default {
   },
   actions: {
     setCurrConfig({ commit }, value) {
-      commit('setCurrConfig', value);
-      localStorage.setItem(chatgptConfigKey, JSON.stringify(value));
+      const config = normalizeAiModelConfig(value);
+      commit('setCurrConfig', config);
+      localStorage.setItem(chatgptConfigKey, JSON.stringify(config));
     },
   },
 };

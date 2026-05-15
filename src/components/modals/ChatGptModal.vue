@@ -1,18 +1,18 @@
 <template>
-  <modal-inner class="modal__inner-1--chatgpt" aria-label="chatgpt">
+  <modal-inner class="modal__inner-1--chatgpt" aria-label="AI内容生成">
     <div class="modal__content">
       <div class="modal__image">
         <icon-chat-gpt></icon-chat-gpt>
       </div>
-      <p><b>ChatGPT内容生成</b><br>使用Kimi大模型生成</p>
+      <p><b>AI内容生成</b><br>使用{{ selectedProvider.name }} - {{ chatGptConfig.model }}生成</p>
       <form-entry label="生成内容要求详细描述" error="content">
-        <template v-slot:field><textarea class="text-input" type="text" placeholder="输入内容(支持换行)" v-model.trim="content" :disabled="generating || !chatGptConfig.apiKey"></textarea></template>
+        <template v-slot:field><textarea class="text-input" type="text" placeholder="输入内容(支持换行)" v-model.trim="content" :disabled="generating || !isConfigured"></textarea></template>
         <div class="form-entry__info">
-          <span v-if="!chatGptConfig.apiKey" class="config-warning">
-            未配置apiKey，请点击 <a href="javascript:void(0)" @click="openConfig">配置</a> apiKey。
+          <span v-if="!isConfigured" class="config-warning">
+            未配置模型服务，请点击 <a href="javascript:void(0)" @click="openConfig">配置</a> 模型服务。
           </span>
           <span v-else>
-            <a href="javascript:void(0)" @click="openConfig">修改apiKey配置</a>
+            <a href="javascript:void(0)" @click="openConfig">修改模型配置</a>
           </span>
         </div>
       </form-entry>
@@ -33,6 +33,7 @@
 import { mapGetters } from 'vuex';
 import modalTemplate from './common/modalTemplate';
 import chatGptSvc from '../../services/chatGptSvc';
+import { normalizeAiModelConfig } from '../../services/aiModelConfig';
 import store from '../../store';
 
 export default modalTemplate({
@@ -46,6 +47,12 @@ export default modalTemplate({
     ...mapGetters('chatgpt', [
       'chatGptConfig',
     ]),
+    selectedProvider() {
+      return chatGptSvc.getProvider(this.chatGptConfig.providerId);
+    },
+    isConfigured() {
+      return !!(this.chatGptConfig.apiKey && this.chatGptConfig.baseUrl && this.chatGptConfig.model);
+    },
   },
   methods: {
     resolve(evt) {
@@ -71,7 +78,7 @@ export default modalTemplate({
       this.result = '';
       try {
         this.xhr = chatGptSvc.chat({
-          apiKey: this.chatGptConfig.apiKey,
+          ...this.chatGptConfig,
           content: this.content,
         }, this.process);
       } catch (err) {
@@ -81,7 +88,7 @@ export default modalTemplate({
     },
     async openConfig() {
       try {
-        const config = await store.dispatch('modal/open', { type: 'chatGptConfig', apiKey: this.chatGptConfig.apiKey });
+        const config = await store.dispatch('modal/open', { type: 'chatGptConfig', ...this.chatGptConfig });
         store.dispatch('chatgpt/setCurrConfig', config);
       } catch (e) { /* Cancel */ }
     },
@@ -99,9 +106,9 @@ export default modalTemplate({
     },
   },
   async created() {
-    // store chatgpt配置
+    // Store AI model config in localStorage only.
     const config = localStorage.getItem('chatgpt/config');
-    store.dispatch('chatgpt/setCurrConfig', JSON.parse(config || '{}'));
+    store.dispatch('chatgpt/setCurrConfig', normalizeAiModelConfig(JSON.parse(config || '{}')));
   },
 });
 </script>

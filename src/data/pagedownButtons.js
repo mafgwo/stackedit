@@ -51,6 +51,6 @@ export default [{
   icon: 'file-image',
 }, {
   method: 'chatgpt',
-  title: 'ChatGPT',
+  title: 'AI内容生成',
   icon: 'chat-gpt',
 }];
