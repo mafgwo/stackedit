@@ -64,8 +64,126 @@
             transform: translateY(50px);
             height: 100vh;
 		}
+
+        .share-content img {
+            cursor: zoom-in;
+        }
+
+        .share-code-block {
+            position: relative;
+        }
+
+        .share-code-block:hover > .share-code-copy-button,
+        .share-code-block:focus-within > .share-code-copy-button {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .share-code-copy-button {
+            position: absolute;
+            top: 6px;
+            right: 6px;
+            width: 30px;
+            height: 30px;
+            padding: 5px;
+            border: 0;
+            border-radius: 4px;
+            opacity: 0;
+            pointer-events: none;
+            color: rgba(0, 0, 0, 0.55);
+            background: rgba(255, 255, 255, 0.88);
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.14);
+            transition: opacity 120ms ease;
+            cursor: pointer;
+        }
+
+        .share-code-copy-button:hover,
+        .share-code-copy-button:focus {
+            color: rgba(0, 0, 0, 0.78);
+            background: #fff;
+        }
+
+        .app--dark .share-code-copy-button {
+            color: rgba(255, 255, 255, 0.74);
+            background: rgba(0, 0, 0, 0.58);
+        }
+
+        .app--dark .share-code-copy-button:hover,
+        .app--dark .share-code-copy-button:focus {
+            color: #fff;
+            background: rgba(0, 0, 0, 0.74);
+        }
+
+        .share-code-copy-button svg {
+            display: block;
+            width: 20px;
+            height: 20px;
+            fill: currentColor;
+            pointer-events: none;
+        }
+
+        .share-lightbox {
+            position: fixed;
+            inset: 0;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+            background: rgba(0, 0, 0, 0.82);
+            z-index: 100000;
+        }
+
+        .share-lightbox.is-open {
+            display: flex;
+        }
+
+        .share-lightbox__image {
+            max-width: min(96vw, 1600px);
+            max-height: 92vh;
+            object-fit: contain;
+            box-shadow: 0 16px 40px rgba(0, 0, 0, 0.35);
+        }
+
+        .share-lightbox__close {
+            position: absolute;
+            top: 18px;
+            right: 18px;
+            width: 40px;
+            height: 40px;
+            border: 0;
+            border-radius: 999px;
+            font-size: 26px;
+            line-height: 1;
+            color: #fff;
+            background: rgba(255, 255, 255, 0.16);
+            cursor: pointer;
+        }
+
+        .share-toast {
+            position: fixed;
+            left: 50%;
+            bottom: 24px;
+            transform: translateX(-50%) translateY(12px);
+            padding: 10px 14px;
+            border-radius: 999px;
+            color: #fff;
+            background: rgba(0, 0, 0, 0.78);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 120ms ease, transform 120ms ease;
+            z-index: 100001;
+        }
+
+        .share-toast.is-visible {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
 	</style>
     <script type="text/javascript">
+    var codeCopyButtonClass = 'share-code-copy-button';
+    var codeBlockClass = 'share-code-block';
+    var toastTimer = null;
+
     function getQueryString(name) {
         var reg = new RegExp('(^|&)' + name + '=([^&]*)(&|$)', 'i');
         var r = window.location.search.substr(1).match(reg);
@@ -83,6 +201,141 @@
         for (let i = 0; i < tags.length; i++) {
             targetParentEle.append(tags[i]);
         }
+    }
+
+    function ensureShareLightbox() {
+        var lightbox = document.getElementById('share_lightbox');
+        if (lightbox) {
+            return lightbox;
+        }
+        lightbox = document.createElement('div');
+        lightbox.id = 'share_lightbox';
+        lightbox.className = 'share-lightbox';
+        lightbox.innerHTML = '<button type="button" class="share-lightbox__close" aria-label="关闭图片预览">&times;</button><img class="share-lightbox__image" alt="" />';
+        lightbox.addEventListener('click', function (evt) {
+            if (evt.target === lightbox || evt.target.classList.contains('share-lightbox__close')) {
+                closeShareLightbox();
+            }
+        });
+        document.body.appendChild(lightbox);
+        return lightbox;
+    }
+
+    function openShareLightbox(src, alt) {
+        var lightbox = ensureShareLightbox();
+        var image = lightbox.querySelector('.share-lightbox__image');
+        image.src = src;
+        image.alt = alt || '';
+        lightbox.classList.add('is-open');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeShareLightbox() {
+        var lightbox = document.getElementById('share_lightbox');
+        if (!lightbox) {
+            return;
+        }
+        lightbox.classList.remove('is-open');
+        document.body.style.overflow = '';
+    }
+
+    function ensureToast() {
+        var toast = document.getElementById('share_toast');
+        if (toast) {
+            return toast;
+        }
+        toast = document.createElement('div');
+        toast.id = 'share_toast';
+        toast.className = 'share-toast';
+        document.body.appendChild(toast);
+        return toast;
+    }
+
+    function showToast(message) {
+        var toast = ensureToast();
+        toast.textContent = message;
+        toast.classList.add('is-visible');
+        if (toastTimer) {
+            window.clearTimeout(toastTimer);
+        }
+        toastTimer = window.setTimeout(function () {
+            toast.classList.remove('is-visible');
+        }, 1600);
+    }
+
+    async function copyText(text) {
+        if (navigator.clipboard && window.isSecureContext) {
+            await navigator.clipboard.writeText(text);
+            return;
+        }
+        var textarea = document.createElement('textarea');
+        textarea.value = text;
+        textarea.setAttribute('readonly', '');
+        textarea.style.position = 'fixed';
+        textarea.style.top = '-9999px';
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textarea);
+    }
+
+    function enhanceCodeBlocks(rootElt) {
+        rootElt.querySelectorAll('pre').forEach(function (preElt) {
+            if (
+                preElt.classList.contains(codeBlockClass)
+                || preElt.classList.contains('mermaid-diagram')
+                || preElt.classList.contains('mermaid-error')
+                || preElt.closest('.abcjs-container')
+            ) {
+                return;
+            }
+            preElt.classList.add(codeBlockClass);
+            var button = document.createElement('button');
+            button.type = 'button';
+            button.className = codeCopyButtonClass;
+            button.title = '复制代码';
+            button.setAttribute('aria-label', '复制代码');
+            button.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M 19,21L 8,21L 8,7L 19,7M 19,5L 8,5C 6.9,5 6,5.9 6,7L 6,21C 6,22.1 6.9,23 8,23L 19,23C 20.1,23 21,22.1 21,21L 21,7C 21,5.9 20.1,5 19,5 Z M 16,1L 4,1C 2.9,1 2,1.9 2,3L 2,17L 4,17L 4,3L 16,3L 16,1 Z"></path></svg>';
+            preElt.appendChild(button);
+        });
+    }
+
+    function bindShareInteractions(rootElt) {
+        enhanceCodeBlocks(rootElt);
+        rootElt.addEventListener('click', async function (evt) {
+            var target = evt.target;
+            var copyButton = target.closest('.' + codeCopyButtonClass);
+            if (copyButton && rootElt.contains(copyButton)) {
+                evt.preventDefault();
+                evt.stopPropagation();
+                var preElt = copyButton.closest('pre');
+                var codeElt = preElt && preElt.querySelector('code');
+                var text = codeElt ? codeElt.textContent : preElt && Array.from(preElt.childNodes)
+                    .filter(function (node) {
+                        return !(node.classList && node.classList.contains(codeCopyButtonClass));
+                    })
+                    .map(function (node) {
+                        return node.textContent;
+                    })
+                    .join('');
+                if (!text) {
+                    return;
+                }
+                try {
+                    await copyText(text);
+                    showToast('代码已复制到剪贴板');
+                } catch (err) {
+                    showToast('代码复制失败');
+                }
+                return;
+            }
+
+            var image = target.closest('img');
+            if (image && rootElt.contains(image)) {
+                evt.preventDefault();
+                openShareLightbox(image.currentSrc || image.src, image.alt || '');
+            }
+        });
     }
 
     window.onload = function() {
@@ -120,6 +373,7 @@
                 const shareContent = document.getElementsByClassName('share-content')[0];
                 shareContent.innerHTML = newdoc.body.innerHTML;
                 document.body.className = newdoc.body.className;
+                bindShareInteractions(shareContent);
             } else if (xhr.status === 403) {
                 const rateLimit = xhr.responseText && xhr.responseText.indexOf('Rate Limit') >= 0;
                 const appUri = `${window.location.protocol}//${window.location.host}/app`;
@@ -131,6 +385,12 @@
         };
         xhr.send();
      }
+
+    document.addEventListener('keydown', function (evt) {
+        if (evt.key === 'Escape') {
+            closeShareLightbox();
+        }
+    });
      </script>
 </head>
 <body>
