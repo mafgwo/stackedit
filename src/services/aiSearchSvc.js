@@ -46,13 +46,35 @@ const segmentSearchQuery = (text) => {
   return (query || source).slice(0, 120);
 };
 
+const buildSearchQueries = (text) => {
+  const source = (text || '').trim();
+  const segmented = segmentSearchQuery(source);
+  return [...new Set([
+    source.replace(/\s+/g, ' ').slice(0, 120),
+    segmented,
+  ].filter(Boolean))].slice(0, 2);
+};
+
+const truncateContent = (content = '') => content
+  .replace(/\s+/g, ' ')
+  .trim()
+  .slice(0, 1200);
+
 const normalizeResults = results => (results || [])
   .map((result, index) => ({
     title: result.title || result.name || `搜索结果 ${index + 1}`,
     url: result.url || result.link || '',
-    content: result.content || result.snippet || result.summary || result.raw_content || '',
+    content: truncateContent(result.content || result.snippet || result.summary || result.raw_content || ''),
   }))
   .filter(result => result.title || result.url || result.content);
+
+const dedupeResults = results => [...results.reduce((map, result) => {
+  const key = result.url || `${result.title}:${result.content.slice(0, 80)}`;
+  if (!map.has(key)) {
+    map.set(key, result);
+  }
+  return map;
+}, new Map()).values()];
 
 const parseSearchResponse = (data) => {
   if (Array.isArray(data)) {
@@ -70,9 +92,9 @@ const searchTavily = (config, query) => fetch(config.baseUrl, {
   body: JSON.stringify({
     query,
     max_results: config.maxResults,
-    search_depth: 'basic',
+    search_depth: config.searchDepth,
     include_answer: false,
-    include_raw_content: false,
+    include_raw_content: config.includeRawContent,
   }),
 }).then(async (response) => {
   if (!response.ok) {
@@ -112,7 +134,8 @@ export default {
   segmentSearchQuery,
   search(config, content) {
     const normalizedConfig = normalizeAiSearchConfig(config);
-    const query = segmentSearchQuery(content);
+    const queries = buildSearchQueries(content);
+    const [query = ''] = queries;
     if (!normalizedConfig.enabled) {
       return Promise.resolve({ query, results: [], context: '' });
     }
@@ -120,9 +143,10 @@ export default {
       throw new Error('启用联网功能必须配置搜索 API。');
     }
     const search = normalizedConfig.providerId === 'custom' ? searchCustom : searchTavily;
-    return search(normalizedConfig, query)
+    return Promise.all(queries.map(item => search(normalizedConfig, item)))
+      .then(resultGroups => dedupeResults([].concat(...resultGroups)).slice(0, normalizedConfig.maxResults))
       .then(results => ({
-        query,
+        query: queries.join(' / '),
         results,
         context: formatSearchContext(results),
       }));

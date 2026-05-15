@@ -849,14 +849,37 @@ commandProto.doLinkOrImage = function (chunk, postProcessing, isImage) {
 };
 
 commandProto.doChatGpt = function (chunk, postProcessing) {
-  var enteredCallback = function (content) {
-    if (content !== null) {
-      chunk.before = `${chunk.before}${content}`;
-      chunk.selection = '';
+  var originalSelection = chunk.selection;
+  var enteredCallback = function (value) {
+    if (value !== null) {
+      var result = typeof value === 'object' ? value : {
+        content: value,
+        insertMode: originalSelection ? 'replace' : 'cursor',
+      };
+      var content = result.content || '';
+      var insertMode = result.insertMode || (originalSelection ? 'replace' : 'cursor');
+
+      if (insertMode === 'replace') {
+        chunk.selection = content;
+      } else if (insertMode === 'afterSelection') {
+        chunk.selection = originalSelection + content;
+      } else if (insertMode === 'append') {
+        chunk.before = `${chunk.before}${originalSelection}`;
+        chunk.selection = '';
+        chunk.after = `${chunk.after.replace(/\s*$/, '')}\n\n${content}`;
+      } else {
+        chunk.before = `${chunk.before}${content}`;
+        chunk.selection = originalSelection;
+      }
     }
     postProcessing();
   };
-  this.hooks.insertChatGptDialog(enteredCallback);
+  this.hooks.insertChatGptDialog(enteredCallback, {
+    before: chunk.before,
+    selection: originalSelection,
+    after: chunk.after,
+  });
+  return true;
 };
 
 // When making a list, hitting shift-enter will put your cursor on the next line

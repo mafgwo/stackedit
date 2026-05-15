@@ -118,6 +118,11 @@ export const normalizeAiModelConfig = (config = {}) => {
     model,
     providerModels,
     availableModels: normalizedModels,
+    temperature: Number(config.temperature) >= 0 && Number(config.temperature) <= 2
+      ? Number(config.temperature)
+      : 0.7,
+    maxTokens: Number(config.maxTokens) > 0 ? Number(config.maxTokens) : 0,
+    systemPrompt: config.systemPrompt || '',
     search: normalizeAiSearchConfig(config.search),
   };
 };

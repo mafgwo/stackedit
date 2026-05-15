@@ -29,6 +29,8 @@ export const normalizeAiSearchConfig = (config = {}) => {
     baseUrl,
     apiKey: config.apiKey || '',
     maxResults: Number(config.maxResults) > 0 ? Math.min(Number(config.maxResults), 10) : 5,
+    searchDepth: config.searchDepth === 'advanced' ? 'advanced' : 'basic',
+    includeRawContent: !!config.includeRawContent,
   };
 };
 

@@ -35,9 +35,16 @@ const parseStreamChunk = (text, callback) => text.split('\n\n')
         try {
           const data = JSON.parse(item);
           const choice = data.choices && data.choices[0];
-          const content = choice && choice.delta && choice.delta.content;
+          const delta = choice && choice.delta;
+          const message = choice && choice.message;
+          const content = (delta && (delta.content || delta.reasoning_content))
+            || (message && message.content)
+            || choice.text;
           if (content) {
             callback({ content });
+          }
+          if (choice && choice.finish_reason) {
+            callback({ done: true });
           }
         } catch (e) {
           // Ignore malformed events and keep parsing later stream events.
@@ -78,12 +85,16 @@ export default {
     xhr.open('POST', url);
     xhr.setRequestHeader('Authorization', `Bearer ${normalizedConfig.apiKey}`);
     xhr.setRequestHeader('Content-Type', 'application/json');
-    xhr.send(JSON.stringify({
+    const payload = {
       model: normalizedConfig.model,
       messages: config.messages || [{ role: 'user', content: config.content }],
-      temperature: 1,
+      temperature: normalizedConfig.temperature,
       stream: true,
-    }));
+    };
+    if (normalizedConfig.maxTokens) {
+      payload.max_tokens = normalizedConfig.maxTokens;
+    }
+    xhr.send(JSON.stringify(payload));
     let lastRespLen = 0;
     let chunkBuffer = '';
     xhr.onprogress = () => {
@@ -96,6 +107,9 @@ export default {
         const error = parseErrorMessage(xhr, provider.name);
         store.dispatch('notification/error', error);
         callback({ error });
+      } else {
+        chunkBuffer = parseStreamChunk(`${chunkBuffer}\n\n`, callback);
+        callback({ done: true });
       }
     };
     xhr.onerror = () => {

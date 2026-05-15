@@ -35,6 +35,21 @@
           <span v-if="modelFetchError" class="config-warning">{{ modelFetchError }}</span>
         </div>
       </form-entry>
+      <form-entry label="生成随机性" error="temperature">
+        <input slot="field" class="textfield" type="number" min="0" max="2" step="0.1" v-model.number="temperature" @keydown.enter="resolve()">
+        <div class="form-entry__info">
+          0 更稳定，1 更发散。润色和技术文档建议 0.3-0.8，创意写作可提高。
+        </div>
+      </form-entry>
+      <form-entry label="最大输出 tokens" error="maxTokens">
+        <input slot="field" class="textfield" type="number" min="0" step="256" v-model.number="maxTokens" @keydown.enter="resolve()">
+        <div class="form-entry__info">
+          填 0 表示由模型服务默认控制。
+        </div>
+      </form-entry>
+      <form-entry label="默认系统提示词" error="systemPrompt">
+        <textarea slot="field" class="textfield system-prompt-input" v-model.trim="systemPrompt" placeholder="可选：例如固定文风、术语规范、输出语言要求等"></textarea>
+      </form-entry>
       <form-entry label="联网搜索" error="search">
         <label slot="field" class="ai-config-checkbox">
           <input type="checkbox" v-model="searchEnabled">
@@ -64,6 +79,18 @@
         </form-entry>
         <form-entry label="搜索结果数" error="searchMaxResults">
           <input slot="field" class="textfield" type="number" min="1" max="10" v-model.number="searchMaxResults" @keydown.enter="resolve()">
+        </form-entry>
+        <form-entry label="搜索深度" error="searchDepth">
+          <select slot="field" class="textfield" v-model="searchDepth">
+            <option value="basic">基础</option>
+            <option value="advanced">增强</option>
+          </select>
+        </form-entry>
+        <form-entry label="搜索正文摘要" error="includeRawContent">
+          <label slot="field" class="ai-config-checkbox">
+            <input type="checkbox" v-model="includeRawContent">
+            <span>尝试读取页面正文</span>
+          </label>
         </form-entry>
       </template>
     </div>
@@ -95,11 +122,16 @@ export default modalTemplate({
     providerModels: {},
     customModel: '',
     modelOptions: [],
+    temperature: 0.7,
+    maxTokens: 0,
+    systemPrompt: '',
     searchEnabled: false,
     searchProviderId: 'tavily',
     searchBaseUrl: '',
     searchApiKey: '',
     searchMaxResults: 5,
+    searchDepth: 'basic',
+    includeRawContent: false,
     loadingModels: false,
     modelFetchError: '',
   }),
@@ -175,6 +207,8 @@ export default modalTemplate({
         baseUrl: this.searchBaseUrl,
         apiKey: this.searchApiKey,
         maxResults: this.searchMaxResults,
+        searchDepth: this.searchDepth,
+        includeRawContent: this.includeRawContent,
       });
     },
     async refreshModels() {
@@ -213,6 +247,14 @@ export default modalTemplate({
         this.setError('model');
         return;
       }
+      if (Number(this.temperature) < 0 || Number(this.temperature) > 2) {
+        this.setError('temperature');
+        return;
+      }
+      if (Number(this.maxTokens) < 0) {
+        this.setError('maxTokens');
+        return;
+      }
       const searchConfig = this.getSearchConfig();
       if (searchConfig.enabled && !searchConfig.baseUrl) {
         this.setError('searchBaseUrl');
@@ -231,6 +273,9 @@ export default modalTemplate({
         model: this.resolvedModel,
         providerModels: this.providerModels,
         availableModels: this.modelOptions,
+        temperature: this.temperature,
+        maxTokens: this.maxTokens,
+        systemPrompt: this.systemPrompt,
         search: searchConfig,
       }));
     },
@@ -246,11 +291,16 @@ export default modalTemplate({
     this.providerModels = config.providerModels;
     this.customModel = '';
     this.modelOptions = config.availableModels;
+    this.temperature = config.temperature;
+    this.maxTokens = config.maxTokens;
+    this.systemPrompt = config.systemPrompt;
     this.searchEnabled = config.search.enabled;
     this.searchProviderId = config.search.providerId;
     this.searchBaseUrl = config.search.baseUrl;
     this.searchApiKey = config.search.apiKey;
     this.searchMaxResults = config.search.maxResults;
+    this.searchDepth = config.search.searchDepth;
+    this.includeRawContent = config.search.includeRawContent;
   },
 });
 </script>
@@ -263,6 +313,12 @@ export default modalTemplate({
 
   .model-custom-input {
     margin-top: 8px;
+  }
+
+  .system-prompt-input {
+    min-height: 84px;
+    padding-top: 8px;
+    padding-bottom: 8px;
   }
 
   .ai-config-checkbox {

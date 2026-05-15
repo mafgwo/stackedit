@@ -598,10 +598,11 @@ const editorSvc = Object.assign(mitt() , editorSvcDiscussions, editorSvcUtils, {
       });
       return true;
     });
-    this.pagedownEditor.hooks.set('insertChatGptDialog', (callback) => {
+    this.pagedownEditor.hooks.set('insertChatGptDialog', (callback, editorContext = {}) => {
       store.dispatch('modal/open', {
         type: 'chatGpt',
         callback,
+        editorContext,
       });
       return true;
     });
