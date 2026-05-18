@@ -140,7 +140,7 @@ export default defineConfig({
           'static/mstile-*.png',
           'static/yandex-browser-*.png',
         ],
-        navigateFallback: null,
+        navigateFallback: '/app',
         ...appShellEntries(),
         maximumFileSizeToCacheInBytes: 3 * 1024 * 1024 // 设置为 3 MiB
       },
