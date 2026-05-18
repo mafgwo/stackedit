@@ -134,9 +134,9 @@ export default {
 
 <style lang="scss">
 .image-lightbox {
-  position: absolute;
+  position: fixed;
   inset: 0;
-  z-index: 20;
+  z-index: 1000;
   padding: 32px;
   background: rgba(0, 0, 0, 0.82);
 }

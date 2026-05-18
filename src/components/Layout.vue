@@ -13,7 +13,7 @@
             <div class="gutter" :style="{left: styles.editorGutterLeft + 'px'}">
               <div class="gutter__background" v-if="styles.editorGutterWidth" :style="{width: styles.editorGutterWidth + 'px'}"></div>
             </div>
-            <editor></editor>
+            <editor @open-image="openZoomedImage"></editor>
             <editor-in-page-buttons v-if="editorShowInPageButtons"></editor-in-page-buttons>
             <div class="gutter" :style="{left: styles.editorGutterLeft + 'px'}">
               <sticky-comment v-if="styles.editorGutterWidth && stickyComment === 'top'"></sticky-comment>
@@ -27,7 +27,7 @@
             <div class="gutter" :style="{left: styles.previewGutterLeft + 'px'}">
               <div class="gutter__background" v-if="styles.previewGutterWidth" :style="{width: styles.previewGutterWidth + 'px'}"></div>
             </div>
-            <preview></preview>
+            <preview @open-image="openZoomedImage"></preview>
             <preview-in-page-buttons></preview-in-page-buttons>
             <div class="gutter" :style="{left: styles.previewGutterLeft + 'px'}">
               <sticky-comment v-if="styles.previewGutterWidth && stickyComment === 'top'"></sticky-comment>
@@ -47,6 +47,7 @@
       </div>
     </div>
     <tour v-if="!light && !layoutSettings.welcomeTourFinished"></tour>
+    <image-lightbox :image="zoomedImage" @close="closeZoomedImage"></image-lightbox>
   </div>
 </template>
 
@@ -65,6 +66,7 @@ import PreviewInPageButtons from './PreviewInPageButtons';
 import StickyComment from './gutters/StickyComment';
 import CurrentDiscussion from './gutters/CurrentDiscussion';
 import FindReplace from './FindReplace';
+import ImageLightbox from './ImageLightbox';
 import editorSvc from '../services/editorSvc';
 import markdownConversionSvc from '../services/markdownConversionSvc';
 import store from '../store';
@@ -84,7 +86,11 @@ export default {
     StickyComment,
     CurrentDiscussion,
     FindReplace,
+    ImageLightbox,
   },
+  data: () => ({
+    zoomedImage: null,
+  }),
   computed: {
     ...mapState([
       'light',
@@ -119,6 +125,12 @@ export default {
     ...mapActions('layout', [
       'updateBodySize',
     ]),
+    closeZoomedImage() {
+      this.zoomedImage = null;
+    },
+    openZoomedImage(image) {
+      this.zoomedImage = image;
+    },
     saveSelection: () => editorSvc.saveSelection(true),
   },
   created() {
@@ -144,6 +156,10 @@ export default {
     };
     setTimeout(focus, 100);
     this.$watch(() => this.styles.showEditor, focus);
+    this.$watch(
+      () => store.getters['file/current'].id,
+      () => this.closeZoomedImage(),
+    );
   },
   destroyed() {
     window.removeEventListener('resize', this.updateStyle);

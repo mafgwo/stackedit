@@ -1,4 +1,3 @@
-import MD5 from 'crypto-js/md5';
 import FileSaver from 'file-saver';
 import localDbSvc from './localDbSvc';
 import markdownConversionSvc from './markdownConversionSvc';
@@ -7,6 +6,7 @@ import utils from './utils';
 import store from '../store';
 import htmlSanitizer from '../libs/htmlSanitizer';
 import TemplateWorker from './templateWorker.js?worker';
+import workspaceImageSvc from './workspaceImageSvc';
 
 function groupHeadings(headings, level = 1) {
   const result = [];
@@ -34,24 +34,6 @@ function groupHeadings(headings, level = 1) {
   pushCurrentItem();
   return result;
 }
-
-const getImgBase64 = async (uri) => {
-  if (uri.indexOf('http://') !== 0 && uri.indexOf('https://') !== 0) {
-    const currDirNode = store.getters['explorer/selectedNodeFolder'];
-    const absoluteImgPath = utils.getAbsoluteFilePath(currDirNode, uri);
-    const md5Id = MD5(absoluteImgPath).toString();
-    const imgItem = await localDbSvc.getImgItem(md5Id);
-    if (imgItem) {
-      const potIdx = uri.lastIndexOf('.');
-      const suffix = potIdx > -1 ? uri.substring(potIdx + 1) : 'png';
-      const mime = `image/${suffix}`;
-      return `data:${mime};base64,${imgItem.content}`;
-    }
-    return '';
-  }
-  return uri;
-};
-
 
 const containerElt = document.createElement('div');
 containerElt.className = 'hidden-rendering-container';
@@ -94,7 +76,7 @@ export default {
     // 替换相对路径图片为blob图片
     const imgs = Array.prototype.slice.call(containerElt.getElementsByTagName('img')).map((imgElt) => {
       let uri = imgElt.attributes && imgElt.attributes.src && imgElt.attributes.src.nodeValue;
-      if (uri && uri.indexOf('http://') !== 0 && uri.indexOf('https://') !== 0) {
+      if (workspaceImageSvc.isWorkspaceLocalUri(uri)) {
         uri = decodeURIComponent(uri);
         imgElt.removeAttribute('src');
         return { imgElt, uri };
@@ -103,7 +85,7 @@ export default {
     });
     const loadedPromises = imgs.map(it => new Promise((resolve, reject) => {
       if (!it.imgElt.src && it.uri) {
-        getImgBase64(it.uri).then((newUrl) => {
+        workspaceImageSvc.getDataUrl(it.uri).then((newUrl) => {
           it.imgElt.src = newUrl;
           resolve();
         }, () => reject(new Error('加载当前空间图片出错')));

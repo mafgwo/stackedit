@@ -5,7 +5,6 @@
       <comment-list v-if="styles.editorGutterWidth"></comment-list>
       <editor-new-discussion-button v-if="!isCurrentTemp"></editor-new-discussion-button>
     </div>
-    <image-lightbox :image="zoomedImage" @close="closeZoomedImage"></image-lightbox>
   </div>
 </template>
 
@@ -13,7 +12,6 @@
 import { mapGetters } from 'vuex';
 import CommentList from './gutters/CommentList';
 import EditorNewDiscussionButton from './gutters/EditorNewDiscussionButton';
-import ImageLightbox from './ImageLightbox';
 import store from '../store';
 import editorSvc from '../services/editorSvc';
 import imageSvc from '../services/imageSvc';
@@ -23,11 +21,7 @@ export default {
   components: {
     CommentList,
     EditorNewDiscussionButton,
-    ImageLightbox,
   },
-  data: () => ({
-    zoomedImage: null,
-  }),
   computed: {
     ...mapGetters('file', [
       'isCurrentTemp',
@@ -40,18 +34,27 @@ export default {
     ]),
   },
   methods: {
-    closeZoomedImage() {
-      this.zoomedImage = null;
-    },
     openZoomedImage(imgElt) {
       const src = imgElt.currentSrc || imgElt.src;
       if (!src) {
         return;
       }
-      this.zoomedImage = {
+      this.$emit('open-image', {
         src,
         alt: imgElt.alt || '',
-      };
+      });
+    },
+    findZoomableImage(elt, editorElt) {
+      while (elt && elt !== editorElt) {
+        if (elt.tagName === 'IMG' && editorElt.contains(elt)) {
+          return elt;
+        }
+        if (elt.classList && elt.classList.contains('img-wrapper')) {
+          return elt.querySelector('img');
+        }
+        elt = elt.parentNode;
+      }
+      return null;
     },
     async processUpload(items) {
       let file = null;
@@ -119,15 +122,11 @@ export default {
     editorElt.addEventListener('mouseover', onDiscussionEvt(classToggler(true)));
     editorElt.addEventListener('mouseout', onDiscussionEvt(classToggler(false)));
     editorElt.addEventListener('click', (evt) => {
-      let elt = evt.target;
-      while (elt && elt !== editorElt) {
-        if (elt.tagName === 'IMG' && editorElt.contains(elt)) {
-          evt.preventDefault();
-          evt.stopPropagation();
-          this.openZoomedImage(elt);
-          return;
-        }
-        elt = elt.parentNode;
+      const imgElt = this.findZoomableImage(evt.target, editorElt);
+      if (imgElt) {
+        evt.preventDefault();
+        evt.stopPropagation();
+        this.openZoomedImage(imgElt);
       }
     });
     editorElt.addEventListener('click', onDiscussionEvt((discussionId) => {
@@ -190,6 +189,7 @@ export default {
     display: none;
   }
 
+  .img-wrapper,
   img {
     cursor: zoom-in;
   }

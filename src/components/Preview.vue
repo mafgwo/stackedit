@@ -13,7 +13,6 @@
         <icon-pen></icon-pen>
       </button>
     </div>
-    <image-lightbox :image="zoomedImage" @close="closeZoomedImage"></image-lightbox>
   </div>
 </template>
 
@@ -22,7 +21,6 @@
 import { mapGetters, mapActions } from 'vuex';
 import CommentList from './gutters/CommentList';
 import PreviewNewDiscussionButton from './gutters/PreviewNewDiscussionButton';
-import ImageLightbox from './ImageLightbox';
 import store from '../store';
 import editorSvc from '../services/editorSvc';
 import { rerenderMermaidDiagrams } from '../extensions/mermaidExtension';
@@ -51,11 +49,9 @@ export default {
   components: {
     CommentList,
     PreviewNewDiscussionButton,
-    ImageLightbox,
   },
   data: () => ({
     previewTop: true,
-    zoomedImage: null,
     offPreviewCtx: null,
   }),
   computed: {
@@ -79,9 +75,6 @@ export default {
     ...mapActions('data', [
       'toggleEditor',
     ]),
-    closeZoomedImage() {
-      this.zoomedImage = null;
-    },
     enhanceCodeBlocks(rootElt) {
       rootElt.querySelectorAll('pre').forEach((preElt) => {
         if (
@@ -124,10 +117,10 @@ export default {
       if (!src) {
         return;
       }
-      this.zoomedImage = {
+      this.$emit('open-image', {
         src,
         alt: imgElt.alt || '',
-      };
+      });
     },
     onClick(evt) {
       let elt = evt.target;
