@@ -12,47 +12,19 @@ if (!indexedDB) {
   throw new Error('不支持您的浏览器，请升级到最新版本。');
 }
 
-registerSW({
-  onRegistered: (registration) => {
-    if (registration) {
-      // 监听 fetch 事件，动态判断路径
-      registration.addEventListener('fetch', (event) => {
-        const url = new URL(event.request.url);
-
-        // 如果路径不是 /app，直接跳过缓存
-        if (!url.pathname.startsWith('/app')) {
-          // 其他路径直接请求网络
-          event.respondWith(fetch(event.request));
-          return;
-        }
-
-        // 否则，返回缓存的 /app 内容
-        event.respondWith(
-          caches.match(event.request).then((response) => {
-            return response || fetch(event.request);
-          })
-        );
-      });
-      console.log('Service Worker 注册成功:', r);
-    }
-  },
-  onOfflineReady: () => {
-    // 离线就绪时的逻辑
-  },
+const updateServiceWorker = registerSW({
   onNeedRefresh: async () => {
     if (!store.state.light) {
       await localDbSvc.sync();
       localStorage.updated = true;
-      console.log('需要刷新页面以更新 Service Worker');
-      window.location.reload();
     }
-    console.log('需要刷新页面以更新 Service Worker');
+    updateServiceWorker();
   },
 });
 
 if (localStorage.updated) {
   store.dispatch('notification/info', 'StackEdit中文版刚刚更新了！');
-  setTimeout(() => localStorage.removeItem('updated'), 3000);
+  setTimeout(() => localStorage.removeItem('updated'), 2000);
 }
 
 if (!localStorage.installPrompted) {

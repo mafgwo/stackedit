@@ -6,6 +6,58 @@ import { visualizer } from 'rollup-plugin-visualizer';
 import { resolve } from 'path';
 import { createHash } from 'crypto';
 import vitePluginFaviconsInject from 'vite-plugin-favicons-inject';
+import { cpSync, mkdirSync, readFileSync, rmSync } from 'fs';
+
+const staticSourceDir = resolve(__dirname, 'static');
+const faviconSource = resolve(__dirname, 'src/assets/favicon.png');
+
+const stackeditStaticBundle = () => ({
+  name: 'stackedit-static-bundle',
+  closeBundle: {
+    sequential: true,
+    order: 'pre',
+    handler() {
+      const staticOutputDir = resolve(__dirname, 'dist/static');
+      const targets = ['landing', 'oauth2', 'themes', 'sitemap.xml'];
+
+      targets.forEach((target) => {
+        rmSync(resolve(staticOutputDir, target), { recursive: true, force: true });
+        cpSync(resolve(staticSourceDir, target), resolve(staticOutputDir, target), {
+          recursive: true,
+          force: true,
+        });
+      });
+
+      mkdirSync(staticOutputDir, { recursive: true });
+      cpSync(faviconSource, resolve(staticOutputDir, 'favicon.png'), { force: true });
+    },
+  },
+});
+
+const revisionForFile = (filePath) =>
+  createHash('md5').update(readFileSync(filePath)).digest('hex');
+
+const appShellEntries = () => ({
+  manifestTransforms: [
+    (entries) => ({
+      manifest: [
+        ...entries,
+        {
+          url: '/',
+          revision: revisionForFile(resolve(__dirname, 'dist/static/landing/index.html')),
+        },
+        {
+          url: '/app',
+          revision: revisionForFile(resolve(__dirname, 'dist/index.html')),
+        },
+        {
+          url: '/oauth2/callback',
+          revision: revisionForFile(resolve(__dirname, 'dist/static/oauth2/callback.html')),
+        },
+      ],
+    }),
+  ],
+});
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -52,27 +104,44 @@ export default defineConfig({
       appName: 'StackEdit中文版', // 应用名称
       appDescription: '笔记利器，在线Markdown编辑器。', // 应用描述
     }),
+    stackeditStaticBundle(),
     VitePWA({
       manifest: {
         name: 'StackEdit中文版', // 应用名称
+        short_name: 'StackEdit',
         description: '笔记利器，在线Markdown编辑器。', // 应用描述
         display: 'standalone', // 显示模式
         orientation: 'any', // 屏幕方向
         start_url: '/app', // 应用启动 URL
+        scope: '/',
         background_color: '#ffffff', // 背景颜色
+        theme_color: '#ffffff',
         crossorigin: 'use-credentials', // 跨域策略
         icons: [
           {
-            src: '/icons/favicon.png', // 图标路径
-            sizes: '512x512', // 图标尺寸
+            src: '/static/favicon.png', // 图标路径
+            sizes: '96x96 128x128 192x192 256x256 384x384 512x512', // 图标尺寸
             type: 'image/png', // 图标类型
             purpose: 'any maskable' // 图标用途
           }
         ]
       },
-      registerType: 'autoUpdate', // 自动更新 Service Worker
+      registerType: 'prompt',
+      useCredentials: true,
       workbox: {
+        globPatterns: ['**/*.{js,css,html,ico,png,svg,gif,json,webmanifest,woff,woff2,ttf}'],
+        globIgnores: [
+          '**/.*',
+          '**/*.map',
+          'index.html',
+          'static/oauth2/callback.html',
+          'static/fonts/KaTeX_*',
+          'static/apple-touch-*.png',
+          'static/mstile-*.png',
+          'static/yandex-browser-*.png',
+        ],
         navigateFallback: null,
+        ...appShellEntries(),
         maximumFileSizeToCacheInBytes: 3 * 1024 * 1024 // 设置为 3 MiB
       },
     }),

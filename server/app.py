@@ -12,8 +12,8 @@ config = Config()
 
 # 配置静态文件路径
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-STATIC_DIR = os.path.join(BASE_DIR, 'static')
 DIST_DIR = os.path.join(BASE_DIR, 'dist')
+DIST_STATIC_DIR = os.path.join(DIST_DIR, 'static')
 PRISM_COMPONENTS_DIR = os.path.join(BASE_DIR, 'node_modules', 'prismjs', 'components')
 
 LISTENING_PORT = int(os.getenv('LISTENING_PORT', '8080'))
@@ -80,19 +80,19 @@ def gitee_client_id():
 # 静态文件服务
 @app.route('/')
 def landing():
-    return send_from_directory(os.path.join(STATIC_DIR, 'landing'), 'index.html')
+    return send_from_directory(os.path.join(DIST_STATIC_DIR, 'landing'), 'index.html')
 
 @app.route('/privacy_policy.html')
 def privacy_policy():
-    return send_from_directory(os.path.join(STATIC_DIR, 'landing'), 'privacy_policy.html')
+    return send_from_directory(os.path.join(DIST_STATIC_DIR, 'landing'), 'privacy_policy.html')
 
 @app.route('/sitemap.xml')
 def sitemap():
-    return send_from_directory(STATIC_DIR, 'sitemap.xml')
+    return send_from_directory(DIST_STATIC_DIR, 'sitemap.xml')
 
 @app.route('/oauth2/callback')
 def oauth2_callback():
-    return send_from_directory(os.path.join(STATIC_DIR, 'oauth2'), 'callback.html')
+    return send_from_directory(os.path.join(DIST_STATIC_DIR, 'oauth2'), 'callback.html')
 
 @app.route('/googleDriveAction')
 def google_drive_action():
@@ -101,7 +101,7 @@ def google_drive_action():
 
 @app.route('/themes/<path:filename>')
 def themes(filename):
-    return send_from_directory(os.path.join(STATIC_DIR, 'themes'), filename)
+    return send_from_directory(os.path.join(DIST_STATIC_DIR, 'themes'), filename, max_age=31536000)
 
 @app.route('/prism-components/<path:filename>')
 def prism_components(filename):
@@ -113,11 +113,11 @@ def style_css():
 
 @app.route('/share.html')
 def share():
-    return send_from_directory(os.path.join(STATIC_DIR, 'landing'), 'share.html')
+    return send_from_directory(os.path.join(DIST_STATIC_DIR, 'landing'), 'share.html')
 
 @app.route('/gistshare.html')
 def gistshare():
-    return send_from_directory(os.path.join(STATIC_DIR, 'landing'), 'gistshare.html')
+    return send_from_directory(os.path.join(DIST_STATIC_DIR, 'landing'), 'gistshare.html')
 
 # 生产环境下的静态文件服务
 @app.route('/app')
@@ -126,11 +126,11 @@ def app_index():
 
 @app.route('/static/landing/<path:fallback>')
 def static_landing_files(fallback):
-    return send_from_directory(os.path.join(STATIC_DIR, 'landing'), fallback, max_age=86400)
+    return send_from_directory(os.path.join(DIST_STATIC_DIR, 'landing'), fallback, max_age=86400)
 
 @app.route('/static/<path:fallback>')
 def static_files(fallback):
-    return send_from_directory(os.path.join(DIST_DIR, 'static'), fallback, max_age=31536000)
+    return send_from_directory(DIST_STATIC_DIR, fallback, max_age=31536000)
 
 @app.route('/<path:fallback>')
 def dist_files(fallback):
