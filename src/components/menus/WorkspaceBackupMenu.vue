@@ -21,7 +21,7 @@ import FileSaver from 'file-saver';
 import MenuEntry from './common/MenuEntry';
 import store from '../../store';
 import backupSvc from '../../services/backupSvc';
-import localDbSvc from '../../services/localDbSvc';
+import workspaceBackupSvc from '../../services/workspaceBackupSvc';
 
 export default {
   components: {
@@ -31,33 +31,49 @@ export default {
     workspaceId: () => store.getters['workspace/currentWorkspace'].id,
   },
   methods: {
-    onImportBackup(evt) {
+    async onImportBackup(evt) {
       const file = evt.target.files[0];
       if (file) {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          const text = e.target.result;
-          if (text.match(/\uFFFD/)) {
-            store.dispatch('notification/error', 'File is not readable.');
+        try {
+          if (file.name.toLowerCase().endsWith('.zip') || file.type === 'application/zip') {
+            const result = await workspaceBackupSvc.importZip(file);
+            await backupSvc.importBackup(result.workspaceJson);
+            if (result.missingImageFileCount) {
+              store.dispatch('notification/error', `有 ${result.missingImageFileCount} 张图片文件在ZIP中缺失。`);
+            } else if (result.importedImageCount) {
+              store.dispatch('notification/info', `已导入 ${result.importedImageCount} 张文档空间图片。`);
+            }
           } else {
-            backupSvc.importBackup(text);
+            const text = await file.text();
+            if (text.match(/\uFFFD/)) {
+              store.dispatch('notification/error', 'File is not readable.');
+            } else {
+              await backupSvc.importBackup(text);
+            }
           }
-        };
-        const blob = file.slice(0, 10000000);
-        reader.readAsText(blob);
+        } catch (err) {
+          store.dispatch('notification/error', err.message || `${err}`);
+        } finally {
+          evt.target.value = '';
+        }
       }
     },
-    exportWorkspace() {
-      const allItemsById = {};
-      localDbSvc.getWorkspaceItems(this.workspaceId, (item) => {
-        allItemsById[item.id] = item;
-      }, () => {
-        const backup = JSON.stringify(allItemsById);
-        const blob = new Blob([backup], {
-          type: 'text/plain;charset=utf-8',
+    async exportWorkspace() {
+      try {
+        const { includeImages } = await store.dispatch('modal/open', 'workspaceBackupExport');
+        const result = await workspaceBackupSvc.exportWorkspace({
+          workspaceId: this.workspaceId,
+          includeImages,
         });
-        FileSaver.saveAs(blob, 'StackEdit workspace.json');
-      });
+        FileSaver.saveAs(result.blob, result.filename);
+        if (result.missingCount) {
+          store.dispatch('notification/error', `有 ${result.missingCount} 张图片未能导出，详情见 missing-images.json。`);
+        }
+      } catch (err) {
+        if (err) {
+          store.dispatch('notification/error', err.message || `${err}`);
+        }
+      }
     },
   },
 };
