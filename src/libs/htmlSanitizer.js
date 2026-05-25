@@ -14,6 +14,8 @@ function sanitizeUri(uri, isImage) {
 }
 
 var buf;
+const unsafeStyleValueRegexp = /(?:expression\s*\(|url\s*\(|@import|javascript\s*:|vbscript\s*:|data\s*:|behavior\s*:|-moz-binding\s*:|\\|\/\*)/i;
+const validStylePropertyRegexp = /^-{0,2}[a-zA-Z_][\w-]*$/;
 
 /* jshint -W083 */
 
@@ -38,7 +40,7 @@ var START_TAG_REGEXP =
 
 // Safe Void Elements - HTML5
 // http://dev.w3.org/html5/spec/Overview.html#void-elements
-var voidElements = makeMap("area,br,col,hr,img,wbr");
+var voidElements = makeMap("area,br,col,hr,img,source,track,wbr");
 
 // Elements that you can, intentionally, leave open (and which close themselves)
 // http://dev.w3.org/html5/spec/Overview.html#optional-tags
@@ -53,8 +55,8 @@ var optionalEndTagBlockElements = makeMap("colgroup,dd,dt,li,p,tbody,td,tfoot,th
 var blockElements = {
   ...optionalEndTagBlockElements,
   ...makeMap("address,article," +
-  "aside,blockquote,caption,center,del,dir,div,dl,figure,figcaption,footer,h1,h2,h3,h4,h5," +
-  "h6,header,hgroup,hr,ins,map,menu,nav,ol,pre,script,section,table,ul")
+  "aside,audio,blockquote,caption,center,del,details,dir,div,dl,figure,figcaption,footer,h1,h2,h3,h4,h5," +
+  "h6,header,hgroup,hr,ins,map,menu,nav,ol,picture,pre,progress,script,section,style,summary,table,ul,video")
 };
 
 // benweet: Add iframe
@@ -64,8 +66,8 @@ blockElements.iframe = true;
 var inlineElements = {
   ...optionalEndTagInlineElements,
   ...makeMap("a,abbr,acronym,b," +
-    "bdi,bdo,big,br,cite,code,del,dfn,em,font,i,img,ins,kbd,label,map,mark,q,ruby,rp,rt,s," +
-    "samp,small,span,strike,strong,sub,sup,time,tt,u,var")
+    "bdi,bdo,big,br,canvas,cite,code,data,del,dfn,em,font,i,iframe,img,ins,kbd,label,map,mark,meter,q," +
+    "ruby,rp,rt,s,samp,small,span,strike,strong,sub,sup,time,tt,u,var")
 };
 
 // SVG Elements
@@ -88,13 +90,24 @@ var validElements = {
 };
 
 //Attributes that have href and hence need to be sanitized
-var uriAttrs = makeMap("background,cite,href,longdesc,src,usemap,xlink:href");
+var uriAttrs = makeMap("background,cite,href,longdesc,poster,src,usemap,xlink:href");
 
-var htmlAttrs = makeMap('abbr,align,alt,axis,bgcolor,border,cellpadding,cellspacing,class,clear,' +
-  'color,cols,colspan,compact,coords,dir,face,headers,height,hreflang,hspace,' +
-  'ismap,lang,language,nohref,nowrap,rel,rev,rows,rowspan,rules,' +
-  'scope,scrolling,shape,size,span,start,summary,tabindex,target,title,type,' +
-  'valign,value,vspace,width');
+var htmlAttrs = makeMap('abbr,align,alt,aria-activedescendant,aria-atomic,' +
+  'aria-autocomplete,aria-busy,aria-checked,aria-colcount,aria-colindex,aria-colspan,aria-controls,' +
+  'aria-current,aria-describedby,aria-description,aria-details,aria-disabled,aria-dropeffect,' +
+  'aria-errormessage,aria-expanded,aria-flowto,aria-grabbed,aria-haspopup,aria-hidden,aria-invalid,' +
+  'aria-keyshortcuts,aria-label,aria-labelledby,aria-level,aria-live,aria-modal,aria-multiline,' +
+  'aria-multiselectable,aria-orientation,aria-owns,aria-placeholder,aria-posinset,aria-pressed,' +
+  'aria-readonly,aria-relevant,aria-required,aria-roledescription,aria-rowcount,aria-rowindex,' +
+  'aria-rowspan,aria-selected,aria-setsize,aria-sort,aria-valuemax,aria-valuemin,aria-valuenow,' +
+  'aria-valuetext,async,autocomplete,autofocus,autoplay,axis,bgcolor,border,cellpadding,cellspacing,' +
+  'charset,checked,cite,class,clear,color,cols,colspan,compact,contenteditable,' +
+  'controls,coords,crossorigin,data,datetime,decoding,default,defer,dir,disabled,download,draggable,' +
+  'face,for,headers,height,hidden,high,href,hreflang,hspace,ismap,kind,label,lang,' +
+  'language,loading,loop,low,max,media,min,muted,nohref,nomodule,nowrap,open,optimum,playsinline,poster,preload,' +
+  'rel,required,rev,reversed,role,rows,rowspan,rules,sandbox,scope,scrolling,selected,shape,size,' +
+  'span,spellcheck,src,srclang,start,summary,tabindex,target,title,translate,type,' +
+  'usemap,valign,value,vspace,width,wrap');
 
 // SVG attributes (without "id" and "name" attributes)
 // https://wiki.whatwg.org/wiki/Sanitization_rules#svg_Attributes
@@ -123,6 +136,7 @@ var validAttrs = {
 // benweet: Add id and allowfullscreen (YouTube iframe)
 validAttrs.id = true;
 validAttrs.allowfullscreen = true;
+validAttrs.style = true;
 
 function makeMap(str, lowercaseKeys) {
   var obj = {},
@@ -345,6 +359,24 @@ function encodeEntities(value) {
     replace(/>/g, '&gt;');
 }
 
+function sanitizeStyle(style) {
+  return style
+    .split(';')
+    .map(declaration => declaration.trim())
+    .filter((declaration) => {
+      const colonIndex = declaration.indexOf(':');
+      if (colonIndex <= 0) {
+        return false;
+      }
+      const property = declaration.slice(0, colonIndex).trim();
+      const value = declaration.slice(colonIndex + 1).trim();
+      return validStylePropertyRegexp.test(property) &&
+        value !== '' &&
+        !unsafeStyleValueRegexp.test(value);
+    })
+    .join(';');
+}
+
 /**
  * create an HTML/XML writer which writes to buffer
  * @param {Array} buf use buf.jain('') to get out sanitized html string
@@ -371,7 +403,11 @@ function htmlSanitizeWriter(buf, uriValidator) {
           var value = attrs[key];
           var lkey = key && key.toLowerCase();
           var isImage = (tag === 'img' && lkey === 'src') || (lkey === 'background');
+          if (lkey === 'style') {
+            value = sanitizeStyle(value);
+          }
           if (validAttrs[lkey] === true &&
+            (lkey !== 'style' || value !== '') &&
             (uriAttrs[lkey] !== true || uriValidator(value, isImage))) {
             out(' ');
             out(key);
