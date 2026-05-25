@@ -2,16 +2,9 @@ import MD5 from 'crypto-js/md5';
 import localDbSvc from './localDbSvc';
 import utils from './utils';
 import store from '../store';
+import { getImageMime } from './imageTypeUtils';
 
 const isRemoteUri = uri => /^([a-z][a-z0-9+.-]*:|\/\/)/i.test(uri);
-
-const getMimeFromPath = (path) => {
-  const cleanPath = (path || '').split('?')[0].split('#')[0];
-  const dotIdx = cleanPath.lastIndexOf('.');
-  const suffix = dotIdx > -1 ? cleanPath.slice(dotIdx + 1).toLowerCase() : 'png';
-  const normalizedSuffix = suffix === 'jpg' ? 'jpeg' : suffix;
-  return `image/${normalizedSuffix || 'png'}`;
-};
 
 export default {
   isWorkspaceLocalUri(uri) {
@@ -29,6 +22,6 @@ export default {
     if (!imgItem || !imgItem.content) {
       return '';
     }
-    return `data:${getMimeFromPath(path)};base64,${imgItem.content}`;
+    return `data:${getImageMime(path)};base64,${imgItem.content}`;
   },
 };

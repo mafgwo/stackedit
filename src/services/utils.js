@@ -2,6 +2,7 @@ import yaml from 'js-yaml';
 import '../libs/clunderscore';
 import presets from '../data/presets';
 import constants from '../data/constants';
+import { getImageMime } from './imageTypeUtils';
 
 // For utils.uid()
 const uidLength = 16;
@@ -191,9 +192,7 @@ export default {
     });
   },
   base64ToBlob(dataurl, fileName) {
-    const potIdx = fileName.lastIndexOf('.');
-    const suffix = potIdx > -1 ? fileName.substring(potIdx + 1) : 'png';
-    const mime = `image/${suffix}`;
+    const mime = getImageMime(fileName);
     const bstr = atob(dataurl);
     let n = bstr.length;
     const u8arr = new Uint8Array(n);

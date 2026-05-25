@@ -6,6 +6,7 @@ import smmsHelper from '../services/providers/helpers/smmsHelper';
 import giteaHelper from '../services/providers/helpers/giteaHelper';
 import githubHelper from '../services/providers/helpers/githubHelper';
 import customHelper from '../services/providers/helpers/customHelper';
+import { getImageExt } from './imageTypeUtils';
 
 const getImagePath = (confPath, imgType) => {
   const time = new Date();
@@ -14,7 +15,7 @@ const getImagePath = (confPath, imgType) => {
   const year = time.getFullYear();
   const path = confPath.replace('{YYYY}', year).replace('{MM}', `0${month}`.slice(-2))
     .replace('{DD}', `0${date}`.slice(-2)).replace('{MDNAME}', store.getters['file/current'].name);
-  return `${path}${path.endsWith('/') ? '' : '/'}${utils.uid()}.${imgType.split('/')[1]}`;
+  return `${path}${path.endsWith('/') ? '' : '/'}${utils.uid()}.${getImageExt(imgType)}`;
 };
 
 export default {
@@ -32,7 +33,7 @@ export default {
       if (!store.getters['workspace/currentWorkspaceIsGit']) {
         return { error: '暂无已选择的图床！' };
       }
-      const path = getImagePath(currStorage.sub, imgFile.type);
+      const path = getImagePath(currStorage.sub, imgFile);
       // 保存到indexeddb
       const base64 = await utils.encodeFiletoBase64(imgFile);
       const currDirNode = store.getters['explorer/selectedNodeFolder'];
@@ -65,7 +66,7 @@ export default {
         return { error: '暂无已选择的图床！' };
       }
       const checkStorage = checkStorages[0];
-      const path = getImagePath(checkStorage.path, imgFile.type);
+      const path = getImagePath(checkStorage.path, imgFile);
       if (currStorage.provider === 'gitea') {
         const result = await giteaHelper.uploadFile({
           token,
